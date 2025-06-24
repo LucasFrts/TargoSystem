@@ -1,4 +1,4 @@
 package com.targosystem.varejo.estoque.domain.service;
 
-public class AlertaValidateProduto {
+public class AlertaValidadeProduto {
 }

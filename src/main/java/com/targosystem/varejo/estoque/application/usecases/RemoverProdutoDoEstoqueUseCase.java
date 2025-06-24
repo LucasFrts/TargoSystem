@@ -1,4 +1,4 @@
-package com.targosystem.varejo.estoque.application.usecase;
+package com.targosystem.varejo.estoque.application.usecases;
 
 public class RemoverProdutoDoEstoqueUseCase {
 }
