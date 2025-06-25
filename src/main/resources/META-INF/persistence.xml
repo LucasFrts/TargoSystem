@@ -5,6 +5,12 @@
 
     <persistence-unit name="targo_system_pu">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>com.targosystem.varejo.produtos.infra.persistence.entity.ProdutoJpaEntity</class>
+        <class>com.targosystem.varejo.seguranca.infra.persistence.entity.UsuarioJpaEntity</class>
+        <class>com.targosystem.varejo.seguranca.infra.persistence.entity.PapelJpaEntity</class>
+        <class>com.targosystem.varejo.promocoes.infra.persistence.entity.PromocaoJpaEntity</class>
+        <class>com.targosystem.varejo.promocoes.infra.persistence.entity.KitPromocionalJpaEntity</class>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/targo_system?useSSL=false&amp;serverTimezone=UTC"/>
