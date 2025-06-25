@@ -18,7 +18,7 @@ public class ProdutoCadastradoLoggerListener implements Consumer<ProdutoCadastra
     @Override
     public void accept(ProdutoCadastradoEvent event) {
         logger.info("ProdutoCadastradoLoggerListener: Evento recebido para Produto ID '{}', Nome: '{}' em {}.",
-                event.getProdutoId().getValue(), event.getNomeProduto(), event.getOcorreuEm());
+                event.getProdutoId(), event.getNomeProduto(), event.getOcorreuEm());
         // Aqui você adicionaria a lógica de negócio real que precisa reagir ao evento.
         // Por exemplo:
         // - Enviar um email de notificação para a equipe de marketing

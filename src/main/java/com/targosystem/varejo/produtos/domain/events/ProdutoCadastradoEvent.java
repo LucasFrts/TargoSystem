@@ -1,26 +1,31 @@
 // src/main/java/com/targosystem/varejo/produtos/domain/events/ProdutoCadastradoEvent.java
 package com.targosystem.varejo.produtos.domain.events;
 
-import com.targosystem.varejo.produtos.domain.model.ProdutoId;
+import com.targosystem.varejo.shared.domain.DomainEvent; // Importar DomainEvent
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * Evento de domínio que representa o cadastro de um novo produto.
- * Publicado após o produto ser persistido com sucesso.
+ * Evento de domínio que sinaliza que um novo produto foi cadastrado.
  */
-public class ProdutoCadastradoEvent {
-    private final ProdutoId produtoId;
-    private final String nomeProduto;
-    private final LocalDateTime ocorreuEm;
+public class ProdutoCadastradoEvent implements DomainEvent { // <--- Verificar esta linha crucial
 
-    public ProdutoCadastradoEvent(ProdutoId produtoId, String nomeProduto) {
-        this.produtoId = Objects.requireNonNull(produtoId, "ProdutoId cannot be null for ProdutoCadastradoEvent");
-        this.nomeProduto = Objects.requireNonNull(nomeProduto, "NomeProduto cannot be null for ProdutoCadastradoEvent");
-        this.ocorreuEm = LocalDateTime.now();
+    private final String produtoId;
+    private final String nomeProduto;
+    private final LocalDateTime occurredOn;
+
+    public ProdutoCadastradoEvent(String produtoId, String nomeProduto) {
+        this.produtoId = Objects.requireNonNull(produtoId, "Product ID cannot be null");
+        this.nomeProduto = Objects.requireNonNull(nomeProduto, "Product name cannot be null");
+        this.occurredOn = LocalDateTime.now();
     }
 
-    public ProdutoId getProdutoId() {
+    @Override
+    public LocalDateTime getOcorreuEm() { // Certifique-se de que o nome é o mesmo da interface
+        return occurredOn; // Retorna o valor que você já está armazenando
+    }
+
+    public String getProdutoId() {
         return produtoId;
     }
 
@@ -28,29 +33,16 @@ public class ProdutoCadastradoEvent {
         return nomeProduto;
     }
 
-    public LocalDateTime getOcorreuEm() {
-        return ocorreuEm;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProdutoCadastradoEvent that = (ProdutoCadastradoEvent) o;
-        return produtoId.equals(that.produtoId) && nomeProduto.equals(that.nomeProduto) && ocorreuEm.equals(that.ocorreuEm);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(produtoId, nomeProduto, ocorreuEm);
+    public LocalDateTime getOccurredOn() {
+        return occurredOn;
     }
 
     @Override
     public String toString() {
         return "ProdutoCadastradoEvent{" +
-                "produtoId=" + produtoId +
+                "produtoId='" + produtoId + '\'' +
                 ", nomeProduto='" + nomeProduto + '\'' +
-                ", ocorreuEm=" + ocorreuEm +
+                ", occurredOn=" + occurredOn +
                 '}';
     }
 }

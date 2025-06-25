@@ -91,7 +91,7 @@ public class ProdutoController {
         }
     }
 
-    private void listarProdutos() {
+    public void listarProdutos() {
         try {
             List<ProdutoOutput> produtos = produtoService.listarTodosProdutos();
             produtoPanel.exibirProdutos(produtos); // Método na view para exibir a lista

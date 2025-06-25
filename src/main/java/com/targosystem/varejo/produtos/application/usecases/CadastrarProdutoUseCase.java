@@ -63,7 +63,7 @@ public class CadastrarProdutoUseCase {
         Produto produtoSalvo = produtoRepository.save(novoProduto);
 
         // 6. Publicar evento de domínio (se houver, por exemplo, ProdutoCadastradoEvent)
-        eventPublisher.publish(new ProdutoCadastradoEvent(produtoSalvo.getId(), produtoSalvo.getNome()));
+        eventPublisher.publish(new ProdutoCadastradoEvent(produtoSalvo.getId().getValue(), produtoSalvo.getNome()));
 
         // 7. Retornar DTO de saída
         return ProdutoOutput.from(produtoSalvo);
