@@ -17,6 +17,10 @@ public class Promocao {
     private String kitPromocionalId;
     private boolean ativa;
 
+    public Promocao(String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        this(nome, tipoDesconto, valorDesconto, dataInicio, dataFim, null);
+    }
+    
     // Construtor principal para criar novas promoções no domínio
     public Promocao(String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto, LocalDateTime dataInicio, LocalDateTime dataFim, String kitPromocionalId) {
         this.id = UUID.randomUUID().toString(); // Gerado no domínio
@@ -43,10 +47,6 @@ public class Promocao {
         this.kitPromocionalId = kitPromocionalId;
         validarDatas(); // As validações ainda pertencem ao domínio
         validarValorDesconto();
-    }
-
-    public Promocao(String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto, LocalDateTime dataInicio, LocalDateTime dataFim) {
-        this(nome, tipoDesconto, valorDesconto, dataInicio, dataFim, null);
     }
 
 

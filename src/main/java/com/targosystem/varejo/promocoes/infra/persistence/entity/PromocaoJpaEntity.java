@@ -32,6 +32,9 @@ public class PromocaoJpaEntity {
     @Column(nullable = false)
     private boolean ativa;
 
+    @Column(name = "kit_promocional_id") // NOVO CAMPO: Pode ser nulo se a promoção não for de kit
+    private String kitPromocionalId;
+
     // Construtor padrão JPA
     protected PromocaoJpaEntity() {}
 
@@ -46,6 +49,17 @@ public class PromocaoJpaEntity {
         this.ativa = ativa;
     }
 
+    public PromocaoJpaEntity(String id, String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto, LocalDateTime dataInicio, LocalDateTime dataFim, boolean ativa, String kitPromocionalId) {
+        this.id = id;
+        this.nome = nome;
+        this.tipoDesconto = tipoDesconto;
+        this.valorDesconto = valorDesconto;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+        this.ativa = ativa;
+        this.kitPromocionalId = kitPromocionalId; // Atribui o novo campo
+    }
+
     // Métodos de conversão
     public static PromocaoJpaEntity fromDomain(Promocao promocao) {
         return new PromocaoJpaEntity(
@@ -55,7 +69,8 @@ public class PromocaoJpaEntity {
                 promocao.getValorDesconto(),
                 promocao.getDataInicio(),
                 promocao.getDataFim(),
-                promocao.isAtiva()
+                promocao.isAtiva(),
+                promocao.getKitPromocionalId()
         );
     }
 
@@ -67,7 +82,8 @@ public class PromocaoJpaEntity {
                 this.valorDesconto,
                 this.dataInicio,
                 this.dataFim,
-                this.ativa
+                this.ativa,
+                this.kitPromocionalId // Inclui o novo campo
         );
     }
 
@@ -79,6 +95,7 @@ public class PromocaoJpaEntity {
     public LocalDateTime getDataInicio() { return dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public boolean isAtiva() { return ativa; }
+    public String getKitPromocionalId() { return kitPromocionalId; }
 
     // Setters (necessários para que o JPA possa carregar e atualizar a entidade)
     public void setId(String id) { this.id = id; }
@@ -88,4 +105,5 @@ public class PromocaoJpaEntity {
     public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
     public void setDataFim(LocalDateTime dataFim) { this.dataFim = dataFim; }
     public void setAtiva(boolean ativa) { this.ativa = ativa; }
+    public void setKitPromocionalId(String kitPromocionalId) { this.kitPromocionalId = kitPromocionalId; }
 }
