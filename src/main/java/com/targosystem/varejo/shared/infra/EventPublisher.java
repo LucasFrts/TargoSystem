@@ -1,4 +1,5 @@
 package com.targosystem.varejo.shared.infra;
 
-public class EventPublisher {
+public interface EventPublisher {
+    void publish(Object event);
 }
