@@ -12,7 +12,7 @@ public record ItemVendaId(String value) implements ValueObject {
             throw new DomainException("ID do item de venda não pode ser nulo ou vazio.");
         }
         try {
-            UUID.fromString(value); // Assumindo que o ID é um UUID
+            UUID.fromString(value); 
         } catch (IllegalArgumentException e) {
             throw new DomainException("Formato de ID de item de venda inválido: " + value, e);
         }

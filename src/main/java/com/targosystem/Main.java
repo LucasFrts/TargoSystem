@@ -8,6 +8,7 @@ import com.targosystem.varejo.fornecedores.application.query.ConsultarFornecedor
 import com.targosystem.varejo.fornecedores.application.query.ConsultarFornecedorPorIdQuery;
 import com.targosystem.varejo.produtos.application.ProdutoService;
 import com.targosystem.varejo.produtos.application.query.ConsultarPrecoProdutoQuery;
+import com.targosystem.varejo.produtos.application.query.ListarCategoriasQuery;
 import com.targosystem.varejo.produtos.application.query.ListarTodosProdutosQuery;
 import com.targosystem.varejo.produtos.application.query.ObterProdutoPorIdQuery;
 import com.targosystem.varejo.produtos.application.usecases.AtualizarProdutoUseCase;
@@ -127,12 +128,14 @@ public class Main {
         AtualizarProdutoUseCase atualizarProdutoUseCase = new AtualizarProdutoUseCase(produtoRepository, categoriaRepository, classificadorProduto);
         ObterProdutoPorIdQuery obterProdutoPorIdQuery = new ObterProdutoPorIdQuery(produtoRepository);
         ListarTodosProdutosQuery listarTodosProdutosQuery = new ListarTodosProdutosQuery(produtoRepository);
+        ListarCategoriasQuery listarCategoriasQuery = new ListarCategoriasQuery(categoriaRepository);
 
         ProdutoService produtoService = new ProdutoService(
                 cadastrarProdutoUseCase,
                 atualizarProdutoUseCase,
                 obterProdutoPorIdQuery,
-                listarTodosProdutosQuery
+                listarTodosProdutosQuery,
+                listarCategoriasQuery
         );
 
         // --- Configuração do Bounded Context de SEGURANÇA ---
@@ -183,10 +186,7 @@ public class Main {
 
         // --- Configuração do Bounded Context de ESTOQUE ---
         logger.info("Configuring 'Estoque' Bounded Context.");
-        EstoqueRepository estoqueRepository = new EstoqueDao(entityManager); // Assuming EstoqueDao exists
-        // Nota: Um serviço de estoque pode precisar de ProdutoRepository para buscar produtos,
-        // mas por simplicidade, para o exemplo, vamos apenas usar o EstoqueRepository.
-
+        EstoqueRepository estoqueRepository = new EstoqueDao(entityManager);
         RegistrarMovimentacaoEstoqueUseCase registrarMovimentacaoEstoqueUseCase = new RegistrarMovimentacaoEstoqueUseCase(estoqueRepository, eventPublisher);
         RegistrarEntradaEstoqueUseCase registrarEntradaEstoqueUseCase = new RegistrarEntradaEstoqueUseCase(estoqueRepository, eventPublisher);
         RegistrarSaidaEstoqueUseCase registrarSaidaEstoqueUseCase = new RegistrarSaidaEstoqueUseCase(estoqueRepository, eventPublisher);
@@ -215,9 +215,7 @@ public class Main {
                 listarTodosClientesQuery
         );
 
-        // --- Configuração do Bounded Context de FORNECEDORES (PENDENTE) ---
-        // TODO: Você precisará criar as DAOs, Repositórios e UseCases/Queries
-        // para Fornecedor e EntregaFornecedor.
+        // --- Configuração do Bounded Context de FORNECEDORES ---
         logger.info("Configuring 'Fornecedores' Bounded Context (Placeholder).");
         FornecedorRepository fornecedorRepository = new FornecedorDao(entityManager);
         EntregaFornecedorRepository entregaFornecedorRepository = new EntregaFornecedorDao(entityManager);
@@ -250,9 +248,7 @@ public class Main {
         );
 
 
-        // --- Configuração do Bounded Context de VENDAS (PENDENTE) ---
-        // TODO: Você precisará criar as DAOs, Repositórios e UseCases/Queries
-        // para Venda e Itens de Venda.
+        // --- Configuração do Bounded Context de VENDAS  ---
         logger.info("Configuring 'Vendas' Bounded Context (Placeholder).");
         EstoqueEventProducer estoqueEventProducer = new EstoqueEventProducer(eventPublisher);
         ConsultarPrecoProdutoQuery consultarPrecoProdutoQuery = new ConsultarPrecoProdutoQuery(produtoRepository);
@@ -285,13 +281,13 @@ public class Main {
                         promocaoService,
                         estoqueService,
                         clienteService,
-                        fornecedorService, // Adicionando FornecedorService
-                        vendaService // Adicionando VendaService
+                        fornecedorService,
+                        vendaService
                 );
 
                 mainFrame.setVisible(true);
 
-                // --- Simulação de Login (TEMPORÁRIA) ---
+                // --- Já entra logado ---
                 UsuarioOutput dummyUser = new UsuarioOutput(
                         "a1b2c3d4-e5f6-7890-1234-567890abcdef",
                         "admin",

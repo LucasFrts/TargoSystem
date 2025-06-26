@@ -11,8 +11,6 @@ public record CategoriaId(String value) implements ValueObject {
         if (value == null || value.trim().isEmpty()) {
             throw new DomainException("ID da categoria não pode ser nulo ou vazio.");
         }
-        // Valida se é um UUID válido, se essa for a intenção.
-        // Se não for UUID, remova esta validação.
         try {
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {

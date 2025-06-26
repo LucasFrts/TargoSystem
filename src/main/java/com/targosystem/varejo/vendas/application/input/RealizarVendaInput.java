@@ -9,10 +9,8 @@ public record RealizarVendaInput(
         List<ItemVendaInput> itens,
         BigDecimal valorDesconto
 ) {
-    // Definir o record ItemVendaInput dentro ou como um arquivo separado
     public record ItemVendaInput(
-            String idProduto, // ID do produto como String
+            String idProduto,
             int quantidade
-            // Remover nomeProduto, precoUnitario, etc. do input, eles serão buscados
     ) {}
 }

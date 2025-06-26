@@ -15,9 +15,9 @@ public class ItemVendaJpaEntity {
     @Id
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many ItemVendaJpaEntity to One VendaJpaEntity
-    @JoinColumn(name = "venda_id", nullable = false) // This specifies the foreign key column name
-    private VendaJpaEntity venda; // Reference to the parent VendaJpaEntity
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venda_id", nullable = false)
+    private VendaJpaEntity venda;
 
     @Column(name = "id_produto", nullable = false)
     private String idProduto;
@@ -48,9 +48,9 @@ public class ItemVendaJpaEntity {
 
     public static ItemVendaJpaEntity fromDomain(ItemVenda itemVenda, VendaJpaEntity vendaEntity) {
         return new ItemVendaJpaEntity(
-                itemVenda.getId().value(), // Assumindo que ItemVenda.getId() retorna um Value Object que tem .value()
+                itemVenda.getId().value(),
                 vendaEntity,
-                itemVenda.getIdProduto().value(), // Assumindo que ProdutoId.value() existe
+                itemVenda.getIdProduto().value(),
                 itemVenda.getNomeProduto(),
                 itemVenda.getQuantidade(),
                 itemVenda.getPrecoUnitario(),

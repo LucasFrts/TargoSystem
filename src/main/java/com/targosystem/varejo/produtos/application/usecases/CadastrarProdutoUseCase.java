@@ -9,18 +9,20 @@ import com.targosystem.varejo.produtos.domain.repository.CategoriaRepository;
 import com.targosystem.varejo.produtos.domain.repository.ProdutoRepository;
 import com.targosystem.varejo.produtos.domain.service.ClassificadorProduto;
 import com.targosystem.varejo.shared.domain.DomainException;
-import com.targosystem.varejo.shared.infra.EventPublisher; // Para eventos de domínio
+import com.targosystem.varejo.shared.infra.EventPublisher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 public class CadastrarProdutoUseCase {
 
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ClassificadorProduto classificadorProduto;
-    private final EventPublisher eventPublisher; // Para publicar eventos após o cadastro
+    private final EventPublisher eventPublisher;
     private final EntityManager entityManager;
 
     public CadastrarProdutoUseCase(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository, ClassificadorProduto classificadorProduto, EventPublisher eventPublisher, EntityManager entityManager) {
@@ -32,11 +34,14 @@ public class CadastrarProdutoUseCase {
     }
 
     public ProdutoOutput execute(CadastrarProdutoInput input) {
-        EntityTransaction transaction = null;
-        try{
+        EntityTransaction transaction = entityManager.getTransaction();
+        boolean newTransaction = false; // Flag para saber se esta Use Case iniciou a transação
 
-            transaction = entityManager.getTransaction();
-            transaction.begin();
+        try {
+            if (!transaction.isActive()) {
+                transaction.begin(); // Inicia a transação se não houver uma ativa
+                newTransaction = true;
+            }
 
             Objects.requireNonNull(input.nome(), "Product name cannot be null");
             Objects.requireNonNull(input.codigoBarras(), "Barcode cannot be null");
@@ -47,42 +52,43 @@ public class CadastrarProdutoUseCase {
             if (produtoRepository.existsByCodigoBarras(input.codigoBarras())) {
                 throw new DomainException("Product with barcode " + input.codigoBarras() + " already exists.");
             }
-            if (categoriaRepository.existsByName(input.nomeCategoria()) && input.descricaoCategoria() != null && !input.descricaoCategoria().isBlank()) {
-                // Regra: se a categoria já existe, a descrição não deve ser passada ou deve ser compatível.
-                // Para simplificar, estamos permitindo que a descrição seja "ignorada" se a categoria já existe.
-                // Uma regra mais forte poderia exigir que a descrição fosse nula ou igual à existente.
-            }
 
-            // 3. Obter ou criar categoria usando o serviço de domínio
             Categoria categoria = classificadorProduto.obterOuCriarCategoria(input.nomeCategoria(), input.descricaoCategoria());
-            if (categoria.getId() == null) { // Se a categoria foi "criada" (sem ID), ela precisa ser persistida
-                categoria = categoriaRepository.save(categoria); // Persiste a nova categoria
-            }
 
-            // 4. Criar o objeto de domínio Produto
             Produto novoProduto = new Produto(
                     input.nome(),
                     input.descricao(),
                     input.precoSugerido().getValue(),
                     input.codigoBarras(),
-                    categoria,
+                    categoria, // **Esta é a instância de Categoria que deve ser gerenciada pelo EM**
                     input.marca()
             );
 
-            // 5. Persistir o produto
+            // 5. Persistir o produto.
+            // Assumimos que produtoRepository.save() vai lidar corretamente com a entidade
+            // Produto e sua associação com Categoria (já gerenciada).
             Produto produtoSalvo = produtoRepository.save(novoProduto);
-            transaction.commit();
-            // 6. Publicar evento de domínio (se houver, por exemplo, ProdutoCadastradoEvent)
+
+            if (newTransaction) {
+                transaction.commit(); // Confirma a transação se foi iniciada por este Use Case
+            }
+
+            // 6. Publicar evento de domínio
             eventPublisher.publish(new ProdutoCadastradoEvent(produtoSalvo.getId().getValue(), produtoSalvo.getNome()));
 
             // 7. Retornar DTO de saída
             return ProdutoOutput.from(produtoSalvo);
-        }
-        catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
+        } catch (DomainException e) {
+            if (transaction != null && transaction.isActive() && newTransaction) { // Só faz rollback se esta transação foi iniciada aqui
                 transaction.rollback();
             }
             throw e;
+        } catch (RuntimeException e) {
+            if (transaction != null && transaction.isActive() && newTransaction) { // Só faz rollback se esta transação foi iniciada aqui
+                transaction.rollback();
+            }
+            e.printStackTrace(); // Para depuração
+            throw new DomainException("Erro ao cadastrar produto: " + e.getMessage(), e);
         }
     }
 }

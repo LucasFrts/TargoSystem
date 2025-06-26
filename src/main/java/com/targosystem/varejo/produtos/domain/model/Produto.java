@@ -11,10 +11,10 @@ public class Produto implements AggregateRoot {
     private ProdutoId id;
     private String nome;
     private String descricao;
-    private BigDecimal precoVenda; // É o precoSugerido do input? Ou o preço de venda final?
+    private BigDecimal precoVenda;
     private String codigoBarras;
-    private Categoria categoria; // Adicionado Categoria como campo
-    private String marca; // Adicionado Marca como campo
+    private Categoria categoria;
+    private String marca;
     private String status;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
@@ -96,7 +96,7 @@ public class Produto implements AggregateRoot {
     }
 
     public void setMarca(String marca) { // Setter para Marca
-        this.marca = marca; // Marca pode ser nula/vazia dependendo da regra de negócio
+        this.marca = marca;
         this.dataAtualizacao = LocalDateTime.now();
     }
 
@@ -128,7 +128,6 @@ public class Produto implements AggregateRoot {
             String marca,
             BigDecimal precoSugerido // Mapeado para precoVenda
     ) {
-        // Delega para os setters, que já contêm as validações de domínio
         setNome(nome);
         setDescricao(descricao);
         setCodigoBarras(codigoBarras);

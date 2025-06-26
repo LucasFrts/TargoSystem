@@ -5,8 +5,6 @@ import com.targosystem.varejo.shared.domain.DomainException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-// Não vamos adicionar lista de EntregaFornecedor diretamente aqui para manter o agregado pequeno.
-// Entregas serão gerenciadas por um outro Use Case/Repositório, mas referenciarão o FornecedorId.
 
 public class Fornecedor implements AggregateRoot {
 
@@ -44,7 +42,6 @@ public class Fornecedor implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
-    // Construtor para reconstruir o Fornecedor a partir da persistência
     public Fornecedor(FornecedorId id, String nome, String cnpj, Contato contato, Endereco endereco, boolean ativo, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
         this.id = Objects.requireNonNull(id, "ID do fornecedor não pode ser nulo.");
         this.nome = Objects.requireNonNull(nome, "Nome do fornecedor não pode ser nulo.");

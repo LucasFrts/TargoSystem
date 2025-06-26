@@ -24,7 +24,7 @@ public class EstoqueEventProducer {
     }
 
     public void sendEstoqueBaixaEvent(String idVenda, List<ProdutoParaEstoqueInfo> produtosParaBaixa) {
-        // Map the generic ProdutoParaEstoqueInfo to the specific ItemEstoque needed by SolicitacaoBaixaEstoqueEvent
+
         List<SolicitacaoBaixaEstoqueEvent.ItemEstoque> itensBaixa = produtosParaBaixa.stream()
                 .map(info -> new SolicitacaoBaixaEstoqueEvent.ItemEstoque(info.idProduto(), info.quantidade()))
                 .collect(Collectors.toList());
@@ -35,7 +35,7 @@ public class EstoqueEventProducer {
     }
 
     public void sendEstoqueReposicaoEvent(String idVenda, List<ProdutoParaEstoqueInfo> produtosParaReposicao) {
-        // Map the generic ProdutoParaEstoqueInfo to the specific ItemEstoque needed by SolicitacaoReposicaoEstoqueEvent
+
         List<SolicitacaoReposicaoEstoqueEvent.ItemEstoque> itensReposicao = produtosParaReposicao.stream()
                 .map(info -> new SolicitacaoReposicaoEstoqueEvent.ItemEstoque(info.idProduto(), info.quantidade()))
                 .collect(Collectors.toList());

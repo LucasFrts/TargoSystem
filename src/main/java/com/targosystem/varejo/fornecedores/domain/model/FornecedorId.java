@@ -12,7 +12,6 @@ public record FornecedorId(String value) implements ValueObject {
         if (value == null || value.trim().isEmpty()) {
             throw new DomainException("ID do fornecedor não pode ser nulo ou vazio.");
         }
-        // Opcional: Adicionar validação de formato UUID se todos os IDs forem UUIDs
         try {
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {

@@ -79,7 +79,6 @@ public class VendaFrame extends JPanel {
         vendasTableModel.setRowCount(0);
     }
 
-    // --- Diálogos para operações ---
 
     /**
      * Exibe um diálogo para realizar uma nova venda.
@@ -92,9 +91,9 @@ public class VendaFrame extends JPanel {
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
 
         JTextField txtIdCliente = new JTextField(20);
-        JTextField txtIdProduto = new JTextField(20); // Campo para o ID do produto
-        JTextField txtQuantidade = new JTextField(5);  // Campo para a quantidade do item
-        JTextField txtValorDesconto = new JTextField("0.00", 10); // Valor padrão 0.00 para desconto
+        JTextField txtIdProduto = new JTextField(20);
+        JTextField txtQuantidade = new JTextField(5);
+        JTextField txtValorDesconto = new JTextField("0.00", 10);
 
         panel.add(new JLabel("ID do Cliente:"));
         panel.add(txtIdCliente);
@@ -102,7 +101,7 @@ public class VendaFrame extends JPanel {
         panel.add(txtIdProduto);
         panel.add(new JLabel("Quantidade:"));
         panel.add(txtQuantidade);
-        panel.add(new JLabel("Valor Desconto (Venda):")); // Desconto aplicado na Venda, não no item
+        panel.add(new JLabel("Valor Desconto (Venda):"));
         panel.add(txtValorDesconto);
 
 

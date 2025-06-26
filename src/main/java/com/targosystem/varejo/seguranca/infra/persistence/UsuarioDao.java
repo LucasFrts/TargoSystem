@@ -58,7 +58,7 @@ public class UsuarioDao implements UsuarioRepository {
         } else {
             entityManager.merge(entity);
         }
-        return toDomain(entity); // Retorna a entidade de domínio atualizada
+        return toDomain(entity);
     }
 
     @Override
@@ -85,8 +85,7 @@ public class UsuarioDao implements UsuarioRepository {
         query.setParameter("email", email);
         return query.getSingleResult() > 0;
     }
-
-    // --- Mappers entre Domínio e JPA Entity ---
+    
     private Usuario toDomain(UsuarioJpaEntity entity) {
         if (entity == null) return null;
         Set<Papel> papeis = entity.getPapeis().stream()

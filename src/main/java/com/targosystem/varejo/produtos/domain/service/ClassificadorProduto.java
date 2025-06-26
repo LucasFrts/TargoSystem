@@ -25,16 +25,22 @@ public class ClassificadorProduto {
      * @throws DomainException Se o nome da categoria for inválido.
      */
     public Categoria obterOuCriarCategoria(String nomeCategoria, String descricaoCategoria) {
-        Objects.requireNonNull(nomeCategoria, "Category name cannot be null");
-        if (nomeCategoria.isBlank()) {
-            throw new DomainException("Category name cannot be empty");
-        }
+        Objects.requireNonNull(nomeCategoria, "Category name cannot be null for classification.");
 
-        Optional<Categoria> existingCategory = categoriaRepository.findByNome(nomeCategoria);
-        // Se não existe, cria e persiste (se o repositório suportar persistência aqui, ou no Use Case)
-        // Para manter o serviço de domínio puro, ele retorna a Categoria sem persistir,
-        // a persistência fica a cargo da camada de aplicação/Use Case.
-        return existingCategory.orElseGet(() -> new Categoria(nomeCategoria, descricaoCategoria));
+        Optional<Categoria> categoriaExistente = categoriaRepository.findByNome(nomeCategoria);
+
+        if (categoriaExistente.isPresent()) {
+            return categoriaExistente.get(); // Retorna a categoria existente (já gerenciada pelo EM se foi buscada na transação atual)
+        } else {
+            // Se a categoria não existe, cria uma nova
+            Categoria novaCategoria = new Categoria(
+                    nomeCategoria,
+                    descricaoCategoria // Pode ser null ou vazio se não fornecido
+            );
+            // Salva a nova categoria. O CategoriaDao.save() agora usa merge e garante
+            // que a instância retornada é a gerenciada.
+            return categoriaRepository.save(novaCategoria);
+        }
     }
 
     /**

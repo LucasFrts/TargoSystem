@@ -29,27 +29,25 @@ public class Venda implements AggregateRoot {
         this.id = VendaId.generate();
         setCliente(cliente);
         this.itens = new ArrayList<>();
-        setItens(itens); // Valida e adiciona itens
-        // setValorDesconto(valorDesconto); // Não chame aqui, será feito no aplicarDesconto
-        this.valorDesconto = BigDecimal.ZERO; // Initialize with zero, then apply discount
-        calcularTotais(); // Calcula o valor total, desconto e final
-        this.status = "CRIADA"; // Status inicial
+        setItens(itens);
+        this.valorDesconto = BigDecimal.ZERO;
+        calcularTotais();
+        this.status = "CRIADA";
         this.dataVenda = LocalDateTime.now();
         this.dataAtualizacao = LocalDateTime.now();
-        // If an initial discount is provided at creation, call aplicarDesconto
+
         if (valorDesconto != null && valorDesconto.compareTo(BigDecimal.ZERO) > 0) {
-            aplicarDesconto(valorDesconto); // Apply the initial discount
+            aplicarDesconto(valorDesconto);
         }
     }
 
-    // Construtor para reconstrução da persistência
     public Venda(VendaId id, Cliente cliente, List<ItemVenda> itens,
                  BigDecimal valorTotal, BigDecimal valorDesconto, BigDecimal valorFinal,
                  String status, LocalDateTime dataVenda, LocalDateTime dataAtualizacao) {
         this.id = Objects.requireNonNull(id, "ID da venda não pode ser nulo.");
         this.cliente = Objects.requireNonNull(cliente, "Cliente da venda não pode ser nulo.");
         this.itens = new ArrayList<>();
-        setItens(itens); // Valida e adiciona itens
+        setItens(itens);
         this.valorTotal = Objects.requireNonNull(valorTotal, "Valor total não pode ser nulo.");
         this.valorDesconto = Objects.requireNonNull(valorDesconto, "Valor desconto não pode ser nulo.");
         this.valorFinal = Objects.requireNonNull(valorFinal, "Valor final não pode ser nulo.");
@@ -85,7 +83,6 @@ public class Venda implements AggregateRoot {
         calcularTotais();
     }
 
-    // New method to apply discount
     public void aplicarDesconto(BigDecimal novoValorDesconto) {
         Objects.requireNonNull(novoValorDesconto, "O valor do desconto não pode ser nulo.");
         if (novoValorDesconto.compareTo(BigDecimal.ZERO) < 0) {
@@ -95,15 +92,12 @@ public class Venda implements AggregateRoot {
             throw new DomainException("Não é possível aplicar desconto em venda com status: " + this.status);
         }
 
-        // You might want to consider if this new discount replaces or adds to existing.
-        // For simplicity, this implementation replaces the current discount.
         this.valorDesconto = novoValorDesconto;
-        calcularTotais(); // Recalculate totals after applying discount
+        calcularTotais();
         this.dataAtualizacao = LocalDateTime.now();
     }
 
-
-    // Métodos de domínio
+    
     public void addItem(ItemVenda item) {
         Objects.requireNonNull(item, "Item de venda não pode ser nulo.");
         this.itens.add(item);

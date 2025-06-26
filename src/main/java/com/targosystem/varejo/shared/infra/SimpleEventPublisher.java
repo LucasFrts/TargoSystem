@@ -19,9 +19,7 @@ import java.util.function.Consumer;
 public class SimpleEventPublisher implements EventPublisher {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleEventPublisher.class);
-
-    // O mapa armazena uma lista de Consumers que aceitam 'DomainEvent' ou seus supertipos.
-    // Isso é flexível o suficiente para lidar com diferentes eventos.
+    
     private final Map<Class<? extends DomainEvent>, List<Consumer<DomainEvent>>> listeners = new HashMap<>();
 
     @Override
@@ -36,8 +34,6 @@ public class SimpleEventPublisher implements EventPublisher {
         if (eventListeners != null) {
             for (Consumer<DomainEvent> listener : eventListeners) {
                 try {
-                    // O 'listener' aceita 'DomainEvent', e 'event' é um 'DomainEvent'.
-                    // Não é necessário um cast aqui, pois 'event' já é um 'DomainEvent'.
                     listener.accept(event);
                     logger.debug("Event {} handled by listener {}.", event.getClass().getSimpleName(), listener.getClass().getSimpleName());
                 } catch (Exception e) {

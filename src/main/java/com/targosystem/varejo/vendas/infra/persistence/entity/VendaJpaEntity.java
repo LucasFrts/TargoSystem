@@ -20,12 +20,12 @@ public class VendaJpaEntity {
     @Id
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many VendaJpaEntity to One ClienteJpaEntity
-    @JoinColumn(name = "cliente_id", nullable = false) // Coluna de FK para a tabela de clientes
-    private ClienteJpaEntity cliente; // Referência à entidade JPA do Cliente
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private ClienteJpaEntity cliente;
 
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemVendaJpaEntity> itens = new ArrayList<>(); // Inicializar para evitar NullPointerException
+    private List<ItemVendaJpaEntity> itens = new ArrayList<>();
 
     @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorTotal;
@@ -59,14 +59,12 @@ public class VendaJpaEntity {
         this.status = status;
         this.dataVenda = dataVenda;
         this.dataAtualizacao = dataAtualizacao;
-        // A lista de itens será populada via addIten ou setItens
     }
 
     public static VendaJpaEntity fromDomain(Venda venda, ClienteJpaEntity clienteJpaEntity) {
-        // Primeiro, crie a instância de VendaJpaEntity
         VendaJpaEntity vendaJpa = new VendaJpaEntity(
                 venda.getId().value(),
-                clienteJpaEntity, // Passe o ClienteJpaEntity aqui
+                clienteJpaEntity,
                 venda.getValorTotal(),
                 venda.getValorDesconto(),
                 venda.getValorFinal(),
@@ -75,8 +73,6 @@ public class VendaJpaEntity {
                 venda.getDataAtualizacao()
         );
 
-        // Mapeie os itens de venda e associe-os à vendaJpa recém-criada
-        // Use o helper method addIten para manter a bidirecionalidade
         venda.getItens().forEach(itemDomain -> {
             ItemVendaJpaEntity itemJpa = ItemVendaJpaEntity.fromDomain(itemDomain, vendaJpa);
             vendaJpa.addIten(itemJpa); // Adiciona e seta a referência venda
@@ -89,7 +85,7 @@ public class VendaJpaEntity {
     public Venda toDomain() {
         return new Venda(
                 new VendaId(this.id),
-                this.cliente.toDomain(), // Converte ClienteJpaEntity para Cliente do domínio
+                this.cliente.toDomain(),
                 this.itens.stream()
                         .map(ItemVendaJpaEntity::toDomain)
                         .collect(Collectors.toList()),

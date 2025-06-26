@@ -8,16 +8,15 @@ import java.util.Objects;
 import java.util.UUID; // Para gerar ItemVendaId
 
 public class ItemVenda {
-    private ItemVendaId id; // Value Object para o ID do item da venda
-    private ProdutoId idProduto; // Value Object para o ID do produto
-    private String nomeProduto; // Nome do produto para "snapshot" no momento da venda
+    private ItemVendaId id;
+    private ProdutoId idProduto;
+    private String nomeProduto;
     private int quantidade;
     private BigDecimal precoUnitario;
     private BigDecimal precoTotal;
 
-    // Construtor para nova criação
     public ItemVenda(ProdutoId idProduto, String nomeProduto, int quantidade, BigDecimal precoUnitario) {
-        this.id = new ItemVendaId(UUID.randomUUID().toString()); // Gerar ID único para o item
+        this.id = new ItemVendaId(UUID.randomUUID().toString());
         setIdProduto(idProduto);
         setNomeProduto(nomeProduto);
         setQuantidade(quantidade);
@@ -25,7 +24,6 @@ public class ItemVenda {
         calcularPrecoTotal();
     }
 
-    // Construtor completo para reconstrução da persistência
     public ItemVenda(ItemVendaId id, ProdutoId idProduto, String nomeProduto, int quantidade, BigDecimal precoUnitario, BigDecimal precoTotal) {
         this.id = Objects.requireNonNull(id, "ID do item de venda não pode ser nulo.");
         this.idProduto = Objects.requireNonNull(idProduto, "ID do produto no item de venda não pode ser nulo.");
@@ -34,8 +32,7 @@ public class ItemVenda {
         this.precoUnitario = Objects.requireNonNull(precoUnitario, "Preço unitário no item de venda não pode ser nulo.");
         this.precoTotal = Objects.requireNonNull(precoTotal, "Preço total no item de venda não pode ser nulo.");
     }
-
-    // Getters
+    
     public ItemVendaId getId() { return id; }
     public ProdutoId getIdProduto() { return idProduto; }
     public String getNomeProduto() { return nomeProduto; }
@@ -43,7 +40,6 @@ public class ItemVenda {
     public BigDecimal getPrecoUnitario() { return precoUnitario; }
     public BigDecimal getPrecoTotal() { return precoTotal; }
 
-    // Setters com validação
     private void setIdProduto(ProdutoId idProduto) {
         Objects.requireNonNull(idProduto, "ID do produto não pode ser nulo.");
         this.idProduto = idProduto;

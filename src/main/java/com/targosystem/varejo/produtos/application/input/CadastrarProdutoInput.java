@@ -6,8 +6,8 @@ public record CadastrarProdutoInput(
         String nome,
         String descricao,
         String codigoBarras,
-        String nomeCategoria, // Nome da categoria para facilitar a entrada
-        String descricaoCategoria, // Descrição da categoria, se precisar criar
+        String nomeCategoria,
+        String descricaoCategoria,
         String marca,
         Price precoSugerido
 ) {}

@@ -50,7 +50,7 @@ public class PapelDao implements PapelRepository {
         PapelJpaEntity entity = toJpaEntity(papel);
         if (entity.getId() == null || entityManager.find(PapelJpaEntity.class, entity.getId()) == null) {
             entityManager.persist(entity);
-            entityManager.flush(); // Garante que o ID seja gerado e disponível
+            entityManager.flush();
         } else {
             entityManager.merge(entity);
         }

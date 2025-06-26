@@ -6,22 +6,21 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public class EntregaFornecedor { // Não é uma AggregateRoot, mas uma Entidade interna ou dependente
+public class EntregaFornecedor {
 
     private String id;
-    private FornecedorId fornecedorId; // Referência ao Fornecedor
-    private String numeroPedidoCompra; // Número do pedido de compra associado
+    private FornecedorId fornecedorId;
+    private String numeroPedidoCompra;
     private LocalDate dataPrevistaEntrega;
-    private LocalDate dataRealizacaoEntrega; // Pode ser nulo se ainda não entregue
-    private String status; // Ex: "PENDENTE", "ENTREGUE", "CANCELADA"
+    private LocalDate dataRealizacaoEntrega;
+    private String status;
     private int quantidadeItens;
     private String observacoes;
-    private Integer avaliacaoNota; // 1 a 5, pode ser nulo
-    private String avaliacaoComentario; // Pode ser nulo
+    private Integer avaliacaoNota;
+    private String avaliacaoComentario;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
 
-    // Construtor para nova entrega
     public EntregaFornecedor(FornecedorId fornecedorId, String numeroPedidoCompra, LocalDate dataPrevistaEntrega, int quantidadeItens, String observacoes) {
         if (fornecedorId == null) {
             throw new DomainException("FornecedorId é obrigatório para registrar uma entrega.");

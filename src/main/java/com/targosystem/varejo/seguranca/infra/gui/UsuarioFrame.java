@@ -14,7 +14,7 @@ public class UsuarioFrame extends JPanel {
     private JTextField emailField;
     private JPasswordField passwordField;
     private JCheckBox activeCheckBox;
-    private JList<String> papeisList; // Para seleção de múltiplos papéis
+    private JList<String> papeisList;
     private DefaultListModel<String> papeisListModel;
     private JButton criarUsuarioButton;
     private JButton limparCamposButton;
@@ -36,7 +36,7 @@ public class UsuarioFrame extends JPanel {
         add(titleLabel, gbc);
 
         // Campos de entrada
-        gbc.gridwidth = 1; // Reset gridwidth
+        gbc.gridwidth = 1;
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -81,7 +81,7 @@ public class UsuarioFrame extends JPanel {
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         activeCheckBox = new JCheckBox();
-        activeCheckBox.setSelected(true); // Usuário ativo por padrão
+        activeCheckBox.setSelected(true);
         add(activeCheckBox, gbc);
 
         // Seleção de Papéis

@@ -10,5 +10,4 @@ public interface VendaRepository {
     Venda save(Venda venda);
     Optional<Venda> findById(VendaId id);
     List<Venda> findAll();
-    // ... outros métodos de busca ou remoção se necessário
 }

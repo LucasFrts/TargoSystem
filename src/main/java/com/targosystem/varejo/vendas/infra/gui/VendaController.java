@@ -46,7 +46,6 @@ public class VendaController {
                     boolean hasSelection = vendaFrame.getVendasTable().getSelectedRow() != -1;
                     vendaFrame.getBtnCancelarVenda().setEnabled(hasSelection);
                     vendaFrame.getBtnAplicarDesconto().setEnabled(hasSelection);
-                    // Lógica para habilitar/desabilitar baseada no status da venda pode ser adicionada aqui
                 }
             }
         });
@@ -55,8 +54,6 @@ public class VendaController {
         listarTodasVendas();
     }
 
-    // --- Métodos de Vendas ---
-
     public void listarTodasVendas() {
         logger.info("Listando todas as vendas...");
         vendaFrame.clearVendasTable();
@@ -64,18 +61,18 @@ public class VendaController {
         try {
             List<VendaOutput> vendas = vendaService.listarTodasVendas();
             DefaultTableModel model = vendaFrame.getVendasTableModel();
-            // As colunas da tabela devem estar em VendaFrame, mas reconfirmo aqui
+
             model.setColumnIdentifiers(new Object[]{"ID", "Cliente ID", "Data Venda", "Total Bruto", "Desconto", "Total Líquido", "Status"});
 
 
             for (VendaOutput venda : vendas) {
                 model.addRow(new Object[]{
                         venda.id(),
-                        venda.cliente().id(),      // <--- Acesso ao ID do cliente
+                        venda.cliente().id(),
                         venda.dataVenda(),
-                        venda.valorTotal(),        // <--- Novo nome para Total Bruto
+                        venda.valorTotal(),
                         venda.valorDesconto(),
-                        venda.valorFinal(),        // <--- Novo nome para Total Líquido
+                        venda.valorFinal(),
                         venda.status()
                 });
             }
@@ -91,7 +88,7 @@ public class VendaController {
 
     private void realizarNovaVenda() {
         logger.info("Abrindo diálogo para realizar nova venda...");
-        // O diálogo agora retorna [idCliente, idProduto, quantidade, valorDesconto]
+
         String[] formData = vendaFrame.showRealizarVendaDialog();
 
         if (formData != null) {
@@ -101,11 +98,9 @@ public class VendaController {
                 int quantidade = Integer.parseInt(formData[2]);
                 BigDecimal valorDesconto = new BigDecimal(formData[3]);
 
-                // Constrói a lista de itens (para esta simulação, com apenas um item)
                 List<RealizarVendaInput.ItemVendaInput> itensVenda = new ArrayList<>();
                 itensVenda.add(new RealizarVendaInput.ItemVendaInput(idProduto, quantidade));
 
-                // Cria o RealizarVendaInput com a nova estrutura
                 RealizarVendaInput input = new RealizarVendaInput(idCliente, itensVenda, valorDesconto);
 
                 VendaOutput novaVenda = vendaService.realizarVenda(input);
@@ -178,7 +173,6 @@ public class VendaController {
 
             if (formData != null) {
                 try {
-                    // formData: [valorDesconto]
                     BigDecimal valorDesconto = new BigDecimal(formData[0]);
 
                     AplicarDescontoVendaInput input = new AplicarDescontoVendaInput(vendaId, valorDesconto);

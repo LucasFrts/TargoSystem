@@ -2,8 +2,6 @@ package com.targosystem.varejo.produtos.infra.persistence.entity;
 
 import com.targosystem.varejo.produtos.domain.model.Produto;
 import com.targosystem.varejo.produtos.domain.model.ProdutoId;
-import com.targosystem.varejo.produtos.domain.model.Categoria; // Importe Categoria
-import com.targosystem.varejo.produtos.domain.model.CategoriaId; // Importe CategoriaId
 
 import jakarta.persistence.*;
 
@@ -30,7 +28,7 @@ public class ProdutoJpaEntity {
     @Column(name = "codigo_barras", unique = true, nullable = false, length = 50)
     private String codigoBarras;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false) // Coluna de FK
     private CategoriaJpaEntity categoria; // Mapeamento para a entidade JPA da Categoria
 

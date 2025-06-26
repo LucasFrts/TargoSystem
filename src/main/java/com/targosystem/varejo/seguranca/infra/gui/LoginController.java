@@ -14,7 +14,7 @@ public class LoginController {
 
     private final SegurancaService segurancaService;
     private final LoginFrame loginPanel;
-    private final MainApplicationFrame mainFrame; // Referência à MainApplicationFrame
+    private final MainApplicationFrame mainFrame;
 
     public LoginController(SegurancaService segurancaService, LoginFrame loginPanel, MainApplicationFrame mainFrame) {
         this.segurancaService = segurancaService;
@@ -29,7 +29,8 @@ public class LoginController {
 
     private void performLogin() {
         String username = loginPanel.getUsername();
-        String password = new String(loginPanel.getPassword()); // Cuidado com segurança em produção
+        // fazer direito
+        String password = new String(loginPanel.getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(loginPanel, "Usuário e senha não podem ser vazios.", "Erro de Login", JOptionPane.WARNING_MESSAGE);
@@ -41,7 +42,7 @@ public class LoginController {
             UsuarioOutput loggedInUser = segurancaService.loginUsuario(input);
             if (loggedInUser != null) {
                 logger.info("Login bem-sucedido para o usuário: {}", username);
-                mainFrame.onLoginSuccess(loggedInUser); // Chama o método na MainApplicationFrame
+                mainFrame.onLoginSuccess(loggedInUser);
                 loginPanel.clearFields();
             } else {
                 JOptionPane.showMessageDialog(loginPanel, "Credenciais inválidas.", "Erro de Login", JOptionPane.ERROR_MESSAGE);

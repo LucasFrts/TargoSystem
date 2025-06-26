@@ -22,7 +22,7 @@ public class ProdutoCadastradoEvent implements DomainEvent { // <--- Verificar e
 
     @Override
     public LocalDateTime getOcorreuEm() { // Certifique-se de que o nome é o mesmo da interface
-        return occurredOn; // Retorna o valor que você já está armazenando
+        return occurredOn;
     }
 
     public String getProdutoId() {

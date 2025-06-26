@@ -4,11 +4,10 @@ import com.targosystem.varejo.shared.domain.DomainException;
 import java.util.Objects;
 
 public class Papel {
-    private final Integer id; // ID gerado pelo DB
+    private final Integer id;
     private String nome;
     private String descricao;
 
-    // Construtor para papéis existentes (com ID)
     public Papel(Integer id, String nome, String descricao) {
         Objects.requireNonNull(id, "Role ID cannot be null");
         setNome(nome);
@@ -16,11 +15,10 @@ public class Papel {
         this.id = id;
     }
 
-    // Construtor para novos papéis (sem ID, a ser gerado na persistência)
     public Papel(String nome, String descricao) {
         setNome(nome);
         setDescricao(descricao);
-        this.id = null; // ID será gerado pelo banco de dados
+        this.id = null;
     }
 
     // Métodos de comportamento (se houver regras de negócio específicas para Papel)

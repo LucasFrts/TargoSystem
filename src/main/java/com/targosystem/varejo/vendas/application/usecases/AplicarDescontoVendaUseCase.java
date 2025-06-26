@@ -33,8 +33,7 @@ public class AplicarDescontoVendaUseCase {
         VendaId vendaId = new VendaId(input.idVenda());
         Venda venda = vendaRepository.findById(vendaId)
                 .orElseThrow(() -> new DomainException("Venda não encontrada com ID: " + input.idVenda()));
-
-        // Validações de domínio antes de aplicar o desconto
+        
         validadorDesconto.validar(venda, input.valorDesconto());
 
         venda.aplicarDesconto(input.valorDesconto());

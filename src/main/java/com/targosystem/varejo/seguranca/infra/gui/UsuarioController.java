@@ -47,7 +47,7 @@ public class UsuarioController {
         String username = usuarioFrame.getUsername();
         String nomeCompleto = usuarioFrame.getNomeCompleto();
         String email = usuarioFrame.getEmail();
-        String password = new String(usuarioFrame.getPassword()); // Cuidado com segurança em produção.
+        String password = new String(usuarioFrame.getPassword());
         boolean isActive = usuarioFrame.isActive();
         List<String> selectedPapeis = usuarioFrame.getSelectedPapeis();
 
@@ -57,7 +57,6 @@ public class UsuarioController {
         }
 
         try {
-            // Criar o input para o serviço
             CriarUsuarioInput input = new CriarUsuarioInput(
                     username,
                     password,
@@ -66,11 +65,10 @@ public class UsuarioController {
                     selectedPapeis
             );
 
-            // Chamar o serviço para criar o usuário
             UsuarioOutput novoUsuario = segurancaService.criarUsuario(input);
 
             JOptionPane.showMessageDialog(usuarioFrame, "Usuário '" + novoUsuario.username() + "' criado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            usuarioFrame.clearFields(); // Limpa o formulário após o sucesso
+            usuarioFrame.clearFields();
             logger.info("Usuário {} criado com sucesso.", novoUsuario.username());
 
         } catch (DomainException e) {

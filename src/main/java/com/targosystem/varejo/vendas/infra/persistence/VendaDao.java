@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 public class VendaDao implements VendaRepository {
 
     private final EntityManager entityManager;
-    private final ClienteRepository clienteDao; // Dependência do ClienteDao para buscar ClienteJpaEntity
+    private final ClienteRepository clienteDao;
 
     public VendaDao(EntityManager entityManager, ClienteRepository clienteDao) {
         this.entityManager = entityManager;
-        this.clienteDao = clienteDao; // Injetar ClienteDao
+        this.clienteDao = clienteDao;
     }
 
     @Override
@@ -35,16 +35,10 @@ public class VendaDao implements VendaRepository {
             transaction = entityManager.getTransaction();
             transaction.begin();
 
-            // Ao salvar uma venda, precisamos garantir que o ClienteJpaEntity existe
-            // Se o Cliente não for novo, podemos buscá-lo. Se for novo, ele já deve ter sido persistido antes.
-            // Para simplicidade, vamos buscar o ClienteJpaEntity aqui.
-            // Em cenários mais complexos, o Cliente já viria anexado ou seria gerenciado por um serviço transacional.
             ClienteJpaEntity clienteJpaEntity = entityManager.find(
                     ClienteJpaEntity.class, venda.getCliente().getId().value());
 
             if (clienteJpaEntity == null) {
-                // Isso indica um problema de integridade referencial ou que o cliente não foi salvo antes.
-                // Dependendo da sua regra de negócio, pode-se tentar salvar o cliente aqui ou lançar exceção.
                 throw new DomainException("Cliente com ID " + venda.getCliente().getId().value() + " não encontrado para salvar a venda.");
             }
 
@@ -72,8 +66,6 @@ public class VendaDao implements VendaRepository {
     @Override
     public Optional<Venda> findById(VendaId id) {
         try {
-            // Usar LEFT JOIN FETCH para carregar os itens e o cliente na mesma consulta,
-            // evitando problemas de N+1 e LazyInitializationException
             TypedQuery<VendaJpaEntity> query = entityManager.createQuery(
                     "SELECT v FROM VendaJpaEntity v LEFT JOIN FETCH v.itens WHERE v.id = :id", VendaJpaEntity.class);
             query.setParameter("id", id.value());

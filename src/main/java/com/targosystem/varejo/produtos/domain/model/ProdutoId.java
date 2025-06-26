@@ -12,7 +12,6 @@ public record ProdutoId(String value) implements ValueObject {
             throw new DomainException("ID do produto não pode ser nulo ou vazio.");
         }
         try {
-            // Validar se é um UUID válido, se essa for a sua intenção
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {
             throw new DomainException("Formato de ID de produto inválido: " + value, e);

@@ -18,11 +18,10 @@ public class Usuario {
     private LocalDateTime ultimoLogin;
     private Set<Papel> papeis; // Set de papéis do usuário
 
-    // Construtor para criar um novo usuário
     public Usuario(String username, String passwordHash, String nomeCompleto, String email) {
         this.id = UsuarioId.generate();
         setUsername(username);
-        setPasswordHash(passwordHash); // Assumindo que o hash já foi gerado
+        setPasswordHash(passwordHash);
         setNomeCompleto(nomeCompleto);
         setEmail(email);
         this.ativo = true;
@@ -30,7 +29,6 @@ public class Usuario {
         this.papeis = new HashSet<>();
     }
 
-    // Construtor para recarregar um usuário existente do repositório
     public Usuario(UsuarioId id, String username, String passwordHash, String nomeCompleto, String email, boolean ativo, LocalDateTime dataCadastro, LocalDateTime ultimoLogin, Set<Papel> papeis) {
         Objects.requireNonNull(id, "User ID cannot be null for existing user");
         this.id = id;
@@ -41,11 +39,10 @@ public class Usuario {
         this.ativo = ativo;
         Objects.requireNonNull(dataCadastro, "Data de cadastro cannot be null");
         this.dataCadastro = dataCadastro;
-        this.ultimoLogin = ultimoLogin; // Pode ser null
-        this.papeis = new HashSet<>(papeis); // Garante mutabilidade interna, mas retorna coleção imutável
+        this.ultimoLogin = ultimoLogin;
+        this.papeis = new HashSet<>(papeis);
     }
 
-    // Métodos de comportamento (regras de negócio)
     public void atualizarInformacoes(String novoNomeCompleto, String novoEmail) {
         setNomeCompleto(novoNomeCompleto);
         setEmail(novoEmail);
@@ -110,12 +107,10 @@ public class Usuario {
         return ultimoLogin;
     }
 
-    // Retorna uma cópia imutável dos papéis
     public Set<Papel> getPapeis() {
         return Collections.unmodifiableSet(papeis);
     }
 
-    // Setters com validações
     private void setUsername(String username) {
         Objects.requireNonNull(username, "Username cannot be null");
         if (username.isBlank()) {
@@ -129,7 +124,6 @@ public class Usuario {
         if (passwordHash.isBlank()) {
             throw new DomainException("Password hash cannot be empty");
         }
-        // Em um sistema real, a lógica de hashing da senha estaria em um serviço de domínio ou aplicação
         this.passwordHash = passwordHash;
     }
 

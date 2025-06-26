@@ -10,16 +10,16 @@ import java.util.stream.Collectors;
 
 public record VendaOutput(
         String id,
-        ClienteOutput cliente, // Cliente como ClienteOutput
+        ClienteOutput cliente,
         List<ItemVendaOutput> itens,
-        String valorTotal, // String para formatação
-        String valorDesconto, // String para formatação
-        String valorFinal, // String para formatação
+        String valorTotal,
+        String valorDesconto,
+        String valorFinal,
         String status,
         LocalDateTime dataVenda,
         LocalDateTime dataAtualizacao
 ) {
-    // O método de conversão de domínio para output DTO agora é 'from'
+    
     public static VendaOutput from(Venda venda) {
         List<ItemVendaOutput> itensOutput = venda.getItens().stream()
                 .map(ItemVendaOutput::from)

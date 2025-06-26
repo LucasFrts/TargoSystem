@@ -39,11 +39,19 @@ public class CategoriaJpaEntity {
         this.dataAtualizacao = dataAtualizacao;
     }
 
+    /**
+     * Converte um objeto de domínio Categoria para uma CategoriaJpaEntity.
+     * O ID da entidade JPA será o ID da Categoria de domínio.
+     * Assumimos que o ID da categoria de domínio nunca é nulo.
+     * @param categoria A entidade de domínio Categoria.
+     * @return A CategoriaJpaEntity correspondente.
+     */
     public static CategoriaJpaEntity fromDomain(Categoria categoria) {
-        // Cuidado: Se o ID da categoria for nulo (nova categoria), o ID da entidade será nulo também.
-        // O JPA gerará o ID no persist.
+        // Assume que categoria.getId() nunca é nulo, pois Categoria.java já gera o UUID.
+        // Se categoria.getId() pudesse ser nulo para uma nova categoria, JPA faria a geração.
+        // Mas como estamos gerando no domínio, o ID já virá preenchido.
         return new CategoriaJpaEntity(
-                categoria.getId() != null ? categoria.getId().value() : null, // Mapeia para String do ProdutoId
+                categoria.getId().value(), // Pega o valor String do CategoriaId
                 categoria.getNome(),
                 categoria.getDescricao(),
                 categoria.getDataCriacao(),
@@ -72,4 +80,28 @@ public class CategoriaJpaEntity {
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) { this.dataAtualizacao = dataAtualizacao; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CategoriaJpaEntity that = (CategoriaJpaEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "CategoriaJpaEntity{" +
+                "id='" + id + '\'' +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", dataCriacao=" + dataCriacao +
+                ", dataAtualizacao=" + dataAtualizacao +
+                '}';
+    }
 }

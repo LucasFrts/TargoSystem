@@ -46,16 +46,12 @@ public class CancelarVendaUseCase {
         Venda vendaSalva = vendaRepository.save(venda);
         logger.info("Venda ID: {} cancelada com sucesso. Status: {}", vendaSalva.getId().value(), vendaSalva.getStatus());
 
-        // Se a venda foi concluída e agora está sendo cancelada, precisamos repor o estoque
         if (statusAnterior.equals("CONCLUIDA")) {
-            // --- FIX STARTS HERE ---
-            // Map the List<ItemVenda> to List<ProdutoParaEstoqueInfo>
             List<ProdutoParaEstoqueInfo> produtosParaReposicao = vendaSalva.getItens().stream()
                     .map(item -> new ProdutoParaEstoqueInfo(item.getIdProduto().value(), item.getQuantidade()))
                     .collect(Collectors.toList());
 
             estoqueEventProducer.sendEstoqueReposicaoEvent(vendaSalva.getId().value(), produtosParaReposicao);
-            // --- FIX ENDS HERE ---
             logger.info("Evento de reposição de estoque enviado para venda ID: {}", vendaSalva.getId().value());
         }
 

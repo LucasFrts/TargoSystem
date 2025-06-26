@@ -8,12 +8,12 @@ import java.util.List;
 public record SolicitacaoBaixaEstoqueEvent(
         String idVenda,
         List<ItemEstoque> itens,
-        LocalDateTime ocorreuEm // Componente do record
+        LocalDateTime ocorreuEm 
 ) implements DomainEvent {
     public record ItemEstoque(String idProduto, int quantidade) {}
 
     @Override
     public LocalDateTime getOcorreuEm() {
-        return ocorreuEm; // Implementação explícita que retorna o componente do record
+        return ocorreuEm;
     }
 }

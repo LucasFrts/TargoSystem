@@ -42,8 +42,8 @@ public class SecurityController {
 
             if (loggedInUser != null) {
                 logger.info("Login bem-sucedido para o usuário: {}", username);
-                mainFrame.onLoginSuccess(loggedInUser); // Notifica o MainApplicationFrame sobre o sucesso
-                loginFrame.clearFields(); // Limpa os campos do formulário de login
+                mainFrame.onLoginSuccess(loggedInUser);
+                loginFrame.clearFields();
             } else {
                 JOptionPane.showMessageDialog(loginFrame, "Usuário ou senha inválidos.", "Falha no Login", JOptionPane.ERROR_MESSAGE);
                 logger.warn("Tentativa de login falhou para o usuário: {}", username);

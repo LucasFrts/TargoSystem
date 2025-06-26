@@ -92,8 +92,7 @@ public class RealizarVendaUseCase {
 
         Venda vendaSalva = vendaRepository.save(venda);
         logger.info("Venda ID: {} salva com sucesso. Status: {}", vendaSalva.getId().value(), vendaSalva.getStatus());
-
-        // CORRECTED USAGE: Now using ProdutoParaEstoqueInfo
+        
         List<ProdutoParaEstoqueInfo> produtosParaBaixa = itensVenda.stream()
                 .map(item -> new ProdutoParaEstoqueInfo(item.getIdProduto().value(), item.getQuantidade()))
                 .collect(Collectors.toList());
