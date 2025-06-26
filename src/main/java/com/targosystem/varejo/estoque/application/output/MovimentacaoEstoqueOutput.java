@@ -1,11 +1,8 @@
 package com.targosystem.varejo.estoque.application.output;
 
-import com.targosystem.varejo.estoque.domain.model.Estoque;
 import com.targosystem.varejo.estoque.domain.model.MovimentacaoEstoque;
 import com.targosystem.varejo.estoque.domain.model.TipoMovimentacao;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 record MovimentacaoEstoqueOutput(
         String id,
@@ -14,8 +11,8 @@ record MovimentacaoEstoqueOutput(
         int quantidade,
         LocalDateTime dataHora,
         String motivo,
-        LoteOutput loteAfetado, // NOVO
-        LocalizacaoArmazenamentoOutput localizacaoAfetada // NOVO
+        LoteOutput loteAfetado,
+        LocalizacaoArmazenamentoOutput localizacaoAfetada
 ) {
     static MovimentacaoEstoqueOutput fromDomain(MovimentacaoEstoque mov) {
         return new MovimentacaoEstoqueOutput(

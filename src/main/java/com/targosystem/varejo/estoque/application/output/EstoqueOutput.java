@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public record EstoqueOutput(
         String id,
         String produtoId,
-        int quantidadeTotalDisponivel, // Agora é uma soma
-        List<ItemEstoqueOutput> itensEstoque, // Nova lista
+        int quantidadeTotalDisponivel,
+        List<ItemEstoqueOutput> itensEstoque,
         List<MovimentacaoEstoqueOutput> movimentacoes
 ) {
     public static EstoqueOutput fromDomain(Estoque estoque) {

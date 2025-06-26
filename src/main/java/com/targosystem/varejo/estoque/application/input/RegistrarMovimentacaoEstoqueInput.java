@@ -7,7 +7,7 @@ public record RegistrarMovimentacaoEstoqueInput(
         String produtoId,
         int quantidade,
         TipoMovimentacao tipoMovimentacao,
-        String motivo, // Opcional
-        LoteInput lote, // Novo: Pode ser nulo para SAIDA
+        String motivo,
+        LoteInput lote,
         LocalizacaoArmazenamentoInput localizacao
 ) {}

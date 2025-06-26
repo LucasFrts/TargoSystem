@@ -29,7 +29,7 @@ public class AtualizarFornecedorUseCase {
     public FornecedorOutput execute(AtualizarFornecedorInput input) {
         logger.info("Tentando atualizar fornecedor com ID: {}", input.id());
 
-        FornecedorId fornecedorId = new FornecedorId(input.id()); // Converte para FornecedorId
+        FornecedorId fornecedorId = new FornecedorId(input.id());
         Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
                 .orElseThrow(() -> new DomainException("Fornecedor não encontrado com ID: " + input.id()));
 
@@ -42,16 +42,16 @@ public class AtualizarFornecedorUseCase {
                 input.estado(),
                 input.cep()
         );
-        Contato novoContato = new Contato(input.emailContato(), input.telefoneContato()); // NOVO
+        Contato novoContato = new Contato(input.emailContato(), input.telefoneContato());
 
         fornecedor.atualizarInformacoes(
                 input.nome(),
-                novoContato, // NOVO
+                novoContato,
                 novoEndereco
         );
 
         Fornecedor fornecedorSalvo = fornecedorRepository.save(fornecedor);
-        logger.info("Fornecedor atualizado com sucesso. ID: {}", fornecedorSalvo.getId().value()); // Usa .value()
+        logger.info("Fornecedor atualizado com sucesso. ID: {}", fornecedorSalvo.getId().value());
 
         return FornecedorOutput.fromDomain(fornecedorSalvo);
     }

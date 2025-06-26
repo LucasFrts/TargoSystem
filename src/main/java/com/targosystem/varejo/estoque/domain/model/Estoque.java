@@ -13,11 +13,10 @@ import java.util.stream.Collectors;
 public class Estoque {
 
     private String id;
-    private String produtoId; // Referência ao ID do Produto no Bounded Context de Produtos
-    private final List<ItemEstoque> itensEstoque; // Coleção de ItemEstoque
-    private final List<MovimentacaoEstoque> movimentacoes; // Histórico de movimentações
+    private String produtoId;
+    private final List<ItemEstoque> itensEstoque;
+    private final List<MovimentacaoEstoque> movimentacoes;
 
-    // Construtor para novo estoque (inicialização)
     public Estoque(String produtoId) {
         this.id = UUID.randomUUID().toString();
         this.produtoId = Objects.requireNonNull(produtoId, "ID do produto não pode ser nulo.");
@@ -41,7 +40,6 @@ public class Estoque {
             throw new IllegalArgumentException("Quantidade a adicionar deve ser positiva.");
         }
 
-        // Tenta encontrar um ItemEstoque existente com o mesmo lote e localização
         Optional<ItemEstoque> existingItem = this.itensEstoque.stream()
                 .filter(item -> item.getLote().equals(lote) && item.getLocalizacao().equals(localizacao))
                 .findFirst();
@@ -49,7 +47,6 @@ public class Estoque {
         if (existingItem.isPresent()) {
             existingItem.get().adicionarQuantidade(quantidade);
         } else {
-            // Se não encontrar, cria um novo ItemEstoque
             ItemEstoque newItem = new ItemEstoque(this.produtoId, quantidade, lote, localizacao, this.id);
             this.itensEstoque.add(newItem);
         }
@@ -73,7 +70,7 @@ public class Estoque {
             if (item1.getLote().getDataValidade() != null && item2.getLote().getDataValidade() != null) {
                 return item1.getLote().getDataValidade().compareTo(item2.getLote().getDataValidade());
             }
-            return 0; // Ou outra regra de desempate
+            return 0;
         });
 
         for (ItemEstoque item : itensParaRemover) {
