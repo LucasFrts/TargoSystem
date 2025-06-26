@@ -100,29 +100,15 @@ public class CategoriaDao implements CategoriaRepository {
 
     @Override
     public boolean existsByName(String nome) {
-        // For read-only operations like COUNT, explicit transaction management here
-        // might be optional depending on your setup (e.g., Spring's @Transactional).
-        // Including it for robustness if not managed externally.
-        EntityTransaction transaction = null;
         try {
-            transaction = entityManager.getTransaction();
-            if (!transaction.isActive()) {
-                transaction.begin();
-            }
 
             TypedQuery<Long> query = entityManager.createQuery(
                     "SELECT COUNT(c) FROM CategoriaJpaEntity c WHERE c.nome = :nome", Long.class);
             query.setParameter("nome", nome);
             Long count = query.getSingleResult();
 
-            if (transaction.isActive() && !transaction.getRollbackOnly()) {
-                // transaction.commit(); // Optional for read-only transactions, or managed externally
-            }
             return count > 0;
         } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
             throw e;
         }
     }

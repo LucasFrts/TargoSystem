@@ -15,7 +15,7 @@ import java.util.Objects;
 public class CategoriaJpaEntity {
 
     @Id
-    private String id; // O ID deve ser String para corresponder a CategoriaId
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String nome;

@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale; // Importação adicionada
 
 // Este seria um JPanel ou JFrame real, com todos os componentes Swing
 public class ProdutoPanel extends JPanel {
@@ -67,9 +68,11 @@ public class ProdutoPanel extends JPanel {
         ((AbstractDocument) marcaField.getDocument()).setDocumentFilter(new LengthDocumentFilter(MAX_MARCA_LENGTH)); // Limita marca
 
         // Configuração para preço (apenas números e formato monetário)
-        NumberFormat priceFormat = NumberFormat.getNumberInstance();
+        NumberFormat priceFormat = NumberFormat.getNumberInstance(new Locale("pt", "BR")); // Ajuste para Localidade Brasileira
         priceFormat.setMinimumFractionDigits(2);
         priceFormat.setMaximumFractionDigits(2);
+        priceFormat.setGroupingUsed(true); // Garante que o agrupamento de milhares seja usado
+
         NumberFormatter priceFormatter = new NumberFormatter(priceFormat);
         priceFormatter.setValueClass(Double.class);
         priceFormatter.setAllowsInvalid(false); // Não permite caracteres inválidos
@@ -169,12 +172,12 @@ public class ProdutoPanel extends JPanel {
         gbc.weightx = 0.1; // Menor peso
         add(marcaField, gbc);
 
-        // Linha 6: Preço Sugerido
+        // Linha 6: Preço Sugerido (ou "Preço de Venda" se for o caso)
         gbc.gridx = 0; gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
-        add(new JLabel("Preço Sugerido:"), gbc);
+        add(new JLabel("Preço Sugerido:"), gbc); // Considere renomear para "Preço de Venda" se for o preço final
 
         gbc.gridx = 1; gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.WEST;
@@ -260,7 +263,9 @@ public class ProdutoPanel extends JPanel {
 
     public String getProdutoPreco() {
         // Retorna o valor formatado como String. O Controller deve fazer o parse para Double.
-        return precoField.getText().replace(",", "."); // Garante que vírgulas sejam trocadas por pontos para o parse
+        // O replace ainda é uma segurança caso a formatação do JFormattedTextField não seja perfeita,
+        // ou se o valor for digitado de alguma forma que ainda tenha vírgula.
+        return precoField.getText().replace(",", ".");
     }
 
     public void limparCampos() {

@@ -123,7 +123,7 @@ public class Main {
         CategoriaRepository categoriaRepository = new CategoriaDao(entityManager);
         ClassificadorProduto classificadorProduto = new ClassificadorProduto(categoriaRepository);
 
-        CadastrarProdutoUseCase cadastrarProdutoUseCase = new CadastrarProdutoUseCase(produtoRepository, categoriaRepository, classificadorProduto, eventPublisher);
+        CadastrarProdutoUseCase cadastrarProdutoUseCase = new CadastrarProdutoUseCase(produtoRepository, categoriaRepository, classificadorProduto, eventPublisher, entityManager);
         AtualizarProdutoUseCase atualizarProdutoUseCase = new AtualizarProdutoUseCase(produtoRepository, categoriaRepository, classificadorProduto);
         ObterProdutoPorIdQuery obterProdutoPorIdQuery = new ObterProdutoPorIdQuery(produtoRepository);
         ListarTodosProdutosQuery listarTodosProdutosQuery = new ListarTodosProdutosQuery(produtoRepository);

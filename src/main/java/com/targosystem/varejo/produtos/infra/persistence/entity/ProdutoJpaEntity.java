@@ -5,12 +5,8 @@ import com.targosystem.varejo.produtos.domain.model.ProdutoId;
 import com.targosystem.varejo.produtos.domain.model.Categoria; // Importe Categoria
 import com.targosystem.varejo.produtos.domain.model.CategoriaId; // Importe CategoriaId
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.ManyToOne; // Para mapear ManyToOne
-import jakarta.persistence.JoinColumn; // Para mapear a coluna de junção
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -34,7 +30,7 @@ public class ProdutoJpaEntity {
     @Column(name = "codigo_barras", unique = true, nullable = false, length = 50)
     private String codigoBarras;
 
-    @ManyToOne // Um Produto pertence a uma Categoria
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "categoria_id", nullable = false) // Coluna de FK
     private CategoriaJpaEntity categoria; // Mapeamento para a entidade JPA da Categoria
 

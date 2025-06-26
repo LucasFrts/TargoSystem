@@ -24,10 +24,7 @@ public class ProdutoDao implements ProdutoRepository {
     @Override
     public Produto save(Produto produto) {
         ProdutoJpaEntity jpaEntity = ProdutoJpaEntity.fromDomain(produto);
-        EntityTransaction transaction = null;
         try {
-            transaction = entityManager.getTransaction();
-            transaction.begin();
 
             ProdutoJpaEntity existingEntity = entityManager.find(ProdutoJpaEntity.class, jpaEntity.getId());
             if (existingEntity == null) {
@@ -42,12 +39,8 @@ public class ProdutoDao implements ProdutoRepository {
                 existingEntity.setDataAtualizacao(jpaEntity.getDataAtualizacao());
                 jpaEntity = entityManager.merge(existingEntity);
             }
-            transaction.commit();
             return jpaEntity.toDomain();
         } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
             throw e;
         }
     }
@@ -86,33 +79,15 @@ public class ProdutoDao implements ProdutoRepository {
 
     @Override
     public boolean existsByCodigoBarras(String codigoBarras) {
-        EntityTransaction transaction = null;
         try {
-            // Em muitas arquiteturas, a transação seria gerenciada no nível de serviço.
-            // Para `COUNT` puro, pode não ser estritamente necessário iniciar uma transação,
-            // mas é bom garantir consistência.
-            transaction = entityManager.getTransaction();
-            if (!transaction.isActive()) {
-                transaction.begin();
-            }
-
             TypedQuery<Long> query = entityManager.createQuery(
                     "SELECT COUNT(p) FROM ProdutoJpaEntity p WHERE p.codigoBarras = :codigoBarras", Long.class);
             query.setParameter("codigoBarras", codigoBarras);
 
             Long count = query.getSingleResult();
 
-            // Se a transação foi iniciada aqui, pode ser comitada.
-            // Caso contrário, ela será gerenciada externamente.
-            if (transaction.isActive() && transaction.getRollbackOnly() == false) {
-                // transaction.commit(); // Descomente se você quiser comitar transações de leitura aqui.
-            }
-
             return count > 0;
         } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
             throw e;
         }
     }

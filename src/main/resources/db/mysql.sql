@@ -9,7 +9,7 @@
 
 -- Table: categorias
 CREATE TABLE IF NOT EXISTS `categorias` (
-    `id` INT NOT NULL AUTO_INCREMENT,
+    `id` VARCHAR(36) NOT NULL,
     `nome` VARCHAR(100) NOT NULL UNIQUE,
     `descricao` TEXT NULL,
     PRIMARY KEY (`id`)
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS `produtos` (
     `nome` VARCHAR(255) NOT NULL,
     `descricao` TEXT NULL,
     `codigo_barras` VARCHAR(50) NOT NULL UNIQUE,
-    `categoria_id` INT NULL,
+    `categoria_id` VARCHAR(36) DEFAULT NULL,
     `marca` VARCHAR(100) NULL,
-    `preco_sugerido` DECIMAL(10, 2) NOT NULL,
+    `preco_sugerido` DECIMAL(10, 2) NULL,
     `ativo` BOOLEAN NOT NULL DEFAULT TRUE,
-    `data_cadastro` DATETIME NOT NULL,
-    `ultima_atualizacao` DATETIME NOT NULL,
+    `data_criacao` DATETIME NOT NULL,
+    `data_atualizacao` DATETIME NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_produtos_categoria_id`
         FOREIGN KEY (`categoria_id`)
