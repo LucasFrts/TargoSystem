@@ -9,7 +9,7 @@ import com.targosystem.varejo.seguranca.domain.repository.PapelRepository;
 import com.targosystem.varejo.seguranca.domain.repository.UsuarioRepository;
 import com.targosystem.varejo.seguranca.domain.service.PasswordEncryptor;
 import com.targosystem.varejo.shared.domain.DomainException;
-import com.targosystem.varejo.shared.infra.EventPublisher; // Para eventos de domínio
+import com.targosystem.varejo.shared.infra.EventPublisher;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -23,8 +23,9 @@ public class CriarUsuarioUseCase {
     private final UsuarioRepository usuarioRepository;
     private final PapelRepository papelRepository;
     private final PasswordEncryptor passwordEncryptor;
-    private final EventPublisher eventPublisher; // Para publicar eventos como UsuarioCriadoEvent
+    private final EventPublisher eventPublisher;
 
+    // Remover EntityManagerFactory do construtor
     public CriarUsuarioUseCase(UsuarioRepository usuarioRepository, PapelRepository papelRepository, PasswordEncryptor passwordEncryptor, EventPublisher eventPublisher) {
         this.usuarioRepository = Objects.requireNonNull(usuarioRepository, "UsuarioRepository cannot be null");
         this.papelRepository = Objects.requireNonNull(papelRepository, "PapelRepository cannot be null");
@@ -45,6 +46,8 @@ public class CriarUsuarioUseCase {
             throw new DomainException("Password cannot be empty");
         }
 
+        // Sem blocos try-catch e transação aqui
+        // Usar os repositórios injetados diretamente
         if (usuarioRepository.existsByUsername(input.username())) {
             logger.warn("User with username {} already exists. Aborting creation.", input.username());
             throw new DomainException("User with this username already exists.");
@@ -71,12 +74,11 @@ public class CriarUsuarioUseCase {
                 papeisDoUsuario.add(papel);
             }
         }
-        papeisDoUsuario.forEach(novoUsuario::adicionarPapel); // Adiciona os papéis ao usuário
+        papeisDoUsuario.forEach(novoUsuario::adicionarPapel);
 
-        Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
+        Usuario usuarioSalvo = usuarioRepository.save(novoUsuario); // Continua chamando o save do repo
         logger.info("User {} (ID: {}) created successfully.", usuarioSalvo.getUsername(), usuarioSalvo.getId().getValue());
 
-        // Opcional: Publicar evento de domínio (ex: UsuarioCriadoEvent)
         eventPublisher.publish(new UsuarioCriadoEvent(usuarioSalvo.getId().getValue(), usuarioSalvo.getUsername(), usuarioSalvo.getNomeCompleto()));
 
         return UsuarioOutput.from(usuarioSalvo);

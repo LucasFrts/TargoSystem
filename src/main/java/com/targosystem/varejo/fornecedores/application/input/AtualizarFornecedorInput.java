@@ -3,6 +3,7 @@ package com.targosystem.varejo.fornecedores.application.input;
 public record AtualizarFornecedorInput(
         String id, // O ID do fornecedor a ser atualizado
         String nome,
+        String cnpj,
         String emailContato,
         String telefoneContato,
         String logradouro,
@@ -11,5 +12,6 @@ public record AtualizarFornecedorInput(
         String bairro,
         String cidade,
         String estado,
-        String cep
+        String cep,
+        boolean ativo
 ) {}

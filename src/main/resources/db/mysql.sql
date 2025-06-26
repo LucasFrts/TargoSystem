@@ -437,3 +437,10 @@ CREATE TABLE IF NOT EXISTS `dashboard_data` (
     PRIMARY KEY (`id`),
     UNIQUE (`tipo_metrica`, `data_referencia`) -- Para métricas diárias, por exemplo
 ) ENGINE = InnoDB;
+
+INSERT INTO papeis (id, nome, descricao) VALUES
+(1, 'ADMINISTRADOR', 'Acesso completo e irrestrito ao sistema.'),
+(2, 'GERENTE', 'Gerenciamento de módulos de negócio (produtos, vendas, estoque).'),
+(3, 'VENDEDOR', 'Realiza vendas, consulta produtos e clientes.'),
+(4, 'ESTOQUISTA', 'Gerencia entradas e saídas de produtos no estoque.'),
+(5, 'CAIXA', 'Operação de caixa e fechamento de vendas.');

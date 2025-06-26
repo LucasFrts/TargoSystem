@@ -11,5 +11,6 @@ public record CriarFornecedorInput(
         String bairro,
         String cidade,
         String estado,
-        String cep
+        String cep,
+        boolean ativo
 ) {}

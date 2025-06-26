@@ -1,5 +1,6 @@
 package com.targosystem.varejo.vendas.infra.persistence;
 
+import com.targosystem.varejo.clientes.domain.repository.ClienteRepository;
 import com.targosystem.varejo.vendas.domain.model.Venda;
 import com.targosystem.varejo.vendas.domain.model.VendaId;
 import com.targosystem.varejo.vendas.domain.repository.VendaRepository;
@@ -20,9 +21,9 @@ import java.util.stream.Collectors;
 public class VendaDao implements VendaRepository {
 
     private final EntityManager entityManager;
-    private final ClienteDao clienteDao; // Dependência do ClienteDao para buscar ClienteJpaEntity
+    private final ClienteRepository clienteDao; // Dependência do ClienteDao para buscar ClienteJpaEntity
 
-    public VendaDao(EntityManager entityManager, ClienteDao clienteDao) {
+    public VendaDao(EntityManager entityManager, ClienteRepository clienteDao) {
         this.entityManager = entityManager;
         this.clienteDao = clienteDao; // Injetar ClienteDao
     }
