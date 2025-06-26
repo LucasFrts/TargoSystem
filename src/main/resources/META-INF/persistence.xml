@@ -10,6 +10,10 @@
         <class>com.targosystem.varejo.seguranca.infra.persistence.entity.PapelJpaEntity</class>
         <class>com.targosystem.varejo.promocoes.infra.persistence.entity.PromocaoJpaEntity</class>
         <class>com.targosystem.varejo.promocoes.infra.persistence.entity.KitPromocionalJpaEntity</class>
+        <class>com.targosystem.varejo.estoque.infra.persistence.entity.EstoqueJpaEntity</class>
+        <class>com.targosystem.varejo.estoque.infra.persistence.entity.MovimentacaoEstoqueJpaEntity</class>
+        <class>com.targosystem.varejo.estoque.infra.persistence.entity.ItemEstoqueJpaEntity</class>
+
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
