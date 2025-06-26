@@ -1,20 +1,18 @@
 package com.targosystem.varejo.produtos.infra.persistence;
 
-import com.targosystem.varejo.produtos.domain.model.Categoria;
 import com.targosystem.varejo.produtos.domain.model.Produto;
 import com.targosystem.varejo.produtos.domain.model.ProdutoId;
 import com.targosystem.varejo.produtos.domain.repository.ProdutoRepository;
-import com.targosystem.varejo.produtos.infra.persistence.entity.CategoriaJpaEntity;
 import com.targosystem.varejo.produtos.infra.persistence.entity.ProdutoJpaEntity;
-import com.targosystem.varejo.shared.domain.Price;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// Exemplo usando JPA, mas pode ser JDBC puro, Jooq, etc.
 public class ProdutoDao implements ProdutoRepository {
 
     private final EntityManager entityManager;
@@ -24,18 +22,41 @@ public class ProdutoDao implements ProdutoRepository {
     }
 
     @Override
-    public Optional<Produto> findById(ProdutoId id) {
-        ProdutoJpaEntity entity = entityManager.find(ProdutoJpaEntity.class, id.getValue());
-        return Optional.ofNullable(entity).map(this::toDomain);
+    public Produto save(Produto produto) {
+        ProdutoJpaEntity jpaEntity = ProdutoJpaEntity.fromDomain(produto);
+        EntityTransaction transaction = null;
+        try {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            ProdutoJpaEntity existingEntity = entityManager.find(ProdutoJpaEntity.class, jpaEntity.getId());
+            if (existingEntity == null) {
+                entityManager.persist(jpaEntity);
+            } else {
+                // Atualizar campos da entidade existente
+                existingEntity.setNome(jpaEntity.getNome());
+                existingEntity.setDescricao(jpaEntity.getDescricao());
+                existingEntity.setPrecoVenda(jpaEntity.getPrecoVenda());
+                existingEntity.setCodigoBarras(jpaEntity.getCodigoBarras()); // Atualiza o código de barras
+                existingEntity.setStatus(jpaEntity.getStatus());
+                existingEntity.setDataAtualizacao(jpaEntity.getDataAtualizacao());
+                jpaEntity = entityManager.merge(existingEntity);
+            }
+            transaction.commit();
+            return jpaEntity.toDomain();
+        } catch (RuntimeException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        }
     }
 
     @Override
-    public Optional<Produto> findByCodigoBarras(String codigoBarras) {
+    public Optional<Produto> findById(ProdutoId id) {
         try {
-            TypedQuery<ProdutoJpaEntity> query = entityManager.createQuery(
-                    "SELECT p FROM ProdutoJpaEntity p WHERE p.codigoBarras = :codigoBarras", ProdutoJpaEntity.class);
-            query.setParameter("codigoBarras", codigoBarras);
-            return Optional.of(query.getSingleResult()).map(this::toDomain);
+            return Optional.ofNullable(entityManager.find(ProdutoJpaEntity.class, id.value()))
+                    .map(ProdutoJpaEntity::toDomain);
         } catch (NoResultException e) {
             return Optional.empty();
         }
@@ -46,78 +67,74 @@ public class ProdutoDao implements ProdutoRepository {
         TypedQuery<ProdutoJpaEntity> query = entityManager.createQuery(
                 "SELECT p FROM ProdutoJpaEntity p", ProdutoJpaEntity.class);
         return query.getResultList().stream()
-                .map(this::toDomain)
+                .map(ProdutoJpaEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Produto save(Produto produto) {
-        ProdutoJpaEntity entity = toJpaEntity(produto);
-        if (entityManager.find(ProdutoJpaEntity.class, entity.getId()) == null) {
-            entityManager.persist(entity); // Nova entidade
-        } else {
-            entityManager.merge(entity); // Entidade existente
-        }
-        // Retorna a entidade de domínio atualizada (importante para IDs gerados ou outras modificações)
-        return toDomain(entity);
-    }
-
-    @Override
-    public void delete(ProdutoId id) {
-        ProdutoJpaEntity entity = entityManager.find(ProdutoJpaEntity.class, id.getValue());
-        if (entity != null) {
-            entityManager.remove(entity);
+    public Optional<Produto> findByCodigoBarras(String codigoBarras) {
+        try {
+            TypedQuery<ProdutoJpaEntity> query = entityManager.createQuery(
+                    "SELECT p FROM ProdutoJpaEntity p WHERE p.codigoBarras = :codigoBarras", ProdutoJpaEntity.class);
+            query.setParameter("codigoBarras", codigoBarras);
+            // Se getSingleResult lançar NoResultException, o catch abaixo lida
+            return Optional.of(query.getSingleResult()).map(ProdutoJpaEntity::toDomain);
+        } catch (NoResultException e) {
+            return Optional.empty();
         }
     }
 
     @Override
     public boolean existsByCodigoBarras(String codigoBarras) {
-        TypedQuery<Long> query = entityManager.createQuery(
-                "SELECT COUNT(p) FROM ProdutoJpaEntity p WHERE p.codigoBarras = :codigoBarras", Long.class);
-        query.setParameter("codigoBarras", codigoBarras);
-        return query.getSingleResult() > 0;
+        EntityTransaction transaction = null;
+        try {
+            // Em muitas arquiteturas, a transação seria gerenciada no nível de serviço.
+            // Para `COUNT` puro, pode não ser estritamente necessário iniciar uma transação,
+            // mas é bom garantir consistência.
+            transaction = entityManager.getTransaction();
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+
+            TypedQuery<Long> query = entityManager.createQuery(
+                    "SELECT COUNT(p) FROM ProdutoJpaEntity p WHERE p.codigoBarras = :codigoBarras", Long.class);
+            query.setParameter("codigoBarras", codigoBarras);
+
+            Long count = query.getSingleResult();
+
+            // Se a transação foi iniciada aqui, pode ser comitada.
+            // Caso contrário, ela será gerenciada externamente.
+            if (transaction.isActive() && transaction.getRollbackOnly() == false) {
+                // transaction.commit(); // Descomente se você quiser comitar transações de leitura aqui.
+            }
+
+            return count > 0;
+        } catch (RuntimeException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        }
     }
 
-    // --- Mappers entre Domínio e JPA Entity ---
-    private Produto toDomain(ProdutoJpaEntity entity) {
-        if (entity == null) return null;
-        Categoria domainCategoria = (entity.getCategoria() != null) ?
-                new Categoria(entity.getCategoria().getId(), entity.getCategoria().getNome(), entity.getCategoria().getDescricao()) : null;
+    @Override
+    public void delete(ProdutoId id) {
+        EntityTransaction transaction = null;
+        try {
+            transaction = entityManager.getTransaction();
+            transaction.begin(); // Inicia a transação para operação de exclusão
 
-        return new Produto(
-                ProdutoId.from(entity.getId()),
-                entity.getNome(),
-                entity.getDescricao(),
-                entity.getCodigoBarras(),
-                domainCategoria,
-                entity.getMarca(),
-                Price.of(entity.getPrecoSugerido()),
-                entity.isAtivo(),
-                entity.getDataCadastro(),
-                entity.getUltimaAtualizacao()
-        );
-    }
+            ProdutoJpaEntity entity = entityManager.find(ProdutoJpaEntity.class, id.value());
+            if (entity != null) {
+                entityManager.remove(entity);
+            }
 
-    private ProdutoJpaEntity toJpaEntity(Produto domain) {
-        if (domain == null) return null;
-        // Assume que a Categoria já existe no banco ou foi criada/persistida
-        CategoriaJpaEntity jpaCategoria = (domain.getCategoria() != null && domain.getCategoria().getId() != null) ?
-                entityManager.find(CategoriaJpaEntity.class, domain.getCategoria().getId()) : null;
-        // Se a categoria no domínio foi criada sem ID (new Categoria(nome, desc)),
-        // ela deve ser persistida antes que o produto possa referenciá-la.
-        // O UseCase de CadastrarProduto já cuida disso.
-
-        ProdutoJpaEntity entity = new ProdutoJpaEntity();
-        entity.setId(domain.getId().getValue());
-        entity.setNome(domain.getNome());
-        entity.setDescricao(domain.getDescricao());
-        entity.setCodigoBarras(domain.getCodigoBarras());
-        entity.setCategoria(jpaCategoria); // Referência à entidade JPA de Categoria
-        entity.setMarca(domain.getMarca());
-        entity.setPrecoSugerido(domain.getPrecoSugerido().getValue());
-        entity.setAtivo(domain.isAtivo());
-        entity.setDataCadastro(domain.getDataCadastro());
-        entity.setUltimaAtualizacao(domain.getUltimaAtualizacao());
-        return entity;
+            transaction.commit(); // Comita a transação
+        } catch (RuntimeException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback(); // Faz rollback em caso de erro
+            }
+            throw e; // Relança a exceção
+        }
     }
 }

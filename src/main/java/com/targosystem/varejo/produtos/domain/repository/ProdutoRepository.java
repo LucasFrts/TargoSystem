@@ -2,14 +2,15 @@ package com.targosystem.varejo.produtos.domain.repository;
 
 import com.targosystem.varejo.produtos.domain.model.Produto;
 import com.targosystem.varejo.produtos.domain.model.ProdutoId;
-import java.util.Optional;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface ProdutoRepository {
+    Produto save(Produto produto);
     Optional<Produto> findById(ProdutoId id);
-    Optional<Produto> findByCodigoBarras(String codigoBarras);
     List<Produto> findAll();
-    Produto save(Produto produto); // Persiste ou atualiza
-    void delete(ProdutoId id);
-    boolean existsByCodigoBarras(String codigoBarras);
+    Optional<Produto> findByCodigoBarras(String codigoBarras); // Novo método
+    boolean existsByCodigoBarras(String codigoBarras); // Novo método
+    void delete(ProdutoId id); // Adicionado para demonstração no DAO
 }

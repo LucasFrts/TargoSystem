@@ -52,7 +52,7 @@ public class AtualizarProdutoUseCase {
                 input.codigoBarras(),
                 categoria,
                 input.marca(),
-                input.precoSugerido()
+                input.precoSugerido().getValue()
         );
 
         // Persistir as mudanças

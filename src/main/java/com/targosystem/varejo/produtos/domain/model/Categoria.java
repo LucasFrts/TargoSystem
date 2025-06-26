@@ -1,46 +1,60 @@
 package com.targosystem.varejo.produtos.domain.model;
 
+import com.targosystem.varejo.shared.domain.AggregateRoot;
 import com.targosystem.varejo.shared.domain.DomainException;
+
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Categoria {
-    private final Integer id; // Pode ser um ID numérico gerado pelo DB
-    private final String nome;
-    private final String descricao;
+public class Categoria implements AggregateRoot {
+    private CategoriaId id;
+    private String nome;
+    private String descricao;
+    private LocalDateTime dataCriacao;
+    private LocalDateTime dataAtualizacao;
 
-    // Construtor para categorias existentes (com ID)
-    public Categoria(Integer id, String nome, String descricao) {
-        Objects.requireNonNull(id, "Category ID cannot be null");
-        Objects.requireNonNull(nome, "Category name cannot be null");
-        if (nome.isBlank()) {
-            throw new DomainException("Category name cannot be empty");
-        }
-        this.id = id;
-        this.nome = nome;
-        this.descricao = descricao;
-    }
-
-    // Construtor para novas categorias (sem ID, a ser gerado na persistência)
+    // Construtor para nova criação
     public Categoria(String nome, String descricao) {
-        Objects.requireNonNull(nome, "Category name cannot be null");
-        if (nome.isBlank()) {
-            throw new DomainException("Category name cannot be empty");
+        this.id = CategoriaId.generate(); // Gerar um novo ID ao criar
+        setNome(nome);
+        setDescricao(descricao);
+        this.dataCriacao = LocalDateTime.now();
+        this.dataAtualizacao = LocalDateTime.now();
+    }
+
+    // Construtor para reconstrução da persistência (todos os campos, incluindo CategoriaId)
+    public Categoria(CategoriaId id, String nome, String descricao, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
+        this.id = Objects.requireNonNull(id, "ID da categoria não pode ser nulo.");
+        setNome(nome); // Usar setter para validação
+        setDescricao(descricao); // Usar setter para validação
+        this.dataCriacao = Objects.requireNonNull(dataCriacao, "Data de criação da categoria não pode ser nula.");
+        this.dataAtualizacao = Objects.requireNonNull(dataAtualizacao, "Data de atualização da categoria não pode ser nula.");
+    }
+
+    // Getters
+    public CategoriaId getId() { return id; }
+    public String getNome() { return nome; }
+    public String getDescricao() { return descricao; }
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+    public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
+
+    // Setters (com validação se necessário)
+    public void setNome(String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new DomainException("Nome da categoria não pode ser nulo ou vazio.");
         }
-        this.id = null; // ID será gerado pelo banco de dados
         this.nome = nome;
+        this.dataAtualizacao = LocalDateTime.now();
+    }
+
+    public void setDescricao(String descricao) {
         this.descricao = descricao;
+        this.dataAtualizacao = LocalDateTime.now();
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getDescricao() {
-        return descricao;
+    // Métodos de domínio adicionais para Categoria (ex: atualizarDescricao)
+    public void atualizarDescricao(String novaDescricao) {
+        setDescricao(novaDescricao);
     }
 
     @Override
@@ -48,25 +62,11 @@ public class Categoria {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Categoria categoria = (Categoria) o;
-        // Se o ID é null (nova categoria ainda não persistida), compara pelo nome
-        // Caso contrário, compara pelo ID
-        if (id == null || categoria.id == null) {
-            return nome.equals(categoria.nome);
-        }
-        return id.equals(categoria.id);
+        return Objects.equals(id, categoria.id);
     }
 
     @Override
     public int hashCode() {
-        // Se o ID é null, usa o nome para o hash, caso contrário, usa o ID
-        return id != null ? Objects.hash(id) : Objects.hash(nome);
-    }
-
-    @Override
-    public String toString() {
-        return "Categoria{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                '}';
+        return Objects.hash(id);
     }
 }

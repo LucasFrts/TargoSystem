@@ -1,53 +1,47 @@
 package com.targosystem.varejo.produtos.domain.model;
 
 import com.targosystem.varejo.shared.domain.DomainException;
+import com.targosystem.varejo.shared.domain.ValueObject;
+
 import java.util.Objects;
 import java.util.UUID;
 
-public class ProdutoId {
-    private final String value;
-
-    public ProdutoId(String value) {
-        Objects.requireNonNull(value, "Product ID cannot be null");
-        if (value.isBlank()) {
-            throw new DomainException("Product ID cannot be empty");
+public record ProdutoId(String value) implements ValueObject {
+    public ProdutoId {
+        if (value == null || value.trim().isEmpty()) {
+            throw new DomainException("ID do produto não pode ser nulo ou vazio.");
         }
-        // Opcional: Adicionar validação de formato UUID se for sempre UUID
         try {
+            // Validar se é um UUID válido, se essa for a sua intenção
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {
-            throw new DomainException("Invalid Product ID format", e);
+            throw new DomainException("Formato de ID de produto inválido: " + value, e);
         }
-        this.value = value;
     }
 
+    /**
+     * Gera um novo ProdutoId com um UUID aleatório.
+     * @return Um novo ProdutoId.
+     */
     public static ProdutoId generate() {
         return new ProdutoId(UUID.randomUUID().toString());
     }
 
-    public static ProdutoId from(String value) {
+    /**
+     * Cria um ProdutoId a partir de uma String existente.
+     * @param value A string que representa o ID do produto.
+     * @return Um ProdutoId.
+     */
+    public static ProdutoId from(String value) { // ADDED THIS METHOD
         return new ProdutoId(value);
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProdutoId produtoId = (ProdutoId) o;
-        return value.equals(produtoId.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 
     @Override
     public String toString() {
+        return value;
+    }
+
+    public String getValue() {
         return value;
     }
 }

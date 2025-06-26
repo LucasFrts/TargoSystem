@@ -53,10 +53,10 @@ public class CadastrarProdutoUseCase {
         Produto novoProduto = new Produto(
                 input.nome(),
                 input.descricao(),
+                input.precoSugerido().getValue(),
                 input.codigoBarras(),
                 categoria,
-                input.marca(),
-                input.precoSugerido()
+                input.marca()
         );
 
         // 5. Persistir o produto
