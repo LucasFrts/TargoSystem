@@ -66,7 +66,7 @@ public class Estoque {
         // Prioriza a remoção de itens com menor validade, ou pode ter outra lógica (FIFO, LIFO)
         List<ItemEstoque> itensParaRemover = new ArrayList<>(this.itensEstoque);
         itensParaRemover.sort((item1, item2) -> {
-            // Lógica para ordenar: Ex: por data de validade (mais antiga primeiro)
+
             if (item1.getLote().getDataValidade() != null && item2.getLote().getDataValidade() != null) {
                 return item1.getLote().getDataValidade().compareTo(item2.getLote().getDataValidade());
             }
@@ -88,7 +88,6 @@ public class Estoque {
             }
         }
 
-        // Remove itens com quantidade zero (se aplicável ao seu domínio)
         this.itensEstoque.removeIf(item -> item.getQuantidade() == 0);
     }
 

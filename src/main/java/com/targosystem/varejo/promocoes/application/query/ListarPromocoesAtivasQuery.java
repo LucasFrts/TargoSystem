@@ -6,8 +6,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListarPromocoesAtivasQuery {
+
+    private static final Logger logger = LoggerFactory.getLogger(ListarPromocoesAtivasQuery.class);
 
     private final PromocaoRepository promocaoRepository;
 
@@ -16,9 +20,16 @@ public class ListarPromocoesAtivasQuery {
     }
 
     public List<PromocaoOutput> execute() {
-        // Busca promoções ativas no momento atual
-        return promocaoRepository.findActivePromotions(LocalDateTime.now()).stream()
-                .map(PromocaoOutput::fromDomain)
-                .collect(Collectors.toList());
+        LocalDateTime now = LocalDateTime.now();
+        logger.debug("Executing ListarPromocoesAtivasQuery to fetch active promotions as of: {}", now);
+        try {
+            // Busca promoções ativas no momento atual
+            return promocaoRepository.findActivePromotions(now).stream()
+                    .map(PromocaoOutput::from) // Assumindo que PromocaoOutput tem um método from(Promocao)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error retrieving active promotions: {}", e.getMessage(), e);
+            throw new RuntimeException("Falha ao listar promoções ativas.", e);
+        }
     }
 }

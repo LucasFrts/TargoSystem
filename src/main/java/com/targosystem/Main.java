@@ -21,10 +21,8 @@ import com.targosystem.varejo.produtos.domain.service.ClassificadorProduto;
 import com.targosystem.varejo.produtos.infra.persistence.CategoriaDao;
 import com.targosystem.varejo.produtos.infra.persistence.ProdutoDao;
 
-import com.targosystem.varejo.promocoes.application.query.ObterKitPromocionalPorIdQuery;
-import com.targosystem.varejo.promocoes.application.query.ObterPromocaoPorIdQuery;
-import com.targosystem.varejo.promocoes.application.usecases.AtualizarPromocaoUseCase;
-import com.targosystem.varejo.promocoes.application.usecases.CriarKitPromocionalUseCase;
+import com.targosystem.varejo.promocoes.application.query.*;
+import com.targosystem.varejo.promocoes.application.usecases.*;
 import com.targosystem.varejo.promocoes.domain.repository.KitPromocionalRepository;
 import com.targosystem.varejo.promocoes.infra.persistence.KitPromocionalDao;
 import com.targosystem.varejo.seguranca.application.SegurancaService;
@@ -47,8 +45,6 @@ import com.targosystem.varejo.seguranca.infra.persistence.UsuarioDao;
 import com.targosystem.varejo.seguranca.infra.security.BCryptPasswordEncryptor;
 
 import com.targosystem.varejo.promocoes.application.PromocaoService;
-import com.targosystem.varejo.promocoes.application.usecases.CriarPromocaoUseCase;
-import com.targosystem.varejo.promocoes.application.query.ListarPromocoesAtivasQuery;
 import com.targosystem.varejo.promocoes.domain.repository.PromocaoRepository;
 import com.targosystem.varejo.promocoes.infra.persistence.PromocaoDao;
 
@@ -167,13 +163,19 @@ public class Main {
         PromocaoRepository promocaoRepository = new PromocaoDao(entityManager);
         KitPromocionalRepository kitPromocionalRepository = new KitPromocionalDao(entityManager);
 
-        CriarPromocaoUseCase criarPromocaoUseCase = new CriarPromocaoUseCase(promocaoRepository, eventPublisher);
-        AtualizarPromocaoUseCase atualizarPromocaoUseCase = new AtualizarPromocaoUseCase(promocaoRepository, eventPublisher);
+        CriarPromocaoUseCase criarPromocaoUseCase = new CriarPromocaoUseCase(promocaoRepository, eventPublisher, entityManager);
+        AtualizarPromocaoUseCase atualizarPromocaoUseCase = new AtualizarPromocaoUseCase(promocaoRepository, eventPublisher, entityManager);
+        CriarKitPromocionalUseCase criarKitPromocionalUseCase = new CriarKitPromocionalUseCase(kitPromocionalRepository, eventPublisher, entityManager);
+        ExcluirPromocaoUseCase excluirPromocaoUseCase = new ExcluirPromocaoUseCase(promocaoRepository, entityManager);
+        ExcluirKitPromocionalUseCase excluirKitPromocionalUseCase = new ExcluirKitPromocionalUseCase(kitPromocionalRepository, entityManager);
+
+
+        ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery = new ObterKitPromocionalPorIdQuery(kitPromocionalRepository);
+        ListarTodosKitsQuery listarTodosKitsQuery = new ListarTodosKitsQuery(kitPromocionalRepository);
         ObterPromocaoPorIdQuery obterPromocaoPorIdQuery = new ObterPromocaoPorIdQuery(promocaoRepository);
         ListarPromocoesAtivasQuery listarPromocoesAtivasQuery = new ListarPromocoesAtivasQuery(promocaoRepository);
-
-        CriarKitPromocionalUseCase criarKitPromocionalUseCase = new CriarKitPromocionalUseCase(kitPromocionalRepository, eventPublisher);
-        ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery = new ObterKitPromocionalPorIdQuery(kitPromocionalRepository);
+        ListarTodosKitsComDetalhesProdutoQuery listarTodosKitsComDetalhesProdutoQuery = new ListarTodosKitsComDetalhesProdutoQuery(kitPromocionalRepository, produtoService);
+        ObterKitPromocionalPorIdComDetalhesProdutoQuery obterKitPromocionalPorIdComDetalhesProdutoQuery = new ObterKitPromocionalPorIdComDetalhesProdutoQuery(kitPromocionalRepository, produtoService);
 
         PromocaoService promocaoService = new PromocaoService(
                 criarPromocaoUseCase,
@@ -181,7 +183,13 @@ public class Main {
                 obterPromocaoPorIdQuery,
                 listarPromocoesAtivasQuery,
                 criarKitPromocionalUseCase,
-                obterKitPromocionalPorIdQuery
+                obterKitPromocionalPorIdQuery,
+                listarTodosKitsQuery,
+                excluirPromocaoUseCase,
+                excluirKitPromocionalUseCase,
+                listarTodosKitsComDetalhesProdutoQuery,
+                obterKitPromocionalPorIdComDetalhesProdutoQuery
+
         );
 
         // --- Configuração do Bounded Context de ESTOQUE ---

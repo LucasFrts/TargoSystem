@@ -113,7 +113,7 @@ public class MainApplicationFrame extends JFrame {
         cardsPanel.add(produtoPanel, "Produtos");
 
         promocaoFrame = new PromocaoFrame();
-        promocaoController = new PromocaoController(promocaoService, promocaoFrame);
+        promocaoController = new PromocaoController(promocaoService,produtoService, promocaoFrame);
         cardsPanel.add(promocaoFrame, "Promocoes");
 
         estoqueFrame = new EstoqueFrame();

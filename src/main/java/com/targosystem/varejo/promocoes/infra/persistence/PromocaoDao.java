@@ -4,7 +4,6 @@ import com.targosystem.varejo.promocoes.domain.model.Promocao;
 import com.targosystem.varejo.promocoes.domain.repository.PromocaoRepository;
 import com.targosystem.varejo.promocoes.infra.persistence.entity.PromocaoJpaEntity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 import java.time.LocalDateTime;
@@ -23,10 +22,7 @@ public class PromocaoDao implements PromocaoRepository {
     @Override
     public Promocao save(Promocao promocao) {
         PromocaoJpaEntity jpaEntity = PromocaoJpaEntity.fromDomain(promocao);
-        EntityTransaction transaction = null;
         try {
-            transaction = entityManager.getTransaction();
-            transaction.begin();
             PromocaoJpaEntity existingEntity = entityManager.find(PromocaoJpaEntity.class, jpaEntity.getId());
             if (existingEntity == null) {
                 entityManager.persist(jpaEntity);
@@ -37,14 +33,14 @@ public class PromocaoDao implements PromocaoRepository {
                 existingEntity.setDataInicio(jpaEntity.getDataInicio());
                 existingEntity.setDataFim(jpaEntity.getDataFim());
                 existingEntity.setAtiva(jpaEntity.isAtiva());
+                existingEntity.setProdutoIds(jpaEntity.getProdutoIds());
+                existingEntity.setDataAtualizacao(jpaEntity.getDataAtualizacao()); // Garante que a data de atualização é propagada
+
                 jpaEntity = entityManager.merge(existingEntity);
             }
-            transaction.commit();
+            entityManager.flush(); // Garante que as alterações são sincronizadas com o banco antes do commit do UseCase
             return jpaEntity.toDomain();
         } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
             throw e;
         }
     }
@@ -75,19 +71,13 @@ public class PromocaoDao implements PromocaoRepository {
 
     @Override
     public void delete(Promocao promocao) {
-        EntityTransaction transaction = null;
         try {
-            transaction = entityManager.getTransaction();
-            transaction.begin();
             PromocaoJpaEntity jpaEntity = entityManager.find(PromocaoJpaEntity.class, promocao.getId());
             if (jpaEntity != null) {
                 entityManager.remove(jpaEntity);
             }
-            transaction.commit();
+            entityManager.flush();
         } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
             throw e;
         }
     }

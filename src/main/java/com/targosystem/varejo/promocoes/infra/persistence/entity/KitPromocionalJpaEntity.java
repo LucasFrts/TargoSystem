@@ -1,9 +1,10 @@
 package com.targosystem.varejo.promocoes.infra.persistence.entity;
 
 import com.targosystem.varejo.promocoes.domain.model.KitPromocional;
-import com.targosystem.varejo.promocoes.domain.model.ItemKit;
+import com.targosystem.varejo.promocoes.domain.model.ItemKit; // Certifique-se que ItemKit está correto
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,13 +19,13 @@ public class KitPromocionalJpaEntity {
     @Column(nullable = false, unique = true)
     private String nome;
 
-    @Column(length = 500) // Aumenta o tamanho da coluna se a descrição for longa
+    @Column(length = 500)
     private String descricao;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precoFixoKit;
 
-    @ElementCollection // Mapeia uma coleção de objetos de valor
+    @ElementCollection
     @CollectionTable(name = "kit_itens", joinColumns = @JoinColumn(name = "kit_id"))
     @AttributeOverrides({
             @AttributeOverride(name = "produtoId", column = @Column(name = "produto_id", nullable = false)),
@@ -32,17 +33,30 @@ public class KitPromocionalJpaEntity {
     })
     private List<ItemKitJpaEmbeddable> itens; // Usaremos uma classe "Embeddable" para ItemKit
 
+    // NOVOS CAMPOS PARA DATAS
+    @Column(name = "data_criacao", nullable = false)
+    private LocalDateTime dataCriacao;
+
+    @Column(name = "data_atualizacao", nullable = false)
+    private LocalDateTime dataAtualizacao;
+
     // Construtor padrão JPA
     protected KitPromocionalJpaEntity() {}
 
-    public KitPromocionalJpaEntity(String id, String nome, String descricao, BigDecimal precoFixoKit, List<ItemKitJpaEmbeddable> itens) {
+    // Construtor completo ajustado para incluir as datas
+    public KitPromocionalJpaEntity(String id, String nome, String descricao, BigDecimal precoFixoKit,
+                                   List<ItemKitJpaEmbeddable> itens,
+                                   LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.precoFixoKit = precoFixoKit;
         this.itens = itens;
+        this.dataCriacao = dataCriacao;
+        this.dataAtualizacao = dataAtualizacao;
     }
 
+    // Método fromDomain ajustado para usar as datas do objeto de domínio
     public static KitPromocionalJpaEntity fromDomain(KitPromocional kit) {
         List<ItemKitJpaEmbeddable> jpaItens = kit.getItens().stream()
                 .map(ItemKitJpaEmbeddable::fromDomain)
@@ -52,10 +66,13 @@ public class KitPromocionalJpaEntity {
                 kit.getNome(),
                 kit.getDescricao(),
                 kit.getPrecoFixoKit(),
-                jpaItens
+                jpaItens,
+                kit.getDataCriacao(),
+                kit.getDataAtualizacao()
         );
     }
 
+    // Método toDomain ajustado para chamar o construtor completo de KitPromocional
     public KitPromocional toDomain() {
         List<ItemKit> domainItens = this.itens.stream()
                 .map(ItemKitJpaEmbeddable::toDomain)
@@ -65,11 +82,13 @@ public class KitPromocionalJpaEntity {
                 this.nome,
                 this.descricao,
                 this.precoFixoKit,
-                domainItens
+                domainItens,
+                this.dataCriacao,
+                this.dataAtualizacao
         );
     }
 
-    // Getters e Setters para JPA
+    // Getters e Setters para JPA (incluir os novos campos)
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getNome() { return nome; }
@@ -80,4 +99,9 @@ public class KitPromocionalJpaEntity {
     public void setPrecoFixoKit(BigDecimal precoFixoKit) { this.precoFixoKit = precoFixoKit; }
     public List<ItemKitJpaEmbeddable> getItens() { return itens; }
     public void setItens(List<ItemKitJpaEmbeddable> itens) { this.itens = itens; }
+
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
+    public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
+    public void setDataAtualizacao(LocalDateTime dataAtualizacao) { this.dataAtualizacao = dataAtualizacao; }
 }

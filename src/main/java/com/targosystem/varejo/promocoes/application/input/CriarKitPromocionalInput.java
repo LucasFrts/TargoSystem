@@ -8,5 +8,5 @@ public record CriarKitPromocionalInput(
         String nome,
         String descricao,
         BigDecimal precoFixoKit,
-        List<ItemKitInput> itens
+        List<KitItemInput> itens
 ) {}

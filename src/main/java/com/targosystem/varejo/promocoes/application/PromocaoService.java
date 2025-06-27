@@ -7,10 +7,18 @@ import com.targosystem.varejo.promocoes.application.output.KitPromocionalOutput;
 import com.targosystem.varejo.promocoes.application.output.PromocaoOutput;
 import com.targosystem.varejo.promocoes.application.query.ListarPromocoesAtivasQuery;
 import com.targosystem.varejo.promocoes.application.query.ObterKitPromocionalPorIdQuery;
+import com.targosystem.varejo.promocoes.application.query.ListarTodosKitsQuery;
 import com.targosystem.varejo.promocoes.application.query.ObterPromocaoPorIdQuery;
 import com.targosystem.varejo.promocoes.application.usecases.CriarKitPromocionalUseCase;
 import com.targosystem.varejo.promocoes.application.usecases.CriarPromocaoUseCase;
 import com.targosystem.varejo.promocoes.application.usecases.AtualizarPromocaoUseCase;
+import com.targosystem.varejo.promocoes.application.usecases.ExcluirPromocaoUseCase;
+import com.targosystem.varejo.promocoes.application.usecases.ExcluirKitPromocionalUseCase;
+
+// NOVOS IMPORTS para as queries detalhadas de kit
+import com.targosystem.varejo.promocoes.application.query.ListarTodosKitsComDetalhesProdutoQuery;
+import com.targosystem.varejo.promocoes.application.query.ObterKitPromocionalPorIdComDetalhesProdutoQuery;
+
 
 import java.util.List;
 import java.util.Objects;
@@ -21,8 +29,15 @@ public class PromocaoService {
     private final AtualizarPromocaoUseCase atualizarPromocaoUseCase;
     private final ObterPromocaoPorIdQuery obterPromocaoPorIdQuery;
     private final ListarPromocoesAtivasQuery listarPromocoesAtivasQuery;
-    private final CriarKitPromocionalUseCase criarKitPromocionalUseCase; // NOVO
-    private final ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery; // NOVO
+    private final CriarKitPromocionalUseCase criarKitPromocionalUseCase;
+    private final ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery; // Query simples (sem detalhes do produto)
+    private final ListarTodosKitsQuery listarTodosKitsQuery; // Query simples (sem detalhes do produto)
+    private final ExcluirPromocaoUseCase excluirPromocaoUseCase;
+    private final ExcluirKitPromocionalUseCase excluirKitPromocionalUseCase;
+
+    // Campos para as queries com detalhes de produto
+    private final ListarTodosKitsComDetalhesProdutoQuery listarTodosKitsComDetalhesProdutoQuery;
+    private final ObterKitPromocionalPorIdComDetalhesProdutoQuery obterKitPromocionalPorIdComDetalhesProdutoQuery;
 
 
     public PromocaoService(
@@ -31,14 +46,27 @@ public class PromocaoService {
             ObterPromocaoPorIdQuery obterPromocaoPorIdQuery,
             ListarPromocoesAtivasQuery listarPromocoesAtivasQuery,
             CriarKitPromocionalUseCase criarKitPromocionalUseCase,
-            ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery
-            ) {
+            ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery,
+            ListarTodosKitsQuery listarTodosKitsQuery,
+            ExcluirPromocaoUseCase excluirPromocaoUseCase,
+            ExcluirKitPromocionalUseCase excluirKitPromocionalUseCase,
+            // Adicionar as novas queries ao construtor
+            ListarTodosKitsComDetalhesProdutoQuery listarTodosKitsComDetalhesProdutoQuery,
+            ObterKitPromocionalPorIdComDetalhesProdutoQuery obterKitPromocionalPorIdComDetalhesProdutoQuery
+    ) {
         this.criarPromocaoUseCase = Objects.requireNonNull(criarPromocaoUseCase, "CriarPromocaoUseCase cannot be null");
         this.atualizarPromocaoUseCase = Objects.requireNonNull(atualizarPromocaoUseCase, "AtualizarPromocaoUseCase cannot be null");
         this.obterPromocaoPorIdQuery = Objects.requireNonNull(obterPromocaoPorIdQuery, "ObterPromocaoPorIdQuery cannot be null");
         this.listarPromocoesAtivasQuery = Objects.requireNonNull(listarPromocoesAtivasQuery, "ListarPromocoesAtivasQuery cannot be null");
         this.criarKitPromocionalUseCase = Objects.requireNonNull(criarKitPromocionalUseCase, "CriarKitPromocionalUseCase cannot be null");
         this.obterKitPromocionalPorIdQuery = Objects.requireNonNull(obterKitPromocionalPorIdQuery, "ObterKitPromocionalPorIdQuery cannot be null");
+        this.listarTodosKitsQuery = Objects.requireNonNull(listarTodosKitsQuery, "ListarTodosKitsQuery cannot be null");
+        this.excluirPromocaoUseCase = Objects.requireNonNull(excluirPromocaoUseCase, "ExcluirPromocaoUseCase cannot be null");
+        this.excluirKitPromocionalUseCase = Objects.requireNonNull(excluirKitPromocionalUseCase, "ExcluirKitPromocionalUseCase cannot be null");
+
+        // Inicializar as novas queries
+        this.listarTodosKitsComDetalhesProdutoQuery = Objects.requireNonNull(listarTodosKitsComDetalhesProdutoQuery, "ListarTodosKitsComDetalhesProdutoQuery cannot be null");
+        this.obterKitPromocionalPorIdComDetalhesProdutoQuery = Objects.requireNonNull(obterKitPromocionalPorIdComDetalhesProdutoQuery, "ObterKitPromocionalPorIdComDetalhesProdutoQuery cannot be null");
     }
 
     public PromocaoOutput criarPromocao(CriarPromocaoInput input) {
@@ -63,5 +91,25 @@ public class PromocaoService {
 
     public KitPromocionalOutput obterKitPromocionalPorId(String id) {
         return obterKitPromocionalPorIdQuery.execute(id);
+    }
+
+    public List<KitPromocionalOutput> listarTodosKits() {
+        return listarTodosKitsQuery.execute();
+    }
+
+    public List<KitPromocionalOutput> listarTodosKitsComDetalhesProduto() {
+        return listarTodosKitsComDetalhesProdutoQuery.execute();
+    }
+
+    public KitPromocionalOutput obterKitPromocionalPorIdComDetalhesProduto(String id) {
+        return obterKitPromocionalPorIdComDetalhesProdutoQuery.execute(id);
+    }
+
+    public void excluirPromocao(String id) {
+        excluirPromocaoUseCase.execute(id);
+    }
+
+    public void excluirKitPromocional(String id) {
+        excluirKitPromocionalUseCase.execute(id);
     }
 }

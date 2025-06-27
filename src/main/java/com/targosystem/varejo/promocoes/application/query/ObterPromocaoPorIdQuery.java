@@ -4,9 +4,13 @@ import com.targosystem.varejo.promocoes.application.output.PromocaoOutput;
 import com.targosystem.varejo.promocoes.domain.repository.PromocaoRepository;
 import com.targosystem.varejo.shared.domain.DomainException;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Optional; // Já importado, mas reforçando
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ObterPromocaoPorIdQuery {
+
+    private static final Logger logger = LoggerFactory.getLogger(ObterPromocaoPorIdQuery.class);
 
     private final PromocaoRepository promocaoRepository;
 
@@ -15,8 +19,12 @@ public class ObterPromocaoPorIdQuery {
     }
 
     public PromocaoOutput execute(String id) {
+        logger.debug("Executing ObterPromocaoPorIdQuery for ID: {}", id);
         return promocaoRepository.findById(id)
-                .map(PromocaoOutput::fromDomain)
-                .orElseThrow(() -> new DomainException("Promoção não encontrada com ID: " + id));
+                .map(PromocaoOutput::from) // Assumindo que PromocaoOutput tem um método from(Promocao)
+                .orElseThrow(() -> {
+                    logger.warn("Promotion with ID {} not found.", id);
+                    return new DomainException("Promoção não encontrada com ID: " + id);
+                });
     }
 }

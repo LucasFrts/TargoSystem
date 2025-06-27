@@ -4,6 +4,8 @@ import com.targosystem.varejo.promocoes.domain.model.Promocao;
 import com.targosystem.varejo.promocoes.domain.model.TipoDesconto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List; // Importar List
+import java.util.Collections; // Para Collections.unmodifiableList
 
 public record PromocaoOutput(
         String id,
@@ -12,9 +14,12 @@ public record PromocaoOutput(
         BigDecimal valorDesconto,
         LocalDateTime dataInicio,
         LocalDateTime dataFim,
-        boolean ativa
+        boolean ativa,
+        List<String> produtoIds,
+        LocalDateTime dataCriacao,
+        LocalDateTime dataAtualizacao
 ) {
-    public static PromocaoOutput fromDomain(Promocao promocao) {
+    public static PromocaoOutput from(Promocao promocao) {
         return new PromocaoOutput(
                 promocao.getId(),
                 promocao.getNome(),
@@ -22,7 +27,10 @@ public record PromocaoOutput(
                 promocao.getValorDesconto(),
                 promocao.getDataInicio(),
                 promocao.getDataFim(),
-                promocao.isAtiva()
+                promocao.isAtiva(),
+                Collections.unmodifiableList(promocao.getProdutoIds()),
+                promocao.getDataCriacao(),
+                promocao.getDataAtualizacao()
         );
     }
 }

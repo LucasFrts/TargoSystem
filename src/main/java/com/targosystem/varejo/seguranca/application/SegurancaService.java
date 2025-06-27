@@ -59,7 +59,7 @@ public class SegurancaService {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e; // Re-lança exceções de domínio
+            throw e;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -70,14 +70,12 @@ public class SegurancaService {
     }
 
     public UsuarioOutput atualizarUsuario(String id){
-        // Implemente a lógica de atualização aqui
+        // TODO: implementar update de usuario
         throw new UnsupportedOperationException("Atualizar usuário não implementado.");
     }
 
     public UsuarioOutput loginUsuario(LoginInput input) throws DomainException {
-        // O login é uma operação de leitura/consulta, geralmente não precisa de transação de escrita,
-        // mas pode precisar de transação de leitura se seu provedor JPA exigir ou se houver Lazy Loading.
-        // Se houver atualização de ultimoLogin, precisará de transação.
+        // Transaction esta aqui, mas o ideal é mover todas para englobar nos useCase
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
@@ -99,9 +97,6 @@ public class SegurancaService {
     }
 
     public UsuarioOutput obterUsuarioPorId(String id) {
-        // Operações de consulta (findAll, findById) normalmente não precisam de transação de escrita.
-        // Se houver Lazy Loading de coleções, pode ser necessário manter o EntityManager aberto
-        // durante a vida do objeto de domínio, ou usar uma transação de leitura.
         return obterUsuarioPorIdQuery.execute(id);
     }
 

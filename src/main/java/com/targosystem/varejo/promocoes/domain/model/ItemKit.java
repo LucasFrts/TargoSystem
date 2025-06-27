@@ -2,11 +2,10 @@ package com.targosystem.varejo.promocoes.domain.model;
 
 import java.util.Objects;
 
-// Objeto de Valor: sem ID próprio, imutável após a criação
 public class ItemKit {
 
-    private final String produtoId; // Referência ao ID do Produto (do BC de Produtos)
-    private final int quantidade;
+    private String produtoId;
+    private int quantidade;
 
     public ItemKit(String produtoId, int quantidade) {
         this.produtoId = Objects.requireNonNull(produtoId, "ID do produto não pode ser nulo.");
@@ -16,8 +15,13 @@ public class ItemKit {
         this.quantidade = quantidade;
     }
 
-    public String getProdutoId() { return produtoId; }
-    public int getQuantidade() { return quantidade; }
+    public String getProdutoId() {
+        return produtoId;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
 
     @Override
     public boolean equals(Object o) {
