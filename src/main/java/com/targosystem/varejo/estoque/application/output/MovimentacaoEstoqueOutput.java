@@ -3,27 +3,29 @@ package com.targosystem.varejo.estoque.application.output;
 import com.targosystem.varejo.estoque.domain.model.MovimentacaoEstoque;
 import com.targosystem.varejo.estoque.domain.model.TipoMovimentacao;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-record MovimentacaoEstoqueOutput(
+public record MovimentacaoEstoqueOutput(
         String id,
-        String estoqueId,
         TipoMovimentacao tipo,
-        int quantidade,
         LocalDateTime dataHora,
         String motivo,
-        LoteOutput loteAfetado,
-        LocalizacaoArmazenamentoOutput localizacaoAfetada
+        String localOrigemId,
+        String localDestinoId,
+        List<ItemMovimentacaoOutput> itens
 ) {
-    static MovimentacaoEstoqueOutput fromDomain(MovimentacaoEstoque mov) {
+    public static MovimentacaoEstoqueOutput fromDomain(MovimentacaoEstoque movimentacao) {
         return new MovimentacaoEstoqueOutput(
-                mov.getId(),
-                mov.getEstoqueId(),
-                mov.getTipo(),
-                mov.getQuantidade(),
-                mov.getDataHora(),
-                mov.getMotivo(),
-                mov.getLoteAfetado() != null ? LoteOutput.fromDomain(mov.getLoteAfetado()) : null,
-                mov.getLocalizacaoAfetada() != null ? LocalizacaoArmazenamentoOutput.fromDomain(mov.getLocalizacaoAfetada()) : null
+                movimentacao.getId(),
+                movimentacao.getTipo(),
+                movimentacao.getDataHora(),
+                movimentacao.getMotivo(),
+                movimentacao.getLocalOrigemId(),
+                movimentacao.getLocalDestinoId(),
+                movimentacao.getItens().stream()
+                        .map(ItemMovimentacaoOutput::fromDomain)
+                        .collect(Collectors.toList())
         );
     }
 }

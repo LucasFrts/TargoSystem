@@ -1,4 +1,3 @@
-// src/main/java/com/targosystem/varejo/fornecedores/infra/gui/FornecedorController.java
 package com.targosystem.varejo.fornecedores.infra.gui;
 
 import com.targosystem.varejo.fornecedores.application.FornecedorService;
@@ -89,12 +88,9 @@ public class FornecedorController {
             }
         });
 
-
         // Inicializa a lista de fornecedores ao carregar o controller
         listarTodosFornecedores();
     }
-
-    // --- Métodos de Fornecedores (inalterados em relação à correção anterior) ---
 
     public void listarTodosFornecedores() {
         logger.info("Listando todos os fornecedores...");
@@ -102,8 +98,31 @@ public class FornecedorController {
 
         try {
             List<FornecedorOutput> fornecedores = fornecedorService.listarTodosFornecedores();
-            DefaultTableModel model = fornecedorFrame.getFornecedoresTableModel();
-            model.setColumnIdentifiers(new Object[]{"ID", "Nome", "CNPJ", "Email Contato", "Telefone Contato", "Logradouro", "Número", "Complemento", "Bairro", "Cidade", "Estado", "CEP", "Ativo"});
+
+            // CORREÇÃO AQUI: Criar um DefaultTableModel customizado
+            DefaultTableModel model = new DefaultTableModel() {
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    // Retorna a classe correta para a coluna "Ativo"
+                    if (columnIndex == 12) { // Índice da coluna "Ativo" (0-based)
+                        return Boolean.class;
+                    }
+                    // Para as outras colunas, assume-se String.
+                    // Você pode adicionar mais verificações se tiver outras colunas de tipos específicos.
+                    return super.getColumnClass(columnIndex);
+                }
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    // Torna todas as células não editáveis diretamente pela UI da tabela
+                    return false;
+                }
+            };
+
+            // Definir os identificadores das colunas no novo modelo
+            model.setColumnIdentifiers(new Object[]{"ID", "Nome", "CNPJ", "Email Contato", "Telefone Contato",
+                    "Logradouro", "Número", "Complemento", "Bairro", "Cidade",
+                    "Estado", "CEP", "Ativo"});
 
             for (FornecedorOutput fornecedor : fornecedores) {
                 model.addRow(new Object[]{
@@ -119,9 +138,13 @@ public class FornecedorController {
                         fornecedor.cidade(),
                         fornecedor.estado(),
                         fornecedor.cep(),
-                        fornecedor.ativo()
+                        fornecedor.ativo() // Passando o Boolean diretamente
                 });
             }
+
+            // Atribuir o modelo customizado à tabela
+            fornecedorFrame.setFornecedoresTableModel(model); // Certifique-se de que FornecedorFrame tem este setter
+
             logger.info("Total de {} fornecedores carregados.", fornecedores.size());
         } catch (DomainException e) {
             logger.error("Erro de domínio ao listar fornecedores: {}", e.getMessage());
@@ -134,14 +157,15 @@ public class FornecedorController {
 
     private void criarNovoFornecedor() {
         logger.info("Abrindo diálogo para criar novo fornecedor...");
-        String[] formData = fornecedorFrame.showFornecedorDialog(true, null, null, null, null, null, null, null, null, null, null, null, null, true); // Added nulls for new address fields
+        // Passando valores default/nulos para todos os campos para um novo registro
+        // A ordem do formData deve corresponder à ordem que showFornecedorDialog retorna.
+        String[] formData = fornecedorFrame.showFornecedorDialog(true, null, null, null, null, null,
+                null, null, null, null, null, null, null, true);
 
         if (formData != null) {
             try {
-                // Adjusting input fields based on FornecedorOutput
-                // Note: Make sure CriarFornecedorInput matches the arguments (13 arguments now)
                 CriarFornecedorInput input = new CriarFornecedorInput(
-                        formData[1], // nome
+                        formData[1], // nome (índice 1 pois 0 seria o ID que é null para novo)
                         formData[2], // cnpj
                         formData[3], // emailContato
                         formData[4], // telefoneContato
@@ -184,14 +208,13 @@ public class FornecedorController {
             String cidade = (String) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 9);
             String estado = (String) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 10);
             String cep = (String) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 11);
-            boolean ativo = (Boolean) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 12);
+            Boolean ativo = (Boolean) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 12);
 
             logger.info("Abrindo diálogo para editar fornecedor ID: {}", id);
             String[] formData = fornecedorFrame.showFornecedorDialog(false, id, nome, cnpj, emailContato, telefoneContato, logradouro, numero, complemento, bairro, cidade, estado, cep, ativo);
 
             if (formData != null) {
                 try {
-                    // Make sure AtualizarFornecedorInput matches the arguments (13 arguments now)
                     AtualizarFornecedorInput input = new AtualizarFornecedorInput(
                             formData[0], // id
                             formData[1], // nome
@@ -230,7 +253,7 @@ public class FornecedorController {
         if (selectedRow != -1) {
             String id = (String) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 0);
             String nome = (String) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 1);
-            boolean ativo = (Boolean) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 12);
+            Boolean ativo = (Boolean) fornecedorFrame.getFornecedoresTableModel().getValueAt(selectedRow, 12);
 
             if (!ativo) {
                 JOptionPane.showMessageDialog(fornecedorFrame, "Fornecedor já está inativo.", "Atenção", JOptionPane.INFORMATION_MESSAGE);
@@ -286,7 +309,6 @@ public class FornecedorController {
         try {
             List<EntregaFornecedorOutput> entregas = fornecedorService.listarEntregasPorFornecedor(fornecedorId);
             DefaultTableModel model = fornecedorFrame.getEntregasTableModel();
-            // FIX: Update column identifiers to match EntregaFornecedorOutput fields
             model.setColumnIdentifiers(new Object[]{"ID Entrega", "Fornecedor ID", "Nº Pedido Compra", "Data Prevista", "Data Realização", "Status", "Qtde Itens", "Avaliação", "Comentário"});
 
             for (EntregaFornecedorOutput entrega : entregas) {
@@ -294,12 +316,12 @@ public class FornecedorController {
                         entrega.id(),
                         entrega.fornecedorId(),
                         entrega.numeroPedidoCompra(),
-                        entrega.dataPrevistaEntrega(), // Use 'dataPrevistaEntrega'
-                        entrega.dataRealizacaoEntrega() != null ? entrega.dataRealizacaoEntrega() : "Pendente", // Use 'dataRealizacaoEntrega'
+                        entrega.dataPrevistaEntrega() != null ? entrega.dataPrevistaEntrega().toString() : "",
+                        entrega.dataRealizacaoEntrega() != null ? entrega.dataRealizacaoEntrega().toString() : "Pendente",
                         entrega.status(),
                         entrega.quantidadeItens(),
-                        entrega.avaliacaoNota() != null ? entrega.avaliacaoNota() : "N/A", // Use 'avaliacaoNota'
-                        entrega.avaliacaoComentario() != null ? entrega.avaliacaoComentario() : "" // Use 'avaliacaoComentario'
+                        entrega.avaliacaoNota() != null ? entrega.avaliacaoNota() : "N/A",
+                        entrega.avaliacaoComentario() != null ? entrega.avaliacaoComentario() : ""
                 });
             }
             logger.info("Total de {} entregas carregadas para o fornecedor ID: {}", entregas.size(), fornecedorId);
@@ -320,18 +342,13 @@ public class FornecedorController {
 
         logger.info("Abrindo diálogo para registrar nova entrega para fornecedor ID: {}", currentFornecedorIdForEntregas);
 
-        // This call will now get the correct data based on the updated showRegistrarEntregaDialog
         String[] formData = fornecedorFrame.showRegistrarEntregaDialog(currentFornecedorIdForEntregas);
 
         if (formData != null) {
             try {
-                // Now, map the formData elements to the correct fields of RegistrarEntregaFornecedorInput
-                // The order returned by showRegistrarEntregaDialog is:
-                // [numeroPedidoCompra, dataPrevistaEntrega (AAAA-MM-DD), quantidadeItens, observacoes]
-
                 String numeroPedidoCompra = formData[0];
                 LocalDate dataPrevistaEntrega = LocalDate.parse(formData[1]);
-                int quantidadeItens = Integer.parseInt(formData[2]); // Parse as int
+                int quantidadeItens = Integer.parseInt(formData[2]);
                 String observacoes = formData[3];
 
                 RegistrarEntregaFornecedorInput input = new RegistrarEntregaFornecedorInput(
@@ -344,7 +361,7 @@ public class FornecedorController {
 
                 EntregaFornecedorOutput novaEntrega = fornecedorService.registrarEntrega(input);
                 JOptionPane.showMessageDialog(fornecedorFrame, "Entrega ID: " + novaEntrega.id() + " registrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                listarEntregasPorFornecedor(currentFornecedorIdForEntregas); // Updates the list of deliveries
+                listarEntregasPorFornecedor(currentFornecedorIdForEntregas);
             } catch (DateTimeParseException e) {
                 JOptionPane.showMessageDialog(fornecedorFrame, "Formato de data inválido para Data Prevista Entrega. Use AAAA-MM-DD.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             } catch (NumberFormatException e) {
@@ -366,7 +383,7 @@ public class FornecedorController {
         int selectedRow = fornecedorFrame.getEntregasTable().getSelectedRow();
         if (selectedRow != -1) {
             String entregaId = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 0);
-            String statusAtual = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 5); // FIX: Adjusted index for 'Status'
+            String statusAtual = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 5);
 
             if (!"PEDIDO_REALIZADO".equals(statusAtual) && !"EM_TRANSPORTE".equals(statusAtual)) {
                 JOptionPane.showMessageDialog(fornecedorFrame, "Entrega não está em um status que permita o recebimento.", "Atenção", JOptionPane.WARNING_MESSAGE);
@@ -407,15 +424,21 @@ public class FornecedorController {
         int selectedRow = fornecedorFrame.getEntregasTable().getSelectedRow();
         if (selectedRow != -1) {
             String entregaId = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 0);
-            String statusAtual = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 5); // FIX: Adjusted index for 'Status'
+            String statusAtual = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 5);
             Integer avaliacaoExistente = null;
-            // FIX: 'avaliacaoNota' is at index 7 now
-            if (fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 7) instanceof Integer) {
-                avaliacaoExistente = (Integer) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 7);
+            Object avaliacaoObj = fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 7);
+            if (avaliacaoObj instanceof Integer) {
+                avaliacaoExistente = (Integer) avaliacaoObj;
+            } else if (avaliacaoObj instanceof String && !"N/A".equals(avaliacaoObj)) {
+                try {
+                    avaliacaoExistente = Integer.parseInt((String) avaliacaoObj);
+                } catch (NumberFormatException e) {
+                    logger.warn("Não foi possível converter a avaliação '{}' para Integer.", avaliacaoObj);
+                }
             }
-            // You might need to retrieve avaliacaoComentario as well if it's displayed,
-            // but for now, we'll use an empty string as it's not directly in the table.
-            String observacoesExistente = "";
+
+            String observacoesExistente = (String) fornecedorFrame.getEntregasTableModel().getValueAt(selectedRow, 8);
+
 
             if (!"ENTREGUE".equals(statusAtual) && !"RECEBIDO_PARCIAL".equals(statusAtual)) {
                 JOptionPane.showMessageDialog(fornecedorFrame, "Entrega não está em um status que permita avaliação.", "Atenção", JOptionPane.WARNING_MESSAGE);
@@ -428,12 +451,12 @@ public class FornecedorController {
             if (formData != null) {
                 try {
                     Integer avaliacao = Integer.parseInt(formData[0]);
-                    String observacoes = formData[1]; // This is `avaliacaoComentario` in the output record
+                    String observacoes = formData[1];
 
                     AvaliarEntregaFornecedorInput input = new AvaliarEntregaFornecedorInput(
                             entregaId,
-                            avaliacao, // This maps to the input DTO's 'avaliacao'
-                            observacoes // This maps to the input DTO's 'observacoes'
+                            avaliacao,
+                            observacoes
                     );
                     EntregaFornecedorOutput entregaAtualizada = fornecedorService.avaliarEntrega(input);
                     JOptionPane.showMessageDialog(fornecedorFrame, "Entrega ID: " + entregaAtualizada.id() + " avaliada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

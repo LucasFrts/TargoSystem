@@ -27,26 +27,34 @@ public class ItemEstoqueJpaEntity {
     @JoinColumn(name = "estoque_id", nullable = false)
     private EstoqueJpaEntity estoque; // Referência à entidade de estoque pai
 
+    // NOVO: Adicionado para referência rápida ao local principal do estoque
+    // Não é FK, apenas uma cópia do ID para facilitar consultas ou consistência
+    @Column(name = "local_estoque_id_denormalized", nullable = false)
+    private String localEstoqueId;
+
     protected ItemEstoqueJpaEntity() {}
 
-    public ItemEstoqueJpaEntity(String id, String produtoId, int quantidade, LoteJpaEmbeddable lote, LocalizacaoArmazenamentoJpaEmbeddable localizacao, EstoqueJpaEntity estoque) {
+    public ItemEstoqueJpaEntity(String id, String produtoId, int quantidade, LoteJpaEmbeddable lote, LocalizacaoArmazenamentoJpaEmbeddable localizacao, EstoqueJpaEntity estoque, String localEstoqueId) {
         this.id = id;
         this.produtoId = produtoId;
         this.quantidade = quantidade;
         this.lote = lote;
         this.localizacao = localizacao;
         this.estoque = estoque;
+        this.localEstoqueId = localEstoqueId;
     }
 
     public static ItemEstoqueJpaEntity fromDomain(ItemEstoque itemEstoque) {
         // A referência 'estoque' (EstoqueJpaEntity) será setada posteriormente no fromDomain de EstoqueJpaEntity
+        // O localEstoqueId será pego do Estoque pai no fromDomain de EstoqueJpaEntity ou diretamente do domínio ItemEstoque
         return new ItemEstoqueJpaEntity(
                 itemEstoque.getId(),
                 itemEstoque.getProdutoId(),
                 itemEstoque.getQuantidade(),
                 LoteJpaEmbeddable.fromDomain(itemEstoque.getLote()),
                 LocalizacaoArmazenamentoJpaEmbeddable.fromDomain(itemEstoque.getLocalizacao()),
-                null // Será preenchido pela entidade pai
+                null, // Será preenchido pela entidade pai
+                itemEstoque.getLocalEstoqueId() // Assumindo que ItemEstoque agora tem localEstoqueId
         );
     }
 
@@ -57,7 +65,8 @@ public class ItemEstoqueJpaEntity {
                 this.quantidade,
                 this.lote.toDomain(),
                 this.localizacao.toDomain(),
-                this.estoque.getId() // Pega o ID do estoque pai
+                this.estoque.getId(), // Pega o ID do estoque pai
+                this.localEstoqueId // Inclui o localEstoqueId
         );
     }
 
@@ -74,4 +83,6 @@ public class ItemEstoqueJpaEntity {
     public void setLocalizacao(LocalizacaoArmazenamentoJpaEmbeddable localizacao) { this.localizacao = localizacao; }
     public EstoqueJpaEntity getEstoque() { return estoque; }
     public void setEstoque(EstoqueJpaEntity estoque) { this.estoque = estoque; } // Setter para o ManyToOne
+    public String getLocalEstoqueId() { return localEstoqueId; } // NOVO GETTER
+    public void setLocalEstoqueId(String localEstoqueId) { this.localEstoqueId = localEstoqueId; } // NOVO SETTER
 }

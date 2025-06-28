@@ -39,7 +39,7 @@ public class RegistrarEntradaEstoqueUseCase {
         Lote lote = new Lote(input.lote().numeroLote(), input.lote().dataFabricacao(), input.lote().dataValidade());
         LocalizacaoArmazenamento localizacao = new LocalizacaoArmazenamento(input.localizacao().corredor(), input.localizacao().prateleira(), input.localizacao().nivel());
 
-        estoque.adicionarItensComLoteELocalizacao(input.quantidade(), lote, localizacao, input.motivo());
+        estoque.adicionarItens(input.quantidade(), lote, localizacao, input.motivo());
 
         Estoque estoqueSalvo = estoqueRepository.save(estoque);
         logger.info("Entrada de estoque para produto {} registrada com sucesso. ID do estoque: {}. Nova quantidade total: {}",

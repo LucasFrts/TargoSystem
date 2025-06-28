@@ -6,5 +6,7 @@ import java.util.Optional;
 public interface EstoqueRepository {
     Estoque save(Estoque estoque);
     Optional<Estoque> findById(String id);
-    Optional<Estoque> findByProdutoId(String produtoId); // Para buscar o estoque de um produto específico
+    Optional<Estoque> findByProdutoIdAndLocalEstoqueId(String produtoId, String localEstoqueId);
+    Optional<Estoque> findByProdutoId(String produtoId);
+
 }

@@ -13,7 +13,7 @@ public class FornecedorFrame extends JPanel {
 
     // --- Painel de Fornecedores ---
     private JTable fornecedoresTable;
-    private DefaultTableModel fornecedoresTableModel;
+    private DefaultTableModel fornecedoresTableModel; // Este será substituído pelo modelo customizado no Controller
     private JButton btnNovoFornecedor;
     private JButton btnEditarFornecedor;
     private JButton btnInativarFornecedor;
@@ -40,14 +40,23 @@ public class FornecedorFrame extends JPanel {
         JPanel fornecedorPanel = new JPanel(new BorderLayout(10, 10));
         fornecedorPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Gerenciamento de Fornecedores", TitledBorder.LEFT, TitledBorder.TOP, new Font("Arial", Font.BOLD, 14)));
 
-        fornecedoresTableModel = new DefaultTableModel(new Object[]{"ID", "Razão Social", "CNPJ", "Contato", "Telefone", "Email", "Ativo"}, 0) {
+        // Inicializa o table model aqui, mas ele será substituído pelo customizado no Controller
+        // É importante que o número de colunas e a ordem inicial reflitam o que será usado no Controller.
+        // As colunas devem ser: ID, Nome, CNPJ, Email Contato, Telefone Contato, Logradouro, Número, Complemento, Bairro, Cidade, Estado, CEP, Ativo
+        fornecedoresTableModel = new DefaultTableModel(
+                new Object[]{"ID", "Nome", "CNPJ", "Email Contato", "Telefone Contato",
+                        "Logradouro", "Número", "Complemento", "Bairro", "Cidade",
+                        "Estado", "CEP", "Ativo"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Células da tabela não editáveis
             }
+            // OBS: getColumnClass será sobrescrito pelo modelo customizado no FornecedorController.
+            // Manter este aqui apenas para a inicialização.
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 6) { // Coluna "Ativo"
+                // A coluna "Ativo" agora está no índice 12 (contando do 0)
+                if (columnIndex == 12) {
                     return Boolean.class;
                 }
                 return super.getColumnClass(columnIndex);
@@ -55,6 +64,30 @@ public class FornecedorFrame extends JPanel {
         };
         fornecedoresTable = new JTable(fornecedoresTableModel);
         fornecedoresTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // Ocultar algumas colunas do endereço para não poluir demais a visualização, mas manter no modelo
+        fornecedoresTable.getColumnModel().getColumn(5).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(5).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(5).setWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(6).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(6).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(6).setWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(7).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(7).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(7).setWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(8).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(8).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(8).setWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(9).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(9).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(9).setWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(10).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(10).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(10).setWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(11).setMinWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(11).setMaxWidth(0);
+        fornecedoresTable.getColumnModel().getColumn(11).setWidth(0);
+
+
         JScrollPane fornecedorScrollPane = new JScrollPane(fornecedoresTable);
         fornecedorPanel.add(fornecedorScrollPane, BorderLayout.CENTER);
 
@@ -88,7 +121,8 @@ public class FornecedorFrame extends JPanel {
         entregasHeaderPanel.add(lblFornecedorSelecionado);
         entregasPanel.add(entregasHeaderPanel, BorderLayout.NORTH);
 
-        entregasTableModel = new DefaultTableModel(new Object[]{"ID Entrega", "Data Pedido", "Data Prevista", "Data Recebimento", "Status", "Valor Total", "Avaliação"}, 0) {
+        // Colunas para a tabela de entregas, conforme o FornecedorController
+        entregasTableModel = new DefaultTableModel(new Object[]{"ID Entrega", "Fornecedor ID", "Nº Pedido Compra", "Data Prevista", "Data Realização", "Status", "Qtde Itens", "Avaliação", "Comentário"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -125,7 +159,38 @@ public class FornecedorFrame extends JPanel {
 
     // --- Getters para componentes do Painel de Fornecedores ---
     public JTable getFornecedoresTable() { return fornecedoresTable; }
-    public DefaultTableModel getFornecedoresTableModel() { return fornecedoresTableModel; }
+    // O FornecedorController irá chamar setFornecedoresTableModel para atribuir o modelo customizado.
+    // getFornecedoresTableModel pode ser usado para obter o modelo atual (que pode ser o customizado).
+    public DefaultTableModel getFornecedoresTableModel() { return (DefaultTableModel) fornecedoresTable.getModel(); }
+
+    // NOVO MÉTODO: Setter para o DefaultTableModel (necessário para o FornecedorController)
+    public void setFornecedoresTableModel(DefaultTableModel model) {
+        this.fornecedoresTable.setModel(model);
+        // Ocultar novamente as colunas de endereço após o modelo ser atualizado
+        this.fornecedoresTable.getColumnModel().getColumn(5).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(5).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(5).setWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(6).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(6).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(6).setWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(7).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(7).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(7).setWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(8).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(8).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(8).setWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(9).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(9).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(9).setWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(10).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(10).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(10).setWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(11).setMinWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(11).setMaxWidth(0);
+        this.fornecedoresTable.getColumnModel().getColumn(11).setWidth(0);
+    }
+
+
     public JButton getBtnNovoFornecedor() { return btnNovoFornecedor; }
     public JButton getBtnEditarFornecedor() { return btnEditarFornecedor; }
     public JButton getBtnInativarFornecedor() { return btnInativarFornecedor; }
@@ -180,10 +245,10 @@ public class FornecedorFrame extends JPanel {
         JTextField txtId = new JTextField(id);
         txtId.setEditable(false);
 
-        JTextField txtNome = new JTextField(nome, 30); // Renamed from txtRazaoSocial
+        JTextField txtNome = new JTextField(nome, 30);
         JFormattedTextField txtCnpj;
-        JTextField txtEmailContato = new JTextField(emailContato, 25); // Renamed from txtContato
-        JFormattedTextField txtTelefoneContato; // Renamed from txtTelefone
+        JTextField txtEmailContato = new JTextField(emailContato, 25);
+        JFormattedTextField txtTelefoneContato;
 
         JTextField txtLogradouro = new JTextField(logradouro, 25);
         JTextField txtNumero = new JTextField(numero, 10);
@@ -225,23 +290,22 @@ public class FornecedorFrame extends JPanel {
             y++;
         }
 
-        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Nome:"), gbc); // Changed label from Razão Social
-        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtNome, gbc); // Changed from txtRazaoSocial
+        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Nome:"), gbc);
+        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtNome, gbc);
         y++;
 
         gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("CNPJ:"), gbc);
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtCnpj, gbc);
         y++;
 
-        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Email Contato:"), gbc); // Changed label from Contato
-        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtEmailContato, gbc); // Changed from txtContato
+        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Email Contato:"), gbc);
+        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtEmailContato, gbc);
         y++;
 
-        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Telefone Contato:"), gbc); // Changed label from Telefone
-        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtTelefoneContato, gbc); // Changed from txtTelefone
+        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Telefone Contato:"), gbc);
+        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtTelefoneContato, gbc);
         y++;
 
-        // Added Address Fields
         gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("Logradouro:"), gbc);
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtLogradouro, gbc);
         y++;
@@ -269,7 +333,6 @@ public class FornecedorFrame extends JPanel {
         gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0; panel.add(new JLabel("CEP:"), gbc);
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtCep, gbc);
         y++;
-        // End of Added Address Fields
 
         gbc.gridx = 0; gbc.gridy = y; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.WEST; panel.add(chkAtivo, gbc);
         y++;
@@ -280,6 +343,7 @@ public class FornecedorFrame extends JPanel {
 
         if (result == JOptionPane.OK_OPTION) {
             String idToReturn = isNew ? null : txtId.getText().trim();
+            // Remova caracteres de máscara antes de retornar
             String cleanedCnpj = txtCnpj.getText().replaceAll("[^0-9]", "");
             String cleanedTelefone = txtTelefoneContato.getText().replaceAll("[^0-9]", "");
             String cleanedCep = txtCep.getText().replaceAll("[^0-9]", "");
@@ -297,7 +361,7 @@ public class FornecedorFrame extends JPanel {
                     txtCidade.getText().trim(),
                     txtEstado.getText().trim(),
                     cleanedCep,
-                    String.valueOf(chkAtivo.isSelected()) // Retorna "true" ou "false"
+                    String.valueOf(chkAtivo.isSelected())
             };
         }
         return null;
@@ -316,9 +380,9 @@ public class FornecedorFrame extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JTextField txtNumeroPedidoCompra = new JTextField(15); // Changed from txtDataPedido
-        JTextField txtDataPrevistaEntrega = new JTextField(10); // Changed from txtDataPrevista
-        JTextField txtQuantidadeItens = new JTextField(5); // Changed from txtValorTotal
+        JTextField txtNumeroPedidoCompra = new JTextField(15);
+        JTextField txtDataPrevistaEntrega = new JTextField(10);
+        JTextField txtQuantidadeItens = new JTextField(5);
         JTextArea txtObservacoes = new JTextArea(3, 20);
         txtObservacoes.setLineWrap(true);
         txtObservacoes.setWrapStyleWord(true);
@@ -329,15 +393,15 @@ public class FornecedorFrame extends JPanel {
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; JTextField lblFornecedorId = new JTextField(fornecedorId); lblFornecedorId.setEditable(false); panel.add(lblFornecedorId, gbc);
         y++;
 
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Nº Pedido Compra:"), gbc); // Updated label
+        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Nº Pedido Compra:"), gbc);
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtNumeroPedidoCompra, gbc);
         y++;
 
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Data Prevista Entrega (AAAA-MM-DD):"), gbc); // Updated label
+        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Data Prevista Entrega (AAAA-MM-DD):"), gbc);
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtDataPrevistaEntrega, gbc);
         y++;
 
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Quantidade Itens:"), gbc); // Updated label
+        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Quantidade Itens:"), gbc);
         gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1.0; panel.add(txtQuantidadeItens, gbc);
         y++;
 
@@ -370,7 +434,7 @@ public class FornecedorFrame extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JTextField txtDataRecebimento = new JTextField(10); // Formato yyyy-MM-dd
+        JTextField txtDataRecebimento = new JTextField(10); // Formato YYYY-MM-DD
 
         int y = 0;
         gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Entrega ID:"), gbc);

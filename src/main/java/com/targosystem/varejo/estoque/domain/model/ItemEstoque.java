@@ -1,57 +1,53 @@
 package com.targosystem.varejo.estoque.domain.model;
 
+import com.targosystem.varejo.shared.domain.DomainException;
 import java.util.Objects;
 import java.util.UUID;
 
 public class ItemEstoque {
-
     private String id;
     private String produtoId;
     private int quantidade;
     private Lote lote;
     private LocalizacaoArmazenamento localizacao;
-    private String estoqueId;
+    private String estoqueId; // ID do estoque ao qual este item pertence
+    private String localEstoqueId; // NOVO: ID do LocalEstoque ao qual este item pertence (denormalizado para consultas)
 
     // Construtor para criar um novo ItemEstoque
-    public ItemEstoque(String produtoId, int quantidade, Lote lote, LocalizacaoArmazenamento localizacao, String estoqueId) {
+    public ItemEstoque(String produtoId, int quantidade, Lote lote, LocalizacaoArmazenamento localizacao, String estoqueId, String localEstoqueId) {
         this.id = UUID.randomUUID().toString();
-        this.produtoId = Objects.requireNonNull(produtoId, "ID do produto não pode ser nulo.");
-        if (quantidade <= 0) {
-            throw new IllegalArgumentException("Quantidade do item de estoque deve ser positiva.");
-        }
+        this.produtoId = Objects.requireNonNull(produtoId);
         this.quantidade = quantidade;
-        this.lote = Objects.requireNonNull(lote, "Lote não pode ser nulo.");
-        this.localizacao = Objects.requireNonNull(localizacao, "Localização de armazenamento não pode ser nula.");
-        this.estoqueId = Objects.requireNonNull(estoqueId, "ID do estoque pai não pode ser nulo.");
+        this.lote = Objects.requireNonNull(lote);
+        this.localizacao = Objects.requireNonNull(localizacao);
+        this.estoqueId = Objects.requireNonNull(estoqueId);
+        this.localEstoqueId = Objects.requireNonNull(localEstoqueId); // NOVO
     }
 
-    // Construtor para reconstruir ItemEstoque do banco de dados
-    public ItemEstoque(String id, String produtoId, int quantidade, Lote lote, LocalizacaoArmazenamento localizacao, String estoqueId) {
-        this.id = Objects.requireNonNull(id, "ID do item de estoque não pode ser nulo.");
-        this.produtoId = Objects.requireNonNull(produtoId, "ID do produto não pode ser nulo.");
-        if (quantidade < 0) { // Pode ser 0 se o item for esgotado, mas ainda precisa ser rastreado
-            throw new IllegalArgumentException("Quantidade do item de estoque não pode ser negativa.");
-        }
+    // Construtor para reconstrução da persistência
+    public ItemEstoque(String id, String produtoId, int quantidade, Lote lote, LocalizacaoArmazenamento localizacao, String estoqueId, String localEstoqueId) {
+        this.id = Objects.requireNonNull(id);
+        this.produtoId = Objects.requireNonNull(produtoId);
         this.quantidade = quantidade;
-        this.lote = Objects.requireNonNull(lote, "Lote não pode ser nulo.");
-        this.localizacao = Objects.requireNonNull(localizacao, "Localização de armazenamento não pode ser nula.");
-        this.estoqueId = Objects.requireNonNull(estoqueId, "ID do estoque pai não pode ser nulo.");
+        this.lote = Objects.requireNonNull(lote);
+        this.localizacao = Objects.requireNonNull(localizacao);
+        this.estoqueId = Objects.requireNonNull(estoqueId);
+        this.localEstoqueId = Objects.requireNonNull(localEstoqueId); // NOVO
     }
 
-    // Métodos de negócio do ItemEstoque
     public void adicionarQuantidade(int qtd) {
         if (qtd <= 0) {
-            throw new IllegalArgumentException("Quantidade a adicionar deve ser positiva.");
+            throw new DomainException("A quantidade a ser adicionada deve ser positiva.");
         }
         this.quantidade += qtd;
     }
 
     public void removerQuantidade(int qtd) {
         if (qtd <= 0) {
-            throw new IllegalArgumentException("Quantidade a remover deve ser positiva.");
+            throw new DomainException("A quantidade a ser removida deve ser positiva.");
         }
         if (this.quantidade < qtd) {
-            throw new IllegalArgumentException("Tentativa de remover mais itens do que o disponível neste item de estoque.");
+            throw new DomainException("Quantidade insuficiente em ItemEstoque. Disponível: " + this.quantidade + ", Tentou remover: " + qtd);
         }
         this.quantidade -= qtd;
     }
@@ -63,17 +59,23 @@ public class ItemEstoque {
     public Lote getLote() { return lote; }
     public LocalizacaoArmazenamento getLocalizacao() { return localizacao; }
     public String getEstoqueId() { return estoqueId; }
+    public String getLocalEstoqueId() { return localEstoqueId; } // NOVO GETTER
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ItemEstoque that = (ItemEstoque) o;
-        return id.equals(that.id);
+        // Um item de estoque é único pelo ID ou pela combinação de produto, lote, localização e o estoque principal
+        return Objects.equals(id, that.id) ||
+                (Objects.equals(produtoId, that.produtoId) &&
+                        Objects.equals(lote, that.lote) &&
+                        Objects.equals(localizacao, that.localizacao) &&
+                        Objects.equals(estoqueId, that.estoqueId));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, produtoId, lote, localizacao, estoqueId);
     }
 }

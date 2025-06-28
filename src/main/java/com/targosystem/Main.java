@@ -1,16 +1,23 @@
 package com.targosystem;
 
 import com.targosystem.varejo.clientes.application.query.ObterClientePorIdQuery;
-import com.targosystem.varejo.estoque.application.queries.ConsultarEstoquePorProdutoIdQuery;
+import com.targosystem.varejo.estoque.application.LocalEstoqueService;
+import com.targosystem.varejo.estoque.application.queries.ConsultarEstoquePorProdutoIdAndLocalEstoqueId;
+import com.targosystem.varejo.estoque.application.queries.ConsultarEstoqueTotalPorProdutoIdQuery;
+import com.targosystem.varejo.estoque.application.queries.ConsultarItensEstoquePorLocalIdQuery;
+import com.targosystem.varejo.estoque.application.queries.ConsultarQuantidadeTotalProdutoEmLocalQuery;
 import com.targosystem.varejo.estoque.application.usecases.RegistrarEntradaEstoqueUseCase;
 import com.targosystem.varejo.estoque.application.usecases.RegistrarSaidaEstoqueUseCase;
+import com.targosystem.varejo.estoque.domain.repository.ItemEstoqueRepository;
+import com.targosystem.varejo.estoque.domain.repository.LocalEstoqueRepository;
+import com.targosystem.varejo.estoque.domain.repository.MovimentacaoEstoqueRepository;
+import com.targosystem.varejo.estoque.infra.persistence.ItemEstoqueDao;
+import com.targosystem.varejo.estoque.infra.persistence.LocalEstoqueDao;
+import com.targosystem.varejo.estoque.infra.persistence.MovimentacaoEstoqueDao;
 import com.targosystem.varejo.fornecedores.application.query.ConsultarFornecedorPorCnpjQuery;
 import com.targosystem.varejo.fornecedores.application.query.ConsultarFornecedorPorIdQuery;
 import com.targosystem.varejo.produtos.application.ProdutoService;
-import com.targosystem.varejo.produtos.application.query.ConsultarPrecoProdutoQuery;
-import com.targosystem.varejo.produtos.application.query.ListarCategoriasQuery;
-import com.targosystem.varejo.produtos.application.query.ListarTodosProdutosQuery;
-import com.targosystem.varejo.produtos.application.query.ObterProdutoPorIdQuery;
+import com.targosystem.varejo.produtos.application.query.*;
 import com.targosystem.varejo.produtos.application.usecases.AtualizarProdutoUseCase;
 import com.targosystem.varejo.produtos.application.usecases.CadastrarProdutoUseCase;
 import com.targosystem.varejo.produtos.domain.events.ProdutoCadastradoEvent;
@@ -125,13 +132,15 @@ public class Main {
         ObterProdutoPorIdQuery obterProdutoPorIdQuery = new ObterProdutoPorIdQuery(produtoRepository);
         ListarTodosProdutosQuery listarTodosProdutosQuery = new ListarTodosProdutosQuery(produtoRepository);
         ListarCategoriasQuery listarCategoriasQuery = new ListarCategoriasQuery(categoriaRepository);
+        ConsultarProdutosAtivosPorNomeOuCodigoQuery consultarProdutosAtivosPorNomeOuCodigoQuery = new ConsultarProdutosAtivosPorNomeOuCodigoQuery(produtoRepository);
 
         ProdutoService produtoService = new ProdutoService(
                 cadastrarProdutoUseCase,
                 atualizarProdutoUseCase,
                 obterProdutoPorIdQuery,
                 listarTodosProdutosQuery,
-                listarCategoriasQuery
+                listarCategoriasQuery,
+                consultarProdutosAtivosPorNomeOuCodigoQuery
         );
 
         // --- Configuração do Bounded Context de SEGURANÇA ---
@@ -192,21 +201,6 @@ public class Main {
 
         );
 
-        // --- Configuração do Bounded Context de ESTOQUE ---
-        logger.info("Configuring 'Estoque' Bounded Context.");
-        EstoqueRepository estoqueRepository = new EstoqueDao(entityManager);
-        RegistrarMovimentacaoEstoqueUseCase registrarMovimentacaoEstoqueUseCase = new RegistrarMovimentacaoEstoqueUseCase(estoqueRepository, eventPublisher);
-        RegistrarEntradaEstoqueUseCase registrarEntradaEstoqueUseCase = new RegistrarEntradaEstoqueUseCase(estoqueRepository, eventPublisher);
-        RegistrarSaidaEstoqueUseCase registrarSaidaEstoqueUseCase = new RegistrarSaidaEstoqueUseCase(estoqueRepository, eventPublisher);
-        ConsultarEstoquePorProdutoIdQuery consultarEstoquePorProdutoIdQuery = new ConsultarEstoquePorProdutoIdQuery(estoqueRepository);
-
-        EstoqueService estoqueService = new EstoqueService(
-              registrarEntradaEstoqueUseCase,
-              registrarSaidaEstoqueUseCase,
-              consultarEstoquePorProdutoIdQuery,
-              registrarMovimentacaoEstoqueUseCase
-        );
-
         // --- Configuração do Bounded Context de CLIENTES ---
         logger.info("Configuring 'Clientes' Bounded Context.");
         ClienteRepository clienteRepository = new ClienteDao(entityManager);
@@ -253,6 +247,35 @@ public class Main {
                 consultarFornecedorPorCnpjQuery,
                 listarTodosFornecedoresQuery,
                 listarEntregasPorFornecedorQuery
+        );
+
+
+        // --- Configuração do Bounded Context de ESTOQUE ---
+        logger.info("Configuring 'Estoque' Bounded Context.");
+        LocalEstoqueRepository localEstoqueRepository = new LocalEstoqueDao(entityManager);
+        LocalEstoqueService localEstoqueService = new LocalEstoqueService(localEstoqueRepository, fornecedorRepository);
+
+        MovimentacaoEstoqueRepository movimentacaoEstoqueRepository = new MovimentacaoEstoqueDao(entityManager);
+        ItemEstoqueRepository itemEstoqueDao = new ItemEstoqueDao(entityManager);
+
+        EstoqueRepository estoqueRepository = new EstoqueDao(entityManager);
+        RegistrarMovimentacaoEstoqueUseCase registrarMovimentacaoEstoqueUseCase = new RegistrarMovimentacaoEstoqueUseCase(movimentacaoEstoqueRepository, estoqueRepository, localEstoqueRepository, eventPublisher);
+        RegistrarEntradaEstoqueUseCase registrarEntradaEstoqueUseCase = new RegistrarEntradaEstoqueUseCase(estoqueRepository, eventPublisher);
+        RegistrarSaidaEstoqueUseCase registrarSaidaEstoqueUseCase = new RegistrarSaidaEstoqueUseCase(estoqueRepository, eventPublisher);
+
+        ConsultarEstoquePorProdutoIdAndLocalEstoqueId consultarEstoquePorProdutoIdAndLocalEstoqueIdQuery = new ConsultarEstoquePorProdutoIdAndLocalEstoqueId(estoqueRepository);
+        ConsultarEstoqueTotalPorProdutoIdQuery consultarEstoqueTotalPorProdutoIdQuery = new ConsultarEstoqueTotalPorProdutoIdQuery(estoqueRepository);
+        ConsultarItensEstoquePorLocalIdQuery consultarItensEstoquePorLocalIdQuery = new ConsultarItensEstoquePorLocalIdQuery(itemEstoqueDao);
+        ConsultarQuantidadeTotalProdutoEmLocalQuery consultarQuantidadeTotalProdutoEmLocalQuery = new ConsultarQuantidadeTotalProdutoEmLocalQuery(itemEstoqueDao);
+
+        EstoqueService estoqueService = new EstoqueService(
+                consultarEstoquePorProdutoIdAndLocalEstoqueIdQuery,
+                consultarEstoqueTotalPorProdutoIdQuery,
+                consultarItensEstoquePorLocalIdQuery,
+                consultarQuantidadeTotalProdutoEmLocalQuery,
+                registrarMovimentacaoEstoqueUseCase,
+                localEstoqueService,
+                produtoService
         );
 
 

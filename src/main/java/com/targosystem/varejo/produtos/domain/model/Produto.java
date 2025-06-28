@@ -116,6 +116,10 @@ public class Produto implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
+    public boolean isAtivo(){
+        return this.status.equals("ATIVO");
+    }
+
     /**
      * Atualiza as informações do produto. Este é o método de domínio que encapsula
      * a lógica de alteração do estado do produto.

@@ -2,7 +2,6 @@ package com.targosystem.varejo.estoque.infra.persistence.entity;
 
 import com.targosystem.varejo.estoque.domain.model.Estoque;
 import com.targosystem.varejo.estoque.domain.model.ItemEstoque;
-import com.targosystem.varejo.estoque.domain.model.MovimentacaoEstoque;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,31 +14,35 @@ public class EstoqueJpaEntity {
     @Id
     private String id;
 
-    @Column(name = "produto_id", nullable = false, unique = true)
+    @Column(name = "produto_id", nullable = false)
     private String produtoId;
+
+    // NEW: Referência ao LocalEstoque a que este estoque pertence
+    // Um Estoque (do Produto X) existe em um LocalEstoque (Loja A ou Depósito B)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "local_estoque_id", nullable = false)
+    private LocalEstoqueJpaEntity localEstoque;
 
     @OneToMany(mappedBy = "estoque", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ItemEstoqueJpaEntity> itensEstoque = new ArrayList<>();
 
-    @OneToMany(mappedBy = "estoque", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<MovimentacaoEstoqueJpaEntity> movimentacoes = new ArrayList<>();
-
     protected EstoqueJpaEntity() {}
 
-    public EstoqueJpaEntity(String id, String produtoId, List<ItemEstoqueJpaEntity> itensEstoque, List<MovimentacaoEstoqueJpaEntity> movimentacoes) {
+    // CONSTRUTOR ATUALIZADO
+    public EstoqueJpaEntity(String id, String produtoId, LocalEstoqueJpaEntity localEstoque, List<ItemEstoqueJpaEntity> itensEstoque) {
         this.id = id;
         this.produtoId = produtoId;
-        // Certifique-se de inicializar as listas para evitar NullPointerExceptions
+        this.localEstoque = localEstoque;
         this.itensEstoque = (itensEstoque != null) ? new ArrayList<>(itensEstoque) : new ArrayList<>();
-        this.movimentacoes = (movimentacoes != null) ? new ArrayList<>(movimentacoes) : new ArrayList<>();
     }
 
+    // fromDomain ATUALIZADO
     public static EstoqueJpaEntity fromDomain(Estoque estoque) {
         EstoqueJpaEntity entity = new EstoqueJpaEntity(
                 estoque.getId(),
                 estoque.getProdutoId(),
-                null, // Não passar listas aqui, elas serão preenchidas abaixo para setar a referência ao pai
-                null
+                LocalEstoqueJpaEntity.fromDomain(estoque.getLocalEstoque()), // Converte e seta o local
+                null // Não passar listas aqui, elas serão preenchidas abaixo para setar a referência ao pai
         );
 
         List<ItemEstoqueJpaEntity> jpaItens = estoque.getItensEstoque().stream()
@@ -48,25 +51,28 @@ public class EstoqueJpaEntity {
         jpaItens.forEach(item -> item.setEstoque(entity)); // Garante a ligação com o pai
         entity.setItensEstoque(jpaItens); // Usa o setter
 
-        List<MovimentacaoEstoqueJpaEntity> jpaMovs = estoque.getMovimentacoes().stream()
-                .map(MovimentacaoEstoqueJpaEntity::fromDomain)
-                .collect(Collectors.toList());
-        jpaMovs.forEach(mov -> mov.setEstoque(entity)); // Garante a ligação com o pai
-        entity.setMovimentacoes(jpaMovs); // Usa o setter
+        // REMOVIDO: Movimentações não mais aqui
+        // List<MovimentacaoEstoqueJpaEntity> jpaMovs = estoque.getMovimentacoes().stream()
+        //         .map(MovimentacaoEstoqueJpaEntity::fromDomain)
+        //         .collect(Collectors.toList());
+        // jpaMovs.forEach(mov -> mov.setEstoque(entity)); // Garante a ligação com o pai
+        // entity.setMovimentacoes(jpaMovs); // Usa o setter
 
         return entity;
     }
 
+    // toDomain ATUALIZADO
     public Estoque toDomain() {
         List<ItemEstoque> domainItens = this.itensEstoque.stream()
                 .map(ItemEstoqueJpaEntity::toDomain)
                 .collect(Collectors.toList());
 
-        List<MovimentacaoEstoque> domainMovs = this.movimentacoes.stream()
-                .map(MovimentacaoEstoqueJpaEntity::toDomain)
-                .collect(Collectors.toList());
+        // REMOVIDO: Movimentações não mais aqui
+        // List<MovimentacaoEstoque> domainMovs = this.movimentacoes.stream()
+        //         .map(MovimentacaoEstoqueJpaEntity::toDomain)
+        //         .collect(Collectors.toList());
 
-        return new Estoque(this.id, this.produtoId, domainItens, domainMovs);
+        return new Estoque(this.id, this.produtoId, this.localEstoque.toDomain(), domainItens); // ATUALIZADO: Inclui LocalEstoque
     }
 
     // Getters e Setters (VERIFIQUE SE ESTÃO TODOS PRESENTES)
@@ -75,26 +81,17 @@ public class EstoqueJpaEntity {
     public String getProdutoId() { return produtoId; }
     public void setProdutoId(String produtoId) { this.produtoId = produtoId; }
 
+    public LocalEstoqueJpaEntity getLocalEstoque() { return localEstoque; } // NOVO GETTER
+    public void setLocalEstoque(LocalEstoqueJpaEntity localEstoque) { this.localEstoque = localEstoque; } // NOVO SETTER
+
     // GETTERS E SETTERS PARA AS COLEÇÕES - ESTES SÃO CRUCIAIS!
     public List<ItemEstoqueJpaEntity> getItensEstoque() {
         return itensEstoque;
     }
     public void setItensEstoque(List<ItemEstoqueJpaEntity> itensEstoque) {
-        // Limpa e adiciona para garantir que o JPA entenda as mudanças
         this.itensEstoque.clear();
         if (itensEstoque != null) {
             this.itensEstoque.addAll(itensEstoque);
-        }
-    }
-
-    public List<MovimentacaoEstoqueJpaEntity> getMovimentacoes() {
-        return movimentacoes;
-    }
-    public void setMovimentacoes(List<MovimentacaoEstoqueJpaEntity> movimentacoes) {
-        // Limpa e adiciona para garantir que o JPA entenda as mudanças
-        this.movimentacoes.clear();
-        if (movimentacoes != null) {
-            this.movimentacoes.addAll(movimentacoes);
         }
     }
 }

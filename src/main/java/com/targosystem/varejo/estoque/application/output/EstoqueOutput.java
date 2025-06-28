@@ -1,32 +1,29 @@
-// src/main/java/com/targosystem/varejo/estoque/application/output/EstoqueOutput.java
 package com.targosystem.varejo.estoque.application.output;
 
 import com.targosystem.varejo.estoque.domain.model.Estoque;
+import com.targosystem.varejo.estoque.domain.model.ItemEstoque;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record EstoqueOutput(
         String id,
         String produtoId,
-        int quantidadeTotalDisponivel,
-        List<ItemEstoqueOutput> itensEstoque,
-        List<MovimentacaoEstoqueOutput> movimentacoes
+        String localEstoqueId, // NOVO: ID do LocalEstoque
+        String nomeLocalEstoque, // NOVO: Nome do LocalEstoque
+        long quantidadeTotalDisponivel,
+        List<ItemEstoqueOutput> itensEstoque
 ) {
     public static EstoqueOutput fromDomain(Estoque estoque) {
-        List<ItemEstoqueOutput> itemOutputs = estoque.getItensEstoque().stream()
-                .map(ItemEstoqueOutput::fromDomain)
-                .collect(Collectors.toList());
-
-        List<MovimentacaoEstoqueOutput> movOutputs = estoque.getMovimentacoes().stream()
-                .map(MovimentacaoEstoqueOutput::fromDomain)
-                .collect(Collectors.toList());
-
         return new EstoqueOutput(
                 estoque.getId(),
                 estoque.getProdutoId(),
+                estoque.getLocalEstoque().getId(), // Pega o ID do LocalEstoque
+                estoque.getLocalEstoque().getNome(), // Pega o Nome do LocalEstoque
                 estoque.getQuantidadeTotalDisponivel(),
-                itemOutputs,
-                movOutputs
+                estoque.getItensEstoque().stream()
+                        .map(ItemEstoqueOutput::fromDomain)
+                        .collect(Collectors.toList())
+                // REMOVIDA: estoque.getMovimentacoes().stream().map(MovimentacaoEstoqueOutput::fromDomain).collect(Collectors.toList())
         );
     }
 }

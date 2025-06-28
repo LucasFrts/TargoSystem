@@ -3,7 +3,6 @@ package com.targosystem.varejo.estoque.domain.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-// Objeto de Valor: Imutável, sem ID próprio
 public class Lote {
 
     private final String numeroLote;
@@ -39,4 +38,5 @@ public class Lote {
     public int hashCode() {
         return Objects.hash(numeroLote, dataFabricacao, dataValidade);
     }
+
 }

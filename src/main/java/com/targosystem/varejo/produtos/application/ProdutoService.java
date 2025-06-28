@@ -4,6 +4,7 @@ import com.targosystem.varejo.produtos.application.input.AtualizarProdutoInput;
 import com.targosystem.varejo.produtos.application.input.CadastrarProdutoInput;
 import com.targosystem.varejo.produtos.application.output.CategoriaOutput;
 import com.targosystem.varejo.produtos.application.output.ProdutoOutput;
+import com.targosystem.varejo.produtos.application.query.ConsultarProdutosAtivosPorNomeOuCodigoQuery;
 import com.targosystem.varejo.produtos.application.query.ListarCategoriasQuery;
 import com.targosystem.varejo.produtos.application.query.ListarTodosProdutosQuery;
 import com.targosystem.varejo.produtos.application.query.ObterProdutoPorIdQuery;
@@ -20,6 +21,7 @@ public class ProdutoService {
     private final ObterProdutoPorIdQuery obterProdutoPorIdQuery;
     private final ListarTodosProdutosQuery listarTodosProdutosQuery;
     private final ListarCategoriasQuery listarCategoriasQuery; // Declare a dependência
+    private final ConsultarProdutosAtivosPorNomeOuCodigoQuery listarProdutosAtivosPorNomeOuCodigoQuery;
     // ... outros use cases/queries como inativar, ativar, etc.
 
     public ProdutoService(
@@ -27,13 +29,15 @@ public class ProdutoService {
             AtualizarProdutoUseCase atualizarProdutoUseCase,
             ObterProdutoPorIdQuery obterProdutoPorIdQuery,
             ListarTodosProdutosQuery listarTodosProdutosQuery,
-            ListarCategoriasQuery listarCategoriasQuery // Injete no construtor
+            ListarCategoriasQuery listarCategoriasQuery,
+            ConsultarProdutosAtivosPorNomeOuCodigoQuery listarProdutosAtivosPorNomeOuCodigoQuery
     ) {
         this.cadastrarProdutoUseCase = Objects.requireNonNull(cadastrarProdutoUseCase, "CadastrarProdutoUseCase cannot be null");
         this.atualizarProdutoUseCase = Objects.requireNonNull(atualizarProdutoUseCase, "AtualizarProdutoUseCase cannot be null");
         this.obterProdutoPorIdQuery = Objects.requireNonNull(obterProdutoPorIdQuery, "ObterProdutoPorIdQuery cannot be null");
         this.listarTodosProdutosQuery = Objects.requireNonNull(listarTodosProdutosQuery, "ListarTodosProdutosQuery cannot be null");
-        this.listarCategoriasQuery = Objects.requireNonNull(listarCategoriasQuery, "ListarCategoriasQuery cannot be null"); // Atribua
+        this.listarCategoriasQuery = Objects.requireNonNull(listarCategoriasQuery, "ListarCategoriasQuery cannot be null");
+        this.listarProdutosAtivosPorNomeOuCodigoQuery = Objects.requireNonNull(listarProdutosAtivosPorNomeOuCodigoQuery, "listarProdutosAtivosPorNomeOuCodigoQuery cannot be null");
     }
 
     public ProdutoOutput cadastrarProduto(CadastrarProdutoInput input) {
@@ -54,5 +58,8 @@ public class ProdutoService {
 
     public List<CategoriaOutput> listarTodasCategorias() {
         return listarCategoriasQuery.execute();
+    }
+    public List<ProdutoOutput> buscarProdutosAtivosPorNomeOuCodigo(String termoBusca) {
+        return this.listarProdutosAtivosPorNomeOuCodigoQuery.execute(termoBusca);
     }
 }

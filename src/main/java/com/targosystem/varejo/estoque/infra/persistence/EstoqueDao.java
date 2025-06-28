@@ -4,7 +4,7 @@ import com.targosystem.varejo.estoque.domain.model.Estoque;
 import com.targosystem.varejo.estoque.domain.repository.EstoqueRepository;
 import com.targosystem.varejo.estoque.infra.persistence.entity.EstoqueJpaEntity;
 import com.targosystem.varejo.estoque.infra.persistence.entity.ItemEstoqueJpaEntity;
-import com.targosystem.varejo.estoque.infra.persistence.entity.MovimentacaoEstoqueJpaEntity;
+// REMOVIDA: import com.targosystem.varejo.estoque.infra.persistence.entity.MovimentacaoEstoqueJpaEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
@@ -29,31 +29,26 @@ public class EstoqueDao implements EstoqueRepository {
 
             EstoqueJpaEntity existingEntity = entityManager.find(EstoqueJpaEntity.class, jpaEntity.getId());
             if (existingEntity == null) {
-                // Se for uma nova entidade de estoque, persistir diretamente.
                 entityManager.persist(jpaEntity);
             } else {
-                // Se já existir, atualizamos seus campos e coleções.
-                existingEntity.setProdutoId(jpaEntity.getProdutoId()); // Atualiza produtoId se ele puder ser alterado
+                existingEntity.setProdutoId(jpaEntity.getProdutoId());
+                existingEntity.setLocalEstoque(jpaEntity.getLocalEstoque()); // ATUALIZA O LOCAL
 
                 // === ATUALIZAÇÃO DA COLEÇÃO DE ITENS DE ESTOQUE ===
-                // 1. Limpa a coleção existente na entidade gerenciada.
-                // Isso, combinado com orphanRemoval=true, fará com que o JPA remova os itens antigos do banco.
                 existingEntity.getItensEstoque().clear();
-                // 2. Adiciona todos os novos itens (do domínio para a JPA) à coleção.
-                // É crucial que cada item na nova lista tenha sua referência ao pai (estoque) setada.
                 for (ItemEstoqueJpaEntity item : jpaEntity.getItensEstoque()) {
                     item.setEstoque(existingEntity); // Garante a ligação bidirecional
+                    item.setLocalEstoqueId(existingEntity.getLocalEstoque().getId()); // Garante o ID do local no item
                     existingEntity.getItensEstoque().add(item);
                 }
 
-                // === ATUALIZAÇÃO DA COLEÇÃO DE MOVIMENTAÇÕES DE ESTOQUE ===
-                existingEntity.getMovimentacoes().clear();
-                for (MovimentacaoEstoqueJpaEntity mov : jpaEntity.getMovimentacoes()) {
-                    mov.setEstoque(existingEntity); // Garante a ligação bidirecional
-                    existingEntity.getMovimentacoes().add(mov);
-                }
+                // REMOVIDO: Movimentações não são mais salvas via Estoque
+                // existingEntity.getMovimentacoes().clear();
+                // for (MovimentacaoEstoqueJpaEntity mov : jpaEntity.getMovimentacoes()) {
+                //     mov.setEstoque(existingEntity);
+                //     existingEntity.getMovimentacoes().add(mov);
+                // }
 
-                // O merge propaga as mudanças para as coleções gerenciadas
                 jpaEntity = entityManager.merge(existingEntity);
             }
             transaction.commit();
@@ -69,12 +64,22 @@ public class EstoqueDao implements EstoqueRepository {
     @Override
     public Optional<Estoque> findById(String id) {
         try {
-            // Usa fetch join para trazer itensEstoque e movimentacoes ansiosamente
-            // Isso evita N+1 problems ao carregar o agregado completo.
             TypedQuery<EstoqueJpaEntity> query = entityManager.createQuery(
-                    "SELECT e FROM EstoqueJpaEntity e LEFT JOIN FETCH e.itensEstoque LEFT JOIN FETCH e.movimentacoes WHERE e.id = :id", EstoqueJpaEntity.class);
+                    "SELECT e FROM EstoqueJpaEntity e LEFT JOIN FETCH e.itensEstoque LEFT JOIN FETCH e.localEstoque WHERE e.id = :id", EstoqueJpaEntity.class);
             query.setParameter("id", id);
-            // Garante que a lista não seja duplicada no caso de múltiplos itens/movimentações (resultando em múltiplas linhas)
+            return query.getResultStream().findFirst().map(EstoqueJpaEntity::toDomain);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Estoque> findByProdutoIdAndLocalEstoqueId(String produtoId, String localEstoqueId) {
+        try {
+            TypedQuery<EstoqueJpaEntity> query = entityManager.createQuery(
+                    "SELECT e FROM EstoqueJpaEntity e LEFT JOIN FETCH e.itensEstoque LEFT JOIN FETCH e.localEstoque WHERE e.produtoId = :produtoId AND e.localEstoque.id = :localEstoqueId", EstoqueJpaEntity.class);
+            query.setParameter("produtoId", produtoId);
+            query.setParameter("localEstoqueId", localEstoqueId);
             return query.getResultStream().findFirst().map(EstoqueJpaEntity::toDomain);
         } catch (NoResultException e) {
             return Optional.empty();
@@ -84,11 +89,9 @@ public class EstoqueDao implements EstoqueRepository {
     @Override
     public Optional<Estoque> findByProdutoId(String produtoId) {
         try {
-            // Similar ao findById, usa fetch join
             TypedQuery<EstoqueJpaEntity> query = entityManager.createQuery(
-                    "SELECT e FROM EstoqueJpaEntity e LEFT JOIN FETCH e.itensEstoque LEFT JOIN FETCH e.movimentacoes WHERE e.produtoId = :produtoId", EstoqueJpaEntity.class);
+                    "SELECT e FROM EstoqueJpaEntity e LEFT JOIN FETCH e.itensEstoque WHERE e.produtoId = :produtoId", EstoqueJpaEntity.class); // FIXED LINE
             query.setParameter("produtoId", produtoId);
-            // Garante que a lista não seja duplicada no caso de múltiplos itens/movimentações
             return query.getResultStream().findFirst().map(EstoqueJpaEntity::toDomain);
         } catch (NoResultException e) {
             return Optional.empty();

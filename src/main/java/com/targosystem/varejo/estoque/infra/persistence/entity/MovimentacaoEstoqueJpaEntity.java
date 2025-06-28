@@ -1,10 +1,13 @@
-// src/main/java/com/targosystem/varejo/estoque/infra/persistence/entity/MovimentacaoEstoqueJpaEntity.java
 package com.targosystem.varejo.estoque.infra.persistence.entity;
 
+import com.targosystem.varejo.estoque.domain.model.ItemMovimentacaoEstoque;
 import com.targosystem.varejo.estoque.domain.model.MovimentacaoEstoque;
 import com.targosystem.varejo.estoque.domain.model.TipoMovimentacao;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "movimentacoes_estoque")
@@ -13,16 +16,9 @@ public class MovimentacaoEstoqueJpaEntity {
     @Id
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estoque_id", nullable = false)
-    private EstoqueJpaEntity estoque; // Referência à entidade de estoque pai
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoMovimentacao tipo;
-
-    @Column(nullable = false)
-    private int quantidade;
 
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
@@ -30,76 +26,86 @@ public class MovimentacaoEstoqueJpaEntity {
     @Column(length = 255)
     private String motivo;
 
-    @Embedded
-    @AttributeOverrides({ // Para evitar conflito de nomes de colunas com outros @Embedded
-            @AttributeOverride(name = "numeroLote", column = @Column(name = "mov_numero_lote")),
-            @AttributeOverride(name = "dataFabricacao", column = @Column(name = "mov_data_fabricacao")),
-            @AttributeOverride(name = "dataValidade", column = @Column(name = "mov_data_validade"))
-    })
-    private LoteJpaEmbeddable loteAfetado; // NOVO
+    // NOVOS: Referências aos IDs dos Locais de Estoque (Origem e Destino)
+    @Column(name = "local_origem_id", nullable = false)
+    private String localOrigemId;
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "corredor", column = @Column(name = "mov_loc_corredor")),
-            @AttributeOverride(name = "prateleira", column = @Column(name = "mov_loc_prateleira")),
-            @AttributeOverride(name = "nivel", column = @Column(name = "mov_loc_nivel"))
-    })
-    private LocalizacaoArmazenamentoJpaEmbeddable localizacaoAfetada; // NOVO
+    @Column(name = "local_destino_id", nullable = false)
+    private String localDestinoId;
+
+    // NOVO: Coleção de itens da movimentação (detalhes dos produtos e quantidades)
+    @OneToMany(mappedBy = "movimentacao", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ItemMovimentacaoEstoqueJpaEntity> itens = new ArrayList<>();
 
     protected MovimentacaoEstoqueJpaEntity() {}
 
-    public MovimentacaoEstoqueJpaEntity(String id, EstoqueJpaEntity estoque, TipoMovimentacao tipo, int quantidade, LocalDateTime dataHora, String motivo, LoteJpaEmbeddable loteAfetado, LocalizacaoArmazenamentoJpaEmbeddable localizacaoAfetada) {
+    public MovimentacaoEstoqueJpaEntity(String id, TipoMovimentacao tipo, LocalDateTime dataHora, String motivo, String localOrigemId, String localDestinoId, List<ItemMovimentacaoEstoqueJpaEntity> itens) {
         this.id = id;
-        this.estoque = estoque;
         this.tipo = tipo;
-        this.quantidade = quantidade;
         this.dataHora = dataHora;
         this.motivo = motivo;
-        this.loteAfetado = loteAfetado;
-        this.localizacaoAfetada = localizacaoAfetada;
+        this.localOrigemId = localOrigemId;
+        this.localDestinoId = localDestinoId;
+        this.itens = (itens != null) ? new ArrayList<>(itens) : new ArrayList<>();
     }
 
     public static MovimentacaoEstoqueJpaEntity fromDomain(MovimentacaoEstoque movimentacao) {
-        return new MovimentacaoEstoqueJpaEntity(
+        MovimentacaoEstoqueJpaEntity entity = new MovimentacaoEstoqueJpaEntity(
                 movimentacao.getId(),
-                null, // Será setado posteriormente pela EstoqueJpaEntity.fromDomain
                 movimentacao.getTipo(),
-                movimentacao.getQuantidade(),
                 movimentacao.getDataHora(),
                 movimentacao.getMotivo(),
-                LoteJpaEmbeddable.fromDomain(movimentacao.getLoteAfetado()),
-                LocalizacaoArmazenamentoJpaEmbeddable.fromDomain(movimentacao.getLocalizacaoAfetada())
+                movimentacao.getLocalOrigemId(),
+                movimentacao.getLocalDestinoId(),
+                null // Os itens serão preenchidos abaixo para setar a referência ao pai
         );
+
+        List<ItemMovimentacaoEstoqueJpaEntity> jpaItens = movimentacao.getItens().stream()
+                .map(ItemMovimentacaoEstoqueJpaEntity::fromDomain)
+                .collect(Collectors.toList());
+        jpaItens.forEach(item -> item.setMovimentacao(entity)); // Garante a ligação com o pai
+        entity.setItens(jpaItens);
+
+        return entity;
     }
 
     public MovimentacaoEstoque toDomain() {
+        List<ItemMovimentacaoEstoque> domainItens = this.itens.stream()
+                .map(ItemMovimentacaoEstoqueJpaEntity::toDomain)
+                .collect(Collectors.toList());
+
         return new MovimentacaoEstoque(
                 this.id,
-                this.estoque.getId(),
                 this.tipo,
-                this.quantidade,
                 this.dataHora,
                 this.motivo,
-                this.loteAfetado != null ? this.loteAfetado.toDomain() : null,
-                this.localizacaoAfetada != null ? this.localizacaoAfetada.toDomain() : null
+                this.localOrigemId,
+                this.localDestinoId,
+                domainItens
         );
     }
 
-    // Getters e Setters
+    // Getters e Setters (ATUALIZADOS)
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    public EstoqueJpaEntity getEstoque() { return estoque; }
-    public void setEstoque(EstoqueJpaEntity estoque) { this.estoque = estoque; }
     public TipoMovimentacao getTipo() { return tipo; }
     public void setTipo(TipoMovimentacao tipo) { this.tipo = tipo; }
-    public int getQuantidade() { return quantidade; }
-    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
     public LocalDateTime getDataHora() { return dataHora; }
     public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
     public String getMotivo() { return motivo; }
     public void setMotivo(String motivo) { this.motivo = motivo; }
-    public LoteJpaEmbeddable getLoteAfetado() { return loteAfetado; } // NOVO
-    public void setLoteAfetado(LoteJpaEmbeddable loteAfetado) { this.loteAfetado = loteAfetado; } // NOVO
-    public LocalizacaoArmazenamentoJpaEmbeddable getLocalizacaoAfetada() { return localizacaoAfetada; } // NOVO
-    public void setLocalizacaoAfetada(LocalizacaoArmazenamentoJpaEmbeddable localizacaoAfetada) { this.localizacaoAfetada = localizacaoAfetada; } // NOVO
+    public String getLocalOrigemId() { return localOrigemId; }
+    public void setLocalOrigemId(String localOrigemId) { this.localOrigemId = localOrigemId; }
+    public String getLocalDestinoId() { return localDestinoId; }
+    public void setLocalDestinoId(String localDestinoId) { this.localDestinoId = localDestinoId; }
+
+    public List<ItemMovimentacaoEstoqueJpaEntity> getItens() {
+        return itens;
+    }
+    public void setItens(List<ItemMovimentacaoEstoqueJpaEntity> itens) {
+        this.itens.clear();
+        if (itens != null) {
+            this.itens.addAll(itens);
+        }
+    }
 }
