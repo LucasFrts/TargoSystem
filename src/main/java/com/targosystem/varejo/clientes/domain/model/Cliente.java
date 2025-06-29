@@ -73,8 +73,7 @@ public class Cliente implements AggregateRoot {
         this.telefone = telefone;
         this.dataAtualizacao = LocalDateTime.now();
     }
-
-    // Método de domínio para atualizar informações do cliente
+    
     public void atualizarInformacoes(String novoNome, String novoEmail, String novoTelefone) {
         setNome(novoNome);
         setEmail(novoEmail);

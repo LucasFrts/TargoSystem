@@ -67,7 +67,6 @@ import com.targosystem.varejo.clientes.application.query.ListarTodosClientesQuer
 import com.targosystem.varejo.clientes.domain.repository.ClienteRepository;
 import com.targosystem.varejo.clientes.infra.persistence.ClienteDao;
 
-// TODO: Importações para Fornecedor e Venda
 import com.targosystem.varejo.fornecedores.application.FornecedorService;
 import com.targosystem.varejo.fornecedores.application.usecases.AtualizarFornecedorUseCase;
 import com.targosystem.varejo.fornecedores.application.usecases.AvaliarEntregaFornecedorUseCase;
