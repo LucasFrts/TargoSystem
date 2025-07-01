@@ -39,6 +39,10 @@ public class LocalEstoqueService {
      * Lista locais de estoque por tipo, incluindo fornecedores se o tipo for FORNECEDOR.
      */
     public List<LocalEstoqueOutput> listarLocaisPorTipo(TipoLocal tipo) {
+        if(tipo == TipoLocal.FORNECEDOR){
+            sincronizarFornecedoresComoLocais();
+        }
+
         List<LocalEstoque> resultLocais = new ArrayList<>();
 
         resultLocais.addAll(localEstoqueRepository.findByTipo(tipo));
