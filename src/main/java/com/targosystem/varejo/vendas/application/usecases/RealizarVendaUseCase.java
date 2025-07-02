@@ -10,12 +10,9 @@ import com.targosystem.varejo.vendas.domain.service.GestorPoliticaPreco;
 import com.targosystem.varejo.shared.domain.DomainException;
 import com.targosystem.varejo.shared.infra.EventPublisher;
 
-// Integration with Estoque
 import com.targosystem.varejo.vendas.infra.integration.EstoqueEventProducer;
-// CORRECTED IMPORT: Use ProdutoParaEstoqueInfo instead of ProdutoVendidoInfo
 import com.targosystem.varejo.vendas.infra.integration.ProdutoParaEstoqueInfo;
 
-// Imports from Bounded Contexts
 import com.targosystem.varejo.clientes.domain.model.ClienteId;
 import com.targosystem.varejo.clientes.domain.repository.ClienteRepository;
 import com.targosystem.varejo.produtos.domain.model.ProdutoId;
@@ -58,23 +55,20 @@ public class RealizarVendaUseCase {
     public VendaOutput execute(RealizarVendaInput input) {
         logger.info("Iniciando RealizarVendaUseCase para cliente ID: {}", input.idCliente());
 
-        com.targosystem.varejo.clientes.domain.model.Cliente clienteDoBCClientes =
-                clienteRepository.findById(ClienteId.from(input.idCliente()))
-                        .orElseThrow(() -> new DomainException("Cliente com ID " + input.idCliente() + " não encontrado."));
+        var cliente = clienteRepository.findById(ClienteId.from(input.idCliente()))
+                .orElseThrow(() -> new DomainException("Cliente com ID " + input.idCliente() + " não encontrado."));
 
         List<ItemVenda> itensVenda = input.itens().stream()
                 .map(itemInput -> {
-                    com.targosystem.varejo.produtos.domain.model.Produto produtoDoBCProdutos =
-                            produtoRepository.findById(ProdutoId.from(itemInput.idProduto()))
-                                    .orElseThrow(() -> new DomainException("Produto com ID " + itemInput.idProduto() + " não encontrado."));
+                    var produto = produtoRepository.findById(ProdutoId.from(itemInput.idProduto()))
+                            .orElseThrow(() -> new DomainException("Produto com ID " + itemInput.idProduto() + " não encontrado."));
 
-                    // Access the value of ProdutoId using .value()
-                    BigDecimal precoUnitario = gestorPoliticaPreco.getPrecoUnitario(produtoDoBCProdutos.getId().value());
+                    BigDecimal precoUnitario = gestorPoliticaPreco.getPrecoUnitario(produto.getId().value());
 
                     return new ItemVenda(
                             new com.targosystem.varejo.vendas.domain.model.ItemVendaId(UUID.randomUUID().toString()),
-                            produtoDoBCProdutos.getId(),
-                            produtoDoBCProdutos.getNome(),
+                            produto.getId(),
+                            produto.getNome(),
                             itemInput.quantidade(),
                             precoUnitario,
                             precoUnitario.multiply(new BigDecimal(itemInput.quantidade()))
@@ -83,16 +77,17 @@ public class RealizarVendaUseCase {
                 .collect(Collectors.toList());
 
         Venda venda = new Venda(
-                clienteDoBCClientes,
+                cliente,
                 itensVenda,
                 input.valorDesconto() != null ? input.valorDesconto() : BigDecimal.ZERO
         );
 
-        venda.concluirVenda();
+        // NÃO CONCLUÍMOS A VENDA AUTOMATICAMENTE
+        // venda.concluirVenda();
 
         Venda vendaSalva = vendaRepository.save(venda);
         logger.info("Venda ID: {} salva com sucesso. Status: {}", vendaSalva.getId().value(), vendaSalva.getStatus());
-        
+
         List<ProdutoParaEstoqueInfo> produtosParaBaixa = itensVenda.stream()
                 .map(item -> new ProdutoParaEstoqueInfo(item.getIdProduto().value(), item.getQuantidade()))
                 .collect(Collectors.toList());
