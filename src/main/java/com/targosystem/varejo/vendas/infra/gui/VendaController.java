@@ -15,8 +15,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,13 +30,11 @@ public class VendaController {
         this.vendaService = Objects.requireNonNull(vendaService, "VendaService cannot be null.");
         this.vendaFrame = Objects.requireNonNull(vendaFrame, "VendaFrame cannot be null.");
 
-        // --- Listeners para o Painel de Vendas ---
         this.vendaFrame.getBtnAtualizarVendas().addActionListener(e -> listarTodasVendas());
         this.vendaFrame.getBtnNovaVenda().addActionListener(e -> realizarNovaVenda());
         this.vendaFrame.getBtnCancelarVenda().addActionListener(e -> cancelarVendaSelecionada());
         this.vendaFrame.getBtnAplicarDesconto().addActionListener(e -> aplicarDescontoVendaSelecionada());
 
-        // Listener para seleção de linha na tabela de vendas
         this.vendaFrame.getVendasTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -50,7 +46,6 @@ public class VendaController {
             }
         });
 
-        // Inicializa a lista de vendas ao carregar o controller
         listarTodasVendas();
     }
 
@@ -63,7 +58,6 @@ public class VendaController {
             DefaultTableModel model = vendaFrame.getVendasTableModel();
 
             model.setColumnIdentifiers(new Object[]{"ID", "Cliente ID", "Data Venda", "Total Bruto", "Desconto", "Total Líquido", "Status"});
-
 
             for (VendaOutput venda : vendas) {
                 model.addRow(new Object[]{
@@ -120,12 +114,11 @@ public class VendaController {
         }
     }
 
-
     private void cancelarVendaSelecionada() {
         int selectedRow = vendaFrame.getVendasTable().getSelectedRow();
         if (selectedRow != -1) {
             String vendaId = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 0);
-            String statusAtual = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 6); // Coluna do Status
+            String statusAtual = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 6);
 
             if ("CANCELADA".equalsIgnoreCase(statusAtual)) {
                 JOptionPane.showMessageDialog(vendaFrame, "Esta venda já está CANCELADA.", "Atenção", JOptionPane.INFORMATION_MESSAGE);
@@ -160,16 +153,31 @@ public class VendaController {
         int selectedRow = vendaFrame.getVendasTable().getSelectedRow();
         if (selectedRow != -1) {
             String vendaId = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 0);
-            BigDecimal totalBruto = (BigDecimal) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 3); // Coluna do Total Bruto
-            String statusAtual = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 6); // Coluna do Status
+            String statusAtual = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 6);
+            String totalBrutoStr = (String) vendaFrame.getVendasTableModel().getValueAt(selectedRow, 3);
 
-            if ("CANCELADA".equalsIgnoreCase(statusAtual) || "CONCLUIDA".equalsIgnoreCase(statusAtual)) {
-                JOptionPane.showMessageDialog(vendaFrame, "Não é possível aplicar desconto em vendas canceladas ou já concluídas.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            // Permitir desconto só se status for "CRIADA"
+            if (!"CRIADA".equalsIgnoreCase(statusAtual)) {
+                JOptionPane.showMessageDialog(vendaFrame,
+                        "Não é possível aplicar desconto em uma venda que não está criada.",
+                        "Atenção",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            BigDecimal totalBruto;
+            try {
+                totalBruto = new BigDecimal(totalBrutoStr);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(vendaFrame,
+                        "Erro ao interpretar o valor total bruto da venda.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             logger.info("Abrindo diálogo para aplicar desconto na venda ID: {}", vendaId);
-            String[] formData = vendaFrame.showAplicarDescontoDialog(vendaId, totalBruto.toPlainString()); // Passa o total bruto como String
+            String[] formData = vendaFrame.showAplicarDescontoDialog(vendaId, totalBruto.toPlainString());
 
             if (formData != null) {
                 try {
@@ -177,7 +185,8 @@ public class VendaController {
 
                     AplicarDescontoVendaInput input = new AplicarDescontoVendaInput(vendaId, valorDesconto);
                     VendaOutput vendaAtualizada = vendaService.aplicarDescontoVenda(input);
-                    JOptionPane.showMessageDialog(vendaFrame, "Desconto de R$" + vendaAtualizada.valorDesconto() + " aplicado na venda ID: " + vendaAtualizada.id() + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(vendaFrame, "Desconto de R$" + vendaAtualizada.valorDesconto() +
+                            " aplicado na venda ID: " + vendaAtualizada.id() + " com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                     listarTodasVendas();
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(vendaFrame, "Valor do desconto inválido. Use um formato numérico válido (ex: 10.50).", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
@@ -195,4 +204,5 @@ public class VendaController {
             JOptionPane.showMessageDialog(vendaFrame, "Nenhuma venda selecionada para aplicar desconto.", "Atenção", JOptionPane.WARNING_MESSAGE);
         }
     }
+
 }
