@@ -61,7 +61,7 @@ public class PromocaoService {
         this.criarKitPromocionalUseCase = Objects.requireNonNull(criarKitPromocionalUseCase, "CriarKitPromocionalUseCase cannot be null");
         this.obterKitPromocionalPorIdQuery = Objects.requireNonNull(obterKitPromocionalPorIdQuery, "ObterKitPromocionalPorIdQuery cannot be null");
         this.listarTodosKitsQuery = Objects.requireNonNull(listarTodosKitsQuery, "ListarTodosKitsQuery cannot be null");
-        this.excluirPromocaoUseCase = Objects.requireNonNull(excluirPromocaoUseCase, "ExcluirPromocaoUseCase cannot be null");
+        this.excluirPromocaoUseCase = Objects.requireNonNull(excluirPromocaoUseCase, "ExcluirClienteUseCase cannot be null");
         this.excluirKitPromocionalUseCase = Objects.requireNonNull(excluirKitPromocionalUseCase, "ExcluirKitPromocionalUseCase cannot be null");
 
         // Inicializar as novas queries

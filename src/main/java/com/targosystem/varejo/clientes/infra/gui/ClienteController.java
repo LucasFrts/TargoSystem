@@ -4,13 +4,13 @@ import com.targosystem.varejo.clientes.application.ClienteService;
 import com.targosystem.varejo.clientes.application.input.AtualizarClienteInput;
 import com.targosystem.varejo.clientes.application.input.CadastrarClienteInput;
 import com.targosystem.varejo.clientes.application.output.ClienteOutput;
+import com.targosystem.varejo.clientes.application.usecases.ExcluirClienteUseCase;
 import com.targosystem.varejo.shared.domain.DomainException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import java.util.Objects;
@@ -20,26 +20,27 @@ public class ClienteController {
     private static final Logger logger = LoggerFactory.getLogger(ClienteController.class);
 
     private final ClienteService clienteService;
+    private final ExcluirClienteUseCase excluirClienteUseCase;
     private final ClienteFrame clienteFrame;
 
-    public ClienteController(ClienteService clienteService, ClienteFrame clienteFrame) {
-        this.clienteService = Objects.requireNonNull(clienteService, "ClienteService cannot be null.");
-        this.clienteFrame = Objects.requireNonNull(clienteFrame, "ClienteFrame cannot be null.");
-        
+    public ClienteController(
+            ClienteService clienteService,
+            ClienteFrame clienteFrame,
+            ExcluirClienteUseCase excluirClienteUseCase
+    ) {
+        this.clienteService = Objects.requireNonNull(clienteService);
+        this.clienteFrame = Objects.requireNonNull(clienteFrame);
+        this.excluirClienteUseCase = Objects.requireNonNull(excluirClienteUseCase);
+
         this.clienteFrame.getBtnAtualizarLista().addActionListener(e -> listarTodosClientes());
         this.clienteFrame.getBtnNovoCliente().addActionListener(e -> cadastrarNovoCliente());
         this.clienteFrame.getBtnEditarCliente().addActionListener(e -> editarClienteSelecionado());
         this.clienteFrame.getBtnExcluirCliente().addActionListener(e -> excluirClienteSelecionado());
 
-        this.clienteFrame.getClientesTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    boolean hasSelection = clienteFrame.getClientesTable().getSelectedRow() != -1;
-                    clienteFrame.getBtnEditarCliente().setEnabled(hasSelection);
-                    clienteFrame.getBtnExcluirCliente().setEnabled(hasSelection);
-                }
-            }
+        this.clienteFrame.getClientesTable().getSelectionModel().addListSelectionListener(e -> {
+            boolean hasSelection = clienteFrame.getClientesTable().getSelectedRow() != -1;
+            clienteFrame.getBtnEditarCliente().setEnabled(hasSelection);
+            clienteFrame.getBtnExcluirCliente().setEnabled(hasSelection);
         });
 
         listarTodosClientes();
@@ -64,10 +65,11 @@ public class ClienteController {
                         cliente.telefone()
                 });
             }
+
             logger.info("Total de {} clientes carregados.", clientes.size());
         } catch (DomainException e) {
             logger.error("Erro de domínio ao listar clientes: {}", e.getMessage());
-            JOptionPane.showMessageDialog(clienteFrame, "Erro de domínio: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(clienteFrame, "Erro: " + e.getMessage(), "Erro de Domínio", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             logger.error("Erro inesperado ao listar clientes", e);
             JOptionPane.showMessageDialog(clienteFrame, "Erro inesperado ao listar clientes.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -87,17 +89,15 @@ public class ClienteController {
                         formData[4]
                 );
                 ClienteOutput novoCliente = clienteService.cadastrarCliente(input);
-                JOptionPane.showMessageDialog(clienteFrame, "Cliente '" + novoCliente.nome() + "' cadastrado com sucesso! ID: " + novoCliente.id(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(clienteFrame, "Cliente '" + novoCliente.nome() + "' cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 listarTodosClientes();
             } catch (DomainException e) {
                 logger.error("Erro de domínio ao cadastrar cliente: {}", e.getMessage());
-                JOptionPane.showMessageDialog(clienteFrame, "Erro de domínio: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(clienteFrame, "Erro: " + e.getMessage(), "Erro de Domínio", JOptionPane.ERROR_MESSAGE);
             } catch (Exception e) {
                 logger.error("Erro inesperado ao cadastrar cliente", e);
                 JOptionPane.showMessageDialog(clienteFrame, "Erro inesperado ao cadastrar cliente.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
-        } else {
-            logger.info("Cadastro de cliente cancelado.");
         }
     }
 
@@ -110,8 +110,8 @@ public class ClienteController {
             String cpf = (String) clienteFrame.getTableModel().getValueAt(selectedRow, 3);
             String telefone = (String) clienteFrame.getTableModel().getValueAt(selectedRow, 4);
 
-            logger.info("Abrindo diálogo para editar cliente ID: {}", clienteId);
-            String[] formData = clienteFrame.showClienteDialog(false, clienteId, nome, email, cpf, telefone, null); // Pass null for endereco
+            logger.info("Editando cliente ID: {}", clienteId);
+            String[] formData = clienteFrame.showClienteDialog(false, clienteId, nome, email, cpf, telefone, null);
 
             if (formData != null) {
                 try {
@@ -123,19 +123,15 @@ public class ClienteController {
                     );
                     ClienteOutput clienteAtualizado = clienteService.atualizarCliente(input);
                     JOptionPane.showMessageDialog(clienteFrame, "Cliente '" + clienteAtualizado.nome() + "' atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                    listarTodosClientes(); // Atualiza a lista
+                    listarTodosClientes();
                 } catch (DomainException e) {
                     logger.error("Erro de domínio ao atualizar cliente: {}", e.getMessage());
-                    JOptionPane.showMessageDialog(clienteFrame, "Erro de domínio: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(clienteFrame, "Erro: " + e.getMessage(), "Erro de Domínio", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception e) {
                     logger.error("Erro inesperado ao atualizar cliente", e);
                     JOptionPane.showMessageDialog(clienteFrame, "Erro inesperado ao atualizar cliente.", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
-            } else {
-                logger.info("Edição de cliente cancelada.");
             }
-        } else {
-            JOptionPane.showMessageDialog(clienteFrame, "Nenhum cliente selecionado para edição.", "Atenção", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -143,18 +139,25 @@ public class ClienteController {
         int selectedRow = clienteFrame.getClientesTable().getSelectedRow();
         if (selectedRow != -1) {
             String clienteId = (String) clienteFrame.getTableModel().getValueAt(selectedRow, 0);
-            String clienteNome = (String) clienteFrame.getTableModel().getValueAt(selectedRow, 1); // Assuming nome is at index 1
+            String clienteNome = (String) clienteFrame.getTableModel().getValueAt(selectedRow, 1);
 
             int confirm = JOptionPane.showConfirmDialog(clienteFrame,
                     "Tem certeza que deseja excluir o cliente '" + clienteNome + "' (ID: " + clienteId + ")?",
                     "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                logger.info("Excluindo cliente ID: {}", clienteId);
-                JOptionPane.showMessageDialog(clienteFrame, "Funcionalidade de exclusão em desenvolvimento!", "Aguarde", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    excluirClienteUseCase.execute(clienteId);
+                    JOptionPane.showMessageDialog(clienteFrame, "Cliente '" + clienteNome + "' excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    listarTodosClientes();
+                } catch (DomainException e) {
+                    logger.error("Erro de domínio ao excluir cliente: {}", e.getMessage());
+                    JOptionPane.showMessageDialog(clienteFrame, "Erro: " + e.getMessage(), "Erro de Domínio", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception e) {
+                    logger.error("Erro inesperado ao excluir cliente", e);
+                    JOptionPane.showMessageDialog(clienteFrame, "Erro inesperado ao excluir cliente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        } else {
-            JOptionPane.showMessageDialog(clienteFrame, "Nenhum cliente selecionado para exclusão.", "Atenção", JOptionPane.WARNING_MESSAGE);
         }
     }
 }

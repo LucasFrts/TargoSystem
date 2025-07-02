@@ -1,6 +1,8 @@
 package com.targosystem.varejo.seguranca.infra.gui;
 
 import com.targosystem.varejo.clientes.application.ClienteService;
+import com.targosystem.varejo.clientes.application.usecases.ExcluirClienteUseCase;
+import com.targosystem.varejo.clientes.domain.repository.ClienteRepository;
 import com.targosystem.varejo.clientes.infra.gui.ClienteController;
 import com.targosystem.varejo.clientes.infra.gui.ClienteFrame; // Deve ser ClientePanel ou similar
 import com.targosystem.varejo.estoque.application.EstoqueService;
@@ -20,6 +22,7 @@ import com.targosystem.varejo.seguranca.application.output.UsuarioOutput;
 import com.targosystem.varejo.vendas.application.VendaService;
 import com.targosystem.varejo.vendas.infra.gui.VendaController;
 import com.targosystem.varejo.vendas.infra.gui.VendaFrame; // Deve ser VendaPanel ou similar
+import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +45,7 @@ public class MainApplicationFrame extends JFrame {
     private final ClienteService clienteService;
     private final FornecedorService fornecedorService;
     private final VendaService vendaService;
+    private final ClienteRepository clienteRepository;
 
     private JPanel cardsPanel;
     private CardLayout cardLayout;
@@ -74,14 +78,14 @@ public class MainApplicationFrame extends JFrame {
     // NOVO: Para usuários
     private UsuarioFrame usuarioFrame; // <- Esta classe UsuarioFrame deve estender JPanel
     private UsuarioController usuarioController;
-
+    private final EntityManager entityManager;
     private JMenuBar menuBar;
     private UsuarioOutput loggedInUser;
 
     public MainApplicationFrame(SegurancaService segurancaService, ProdutoService produtoService,
                                 PromocaoService promocaoService, EstoqueService estoqueService,
                                 ClienteService clienteService, FornecedorService fornecedorService,
-                                VendaService vendaService) {
+                                VendaService vendaService,  ClienteRepository clienteRepository, EntityManager entityManager) {
         super("Targo System - Sistema de Varejo");
         this.segurancaService = Objects.requireNonNull(segurancaService, "SegurancaService cannot be null");
         this.produtoService = Objects.requireNonNull(produtoService, "ProdutoService cannot be null");
@@ -90,7 +94,8 @@ public class MainApplicationFrame extends JFrame {
         this.clienteService = Objects.requireNonNull(clienteService, "ClienteService cannot be null");
         this.fornecedorService = Objects.requireNonNull(fornecedorService, "FornecedorService cannot be null");
         this.vendaService = Objects.requireNonNull(vendaService, "VendaService cannot be null");
-
+        this.clienteRepository = Objects.requireNonNull(clienteRepository, "ClienteRepository cannot be null");
+        this.entityManager = Objects.requireNonNull(entityManager);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
         setLocationRelativeTo(null);
@@ -132,7 +137,7 @@ public class MainApplicationFrame extends JFrame {
 
         // Certifique-se que ClienteFrame estenda JPanel
         clienteFrame = new ClienteFrame();
-        clienteController = new ClienteController(clienteService, clienteFrame);
+        clienteController = new ClienteController(clienteService, clienteFrame, new ExcluirClienteUseCase(clienteRepository, entityManager));
         cardsPanel.add(clienteFrame, "Clientes");
 
         // Certifique-se que FornecedorFrame estenda JPanel

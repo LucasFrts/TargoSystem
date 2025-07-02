@@ -1,6 +1,7 @@
 package com.targosystem;
 
 import com.targosystem.varejo.clientes.application.query.ObterClientePorIdQuery;
+import com.targosystem.varejo.clientes.application.usecases.ExcluirClienteUseCase;
 import com.targosystem.varejo.estoque.application.LocalEstoqueService;
 import com.targosystem.varejo.estoque.application.queries.ConsultarEstoquePorProdutoIdAndLocalEstoqueId;
 import com.targosystem.varejo.estoque.application.queries.ConsultarEstoqueTotalPorProdutoIdQuery;
@@ -204,8 +205,9 @@ public class Main {
         logger.info("Configuring 'Clientes' Bounded Context.");
         ClienteRepository clienteRepository = new ClienteDao(entityManager);
 
-        CadastrarClienteUseCase cadastrarClienteUseCase = new CadastrarClienteUseCase(clienteRepository);
+        CadastrarClienteUseCase cadastrarClienteUseCase = new CadastrarClienteUseCase(clienteRepository, entityManager);
         AtualizarClienteUseCase atualizarClienteUseCase = new AtualizarClienteUseCase(clienteRepository);
+        ExcluirClienteUseCase  excluirClienteUseCase = new ExcluirClienteUseCase(clienteRepository, entityManager);
         ListarTodosClientesQuery listarTodosClientesQuery = new ListarTodosClientesQuery(clienteRepository);
         ObterClientePorIdQuery obterClientePorIdQuery = new ObterClientePorIdQuery(clienteRepository);
 
@@ -312,7 +314,9 @@ public class Main {
                         estoqueService,
                         clienteService,
                         fornecedorService,
-                        vendaService
+                        vendaService,
+                        clienteRepository,
+                         entityManager
                 );
 
                 mainFrame.setVisible(true);
