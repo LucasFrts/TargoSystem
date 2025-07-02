@@ -1,6 +1,6 @@
 package com.targosystem.varejo.vendas.domain.model;
 
-import com.targosystem.varejo.produtos.domain.model.ProdutoId; // Importe ProdutoId
+import com.targosystem.varejo.produtos.domain.model.ProdutoId;
 import com.targosystem.varejo.shared.domain.DomainException;
 
 import java.math.BigDecimal;

@@ -1,7 +1,6 @@
 package com.targosystem.varejo.produtos.application.output;
 
 import com.targosystem.varejo.produtos.domain.model.Categoria;
-import com.targosystem.varejo.produtos.domain.model.CategoriaId;
 
 public record CategoriaOutput(
         String id,

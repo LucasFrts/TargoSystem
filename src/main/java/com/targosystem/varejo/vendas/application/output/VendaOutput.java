@@ -1,7 +1,7 @@
 package com.targosystem.varejo.vendas.application.output;
 
 import com.targosystem.varejo.vendas.domain.model.Venda;
-import com.targosystem.varejo.clientes.application.output.ClienteOutput; // Importe ClienteOutput
+import com.targosystem.varejo.clientes.application.output.ClienteOutput;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,7 +27,7 @@ public record VendaOutput(
 
         return new VendaOutput(
                 venda.getId().value(),
-                ClienteOutput.from(venda.getCliente()), // Mapear Cliente de domínio para ClienteOutput
+                ClienteOutput.from(venda.getCliente()),
                 itensOutput,
                 venda.getValorTotal().toPlainString(),
                 venda.getValorDesconto().toPlainString(),

@@ -30,11 +30,10 @@ public class ProdutoDao implements ProdutoRepository {
             if (existingEntity == null) {
                 entityManager.persist(jpaEntity);
             } else {
-                // Atualizar campos da entidade existente
                 existingEntity.setNome(jpaEntity.getNome());
                 existingEntity.setDescricao(jpaEntity.getDescricao());
                 existingEntity.setPrecoVenda(jpaEntity.getPrecoVenda());
-                existingEntity.setCodigoBarras(jpaEntity.getCodigoBarras()); // Atualiza o código de barras
+                existingEntity.setCodigoBarras(jpaEntity.getCodigoBarras());
                 existingEntity.setStatus(jpaEntity.getStatus());
                 existingEntity.setDataAtualizacao(jpaEntity.getDataAtualizacao());
                 jpaEntity = entityManager.merge(existingEntity);
@@ -97,19 +96,19 @@ public class ProdutoDao implements ProdutoRepository {
         EntityTransaction transaction = null;
         try {
             transaction = entityManager.getTransaction();
-            transaction.begin(); // Inicia a transação para operação de exclusão
+            transaction.begin();
 
             ProdutoJpaEntity entity = entityManager.find(ProdutoJpaEntity.class, id.value());
             if (entity != null) {
                 entityManager.remove(entity);
             }
 
-            transaction.commit(); // Comita a transação
+            transaction.commit();
         } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive()) {
-                transaction.rollback(); // Faz rollback em caso de erro
+                transaction.rollback();
             }
-            throw e; // Relança a exceção
+            throw e;
         }
     }
 }

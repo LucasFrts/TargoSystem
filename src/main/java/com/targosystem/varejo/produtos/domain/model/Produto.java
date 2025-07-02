@@ -19,29 +19,27 @@ public class Produto implements AggregateRoot {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
 
-    // Construtor para nova criação (ajustado para incluir categoria e marca)
     public Produto(String nome, String descricao, BigDecimal precoVenda, String codigoBarras, Categoria categoria, String marca) {
         this.id = ProdutoId.generate();
         setNome(nome);
         setDescricao(descricao);
         setPrecoVenda(precoVenda);
         setCodigoBarras(codigoBarras);
-        setCategoria(categoria); // Novo setter
-        setMarca(marca); // Novo setter
+        setCategoria(categoria);
+        setMarca(marca);
         this.status = "ATIVO";
         this.dataCriacao = LocalDateTime.now();
         this.dataAtualizacao = LocalDateTime.now();
     }
 
-    // Construtor para reconstrução da persistência (ajustado para incluir categoria e marca)
     public Produto(ProdutoId id, String nome, String descricao, BigDecimal precoVenda, String codigoBarras, Categoria categoria, String marca, String status, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
         this.id = Objects.requireNonNull(id);
         this.nome = Objects.requireNonNull(nome);
         this.descricao = Objects.requireNonNull(descricao);
         this.precoVenda = Objects.requireNonNull(precoVenda);
         this.codigoBarras = Objects.requireNonNull(codigoBarras);
-        this.categoria = Objects.requireNonNull(categoria); // Adicionado aqui
-        this.marca = Objects.requireNonNull(marca); // Adicionado aqui
+        this.categoria = Objects.requireNonNull(categoria);
+        this.marca = Objects.requireNonNull(marca);
         this.status = Objects.requireNonNull(status);
         this.dataCriacao = Objects.requireNonNull(dataCriacao);
         this.dataAtualizacao = Objects.requireNonNull(dataAtualizacao);
@@ -137,9 +135,9 @@ public class Produto implements AggregateRoot {
         setCodigoBarras(codigoBarras);
         setCategoria(categoria);
         setMarca(marca);
-        setPrecoVenda(precoSugerido); // Assume que precoSugerido do input é o precoVenda
+        setPrecoVenda(precoSugerido);
 
-        this.dataAtualizacao = LocalDateTime.now(); // Atualiza o timestamp de modificação
+        this.dataAtualizacao = LocalDateTime.now();
     }
 
 

@@ -8,12 +8,13 @@ import com.targosystem.varejo.seguranca.domain.model.UsuarioId;
 import com.targosystem.varejo.seguranca.domain.repository.PapelRepository;
 import com.targosystem.varejo.seguranca.domain.repository.UsuarioRepository;
 import com.targosystem.varejo.shared.domain.DomainException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AtualizarUsuarioUseCase {
 
@@ -35,10 +36,8 @@ public class AtualizarUsuarioUseCase {
         Usuario usuarioExistente = usuarioRepository.findById(UsuarioId.from(input.id()))
                 .orElseThrow(() -> new DomainException("User with ID " + input.id() + " not found."));
 
-        // Atualizar nome completo e email
         usuarioExistente.atualizarInformacoes(input.nomeCompleto(), input.email());
 
-        // Atualizar status (ativo/inativo)
         if (input.ativo() != null) {
             if (input.ativo()) {
                 usuarioExistente.ativar();
@@ -47,7 +46,6 @@ public class AtualizarUsuarioUseCase {
             }
         }
 
-        // Atualizar papéis
         if (input.papeisNomes() != null) {
             Set<Papel> novosPapeis = new HashSet<>();
             for (String papelNome : input.papeisNomes()) {
@@ -56,13 +54,11 @@ public class AtualizarUsuarioUseCase {
                 novosPapeis.add(papel);
             }
 
-            // Remover papéis antigos que não estão na nova lista
             Set<Papel> papeisParaRemover = usuarioExistente.getPapeis().stream()
                     .filter(p -> !novosPapeis.contains(p))
                     .collect(Collectors.toSet());
             papeisParaRemover.forEach(usuarioExistente::removerPapel);
 
-            // Adicionar novos papéis
             novosPapeis.stream()
                     .filter(p -> !usuarioExistente.getPapeis().contains(p))
                     .forEach(usuarioExistente::adicionarPapel);

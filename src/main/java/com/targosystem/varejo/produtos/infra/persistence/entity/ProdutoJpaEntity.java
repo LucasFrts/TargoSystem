@@ -2,12 +2,10 @@ package com.targosystem.varejo.produtos.infra.persistence.entity;
 
 import com.targosystem.varejo.produtos.domain.model.Produto;
 import com.targosystem.varejo.produtos.domain.model.ProdutoId;
-
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(name = "produtos")
@@ -30,10 +28,10 @@ public class ProdutoJpaEntity {
 
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false) // Coluna de FK
-    private CategoriaJpaEntity categoria; // Mapeamento para a entidade JPA da Categoria
+    private CategoriaJpaEntity categoria;
 
-    @Column(length = 100) // Assumindo que marca não é uma entidade complexa
-    private String marca; // Novo campo mapeado
+    @Column(length = 100)
+    private String marca;
 
     @Column(nullable = false, length = 20)
     private String status;
@@ -52,8 +50,8 @@ public class ProdutoJpaEntity {
         this.descricao = descricao;
         this.precoVenda = precoVenda;
         this.codigoBarras = codigoBarras;
-        this.categoria = categoria; // Adicionado ao construtor
-        this.marca = marca; // Adicionado ao construtor
+        this.categoria = categoria;
+        this.marca = marca;
         this.status = status;
         this.dataCriacao = dataCriacao;
         this.dataAtualizacao = dataAtualizacao;
@@ -66,7 +64,6 @@ public class ProdutoJpaEntity {
                 produto.getDescricao(),
                 produto.getPrecoVenda(),
                 produto.getCodigoBarras(),
-                // Converta Categoria do domínio para CategoriaJpaEntity
                 CategoriaJpaEntity.fromDomain(produto.getCategoria()),
                 produto.getMarca(),
                 produto.getStatus(),
@@ -82,7 +79,6 @@ public class ProdutoJpaEntity {
                 this.descricao,
                 this.precoVenda,
                 this.codigoBarras,
-                // Converta CategoriaJpaEntity para Categoria do domínio
                 this.categoria.toDomain(),
                 this.marca,
                 this.status,

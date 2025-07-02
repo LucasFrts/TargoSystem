@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class UsuarioFrame extends JPanel {
 
@@ -92,32 +90,32 @@ public class UsuarioFrame extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.BOTH; // Preenche verticalmente
-        gbc.weighty = 1.0; // Permite que a lista se expanda verticalmente
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1.0;
 
         papeisListModel = new DefaultListModel<>();
         papeisList = new JList<>(papeisListModel);
-        papeisList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Permite múltiplos
+        papeisList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(papeisList);
-        scrollPane.setPreferredSize(new Dimension(200, 100)); // Tamanho preferencial para a lista
+        scrollPane.setPreferredSize(new Dimension(200, 100));
         add(scrollPane, gbc);
 
-        gbc.gridwidth = 2; // Botões ocupam 2 colunas
-        gbc.weighty = 0; // Reset weighty
-        gbc.fill = GridBagConstraints.NONE; // Não preenche
-        gbc.anchor = GridBagConstraints.CENTER; // Centraliza
+        gbc.gridwidth = 2;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
 
         // Botões de ação
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10)); // Layout para os botões
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         criarUsuarioButton = new JButton("Criar Usuário");
         limparCamposButton = new JButton("Limpar Campos");
 
         criarUsuarioButton.setFont(new Font("Arial", Font.BOLD, 16));
         limparCamposButton.setFont(new Font("Arial", Font.PLAIN, 16));
 
-        criarUsuarioButton.setBackground(new Color(46, 204, 113)); // Verde para criar
+        criarUsuarioButton.setBackground(new Color(46, 204, 113));
         criarUsuarioButton.setForeground(Color.WHITE);
-        limparCamposButton.setBackground(new Color(189, 195, 199)); // Cinza para limpar
+        limparCamposButton.setBackground(new Color(189, 195, 199));
         limparCamposButton.setForeground(Color.BLACK);
 
         buttonPanel.add(criarUsuarioButton);
@@ -128,7 +126,6 @@ public class UsuarioFrame extends JPanel {
         gbc.gridwidth = 2;
         add(buttonPanel, gbc);
 
-        // Preencher a lista de papéis (no construtor ou via método setter)
         setPapeisDisponiveis(papeisDisponiveis);
     }
 

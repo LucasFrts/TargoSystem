@@ -1,4 +1,3 @@
-// src/main/java/com/targosystem/varejo/promocoes/infra/persistence/entity/PromocaoJpaEntity.java
 package com.targosystem.varejo.promocoes.infra.persistence.entity;
 
 import com.targosystem.varejo.promocoes.domain.model.Promocao;
@@ -6,7 +5,7 @@ import com.targosystem.varejo.promocoes.domain.model.TipoDesconto;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList; // Para inicializar a lista
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,11 +34,10 @@ public class PromocaoJpaEntity {
     @Column(nullable = false)
     private boolean ativa;
 
-    // NOVO: Coleção de IDs de produtos associados à promoção
-    @ElementCollection(fetch = FetchType.LAZY) // Lazy loading para otimização
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "promocao_produtos", joinColumns = @JoinColumn(name = "promocao_id"))
     @Column(name = "produto_id", nullable = false)
-    private List<String> produtoIds = new ArrayList<>(); // Inicializa para evitar NullPointer
+    private List<String> produtoIds = new ArrayList<>();
 
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
@@ -47,11 +45,8 @@ public class PromocaoJpaEntity {
     @Column(name = "data_atualizacao", nullable = false)
     private LocalDateTime dataAtualizacao;
 
-    // Construtor padrão JPA
     protected PromocaoJpaEntity() {}
 
-    // Construtor COMPLETO para facilitar a criação a partir do modelo de domínio
-    // Agora com 9 argumentos (sem kitPromocionalId, com produtoIds)
     public PromocaoJpaEntity(String id, String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto,
                              LocalDateTime dataInicio, LocalDateTime dataFim, boolean ativa,
                              List<String> produtoIds, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) { // MUDADO
@@ -62,12 +57,11 @@ public class PromocaoJpaEntity {
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.ativa = ativa;
-        this.produtoIds = produtoIds != null ? new ArrayList<>(produtoIds) : new ArrayList<>(); // Atribui a lista de IDs
+        this.produtoIds = produtoIds != null ? new ArrayList<>(produtoIds) : new ArrayList<>();
         this.dataCriacao = dataCriacao;
         this.dataAtualizacao = dataAtualizacao;
     }
 
-    // Métodos de conversão
     public static PromocaoJpaEntity fromDomain(Promocao promocao) {
         return new PromocaoJpaEntity(
                 promocao.getId(),
@@ -77,7 +71,7 @@ public class PromocaoJpaEntity {
                 promocao.getDataInicio(),
                 promocao.getDataFim(),
                 promocao.isAtiva(),
-                promocao.getProdutoIds(),     // Inclui a lista de IDs de produtos
+                promocao.getProdutoIds(),
                 promocao.getDataCriacao(),
                 promocao.getDataAtualizacao()
         );
@@ -92,7 +86,7 @@ public class PromocaoJpaEntity {
                 this.dataInicio,
                 this.dataFim,
                 this.ativa,
-                this.produtoIds,     // Inclui a lista de IDs de produtos
+                this.produtoIds,
                 this.dataCriacao,
                 this.dataAtualizacao
         );
@@ -106,12 +100,11 @@ public class PromocaoJpaEntity {
     public LocalDateTime getDataInicio() { return dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public boolean isAtiva() { return ativa; }
-    public List<String> getProdutoIds() { return produtoIds; } // Getter para a lista de IDs de produtos
+    public List<String> getProdutoIds() { return produtoIds; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
 
 
-    // Setters (necessários para que o JPA possa carregar e atualizar a entidade)
     public void setId(String id) { this.id = id; }
     public void setNome(String nome) { this.nome = nome; }
     public void setTipoDesconto(TipoDesconto tipoDesconto) { this.tipoDesconto = tipoDesconto; }

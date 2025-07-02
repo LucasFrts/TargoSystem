@@ -22,7 +22,6 @@ public class ProdutoService {
     private final ListarTodosProdutosQuery listarTodosProdutosQuery;
     private final ListarCategoriasQuery listarCategoriasQuery; // Declare a dependência
     private final ConsultarProdutosAtivosPorNomeOuCodigoQuery listarProdutosAtivosPorNomeOuCodigoQuery;
-    // ... outros use cases/queries como inativar, ativar, etc.
 
     public ProdutoService(
             CadastrarProdutoUseCase cadastrarProdutoUseCase,

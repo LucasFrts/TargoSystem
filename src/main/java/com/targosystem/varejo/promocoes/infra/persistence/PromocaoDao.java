@@ -34,11 +34,11 @@ public class PromocaoDao implements PromocaoRepository {
                 existingEntity.setDataFim(jpaEntity.getDataFim());
                 existingEntity.setAtiva(jpaEntity.isAtiva());
                 existingEntity.setProdutoIds(jpaEntity.getProdutoIds());
-                existingEntity.setDataAtualizacao(jpaEntity.getDataAtualizacao()); // Garante que a data de atualização é propagada
+                existingEntity.setDataAtualizacao(jpaEntity.getDataAtualizacao());
 
                 jpaEntity = entityManager.merge(existingEntity);
             }
-            entityManager.flush(); // Garante que as alterações são sincronizadas com o banco antes do commit do UseCase
+            entityManager.flush();
             return jpaEntity.toDomain();
         } catch (RuntimeException e) {
             throw e;

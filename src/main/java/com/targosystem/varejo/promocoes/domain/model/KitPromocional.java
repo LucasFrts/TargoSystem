@@ -18,7 +18,6 @@ public class KitPromocional {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
 
-    // Construtor principal para criar um novo kit no domínio (gera ID e datas)
     public KitPromocional(String nome, String descricao, BigDecimal precoFixoKit, List<ItemKit> itens) {
         this.id = UUID.randomUUID().toString();
         this.nome = Objects.requireNonNull(nome, "Nome do kit não pode ser nulo.");
@@ -34,7 +33,6 @@ public class KitPromocional {
         validarPrecoFixoKit();
     }
 
-    // Construtor usado pelo repositório (infraestrutura) ao carregar do banco (recebe ID e datas)
     public KitPromocional(String id, String nome, String descricao, BigDecimal precoFixoKit,
                           List<ItemKit> itens, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
         this.id = Objects.requireNonNull(id, "ID do kit não pode ser nulo.");
@@ -51,14 +49,12 @@ public class KitPromocional {
         validarPrecoFixoKit();
     }
 
-    // Validações
     private void validarPrecoFixoKit() {
         if (precoFixoKit.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Preço fixo do kit não pode ser negativo.");
         }
     }
 
-    // Métodos de negócio
     public void adicionarItem(ItemKit item) {
         List<ItemKit> novaLista = new java.util.ArrayList<>(this.itens);
         novaLista.add(Objects.requireNonNull(item, "Item do kit não pode ser nulo."));

@@ -29,7 +29,6 @@ public class PromocaoFrame extends JPanel {
 
         tabbedPane = new JTabbedPane();
 
-        // --- Aba de Promoções ---
         JPanel promocoesPanel = new JPanel(new BorderLayout(10, 10));
         promocoesTableModel = new DefaultTableModel(new Object[]{"ID", "Nome", "Tipo", "Valor", "Ativa", "Início", "Fim"}, 0) { // Adicionado "Kit ID"
             @Override
@@ -54,7 +53,6 @@ public class PromocaoFrame extends JPanel {
 
         tabbedPane.addTab("Promoções", promocoesPanel);
 
-        // --- Aba de Kits Promocionais (sem alterações significativas aqui) ---
         JPanel kitsPanel = new JPanel(new BorderLayout(10, 10));
         kitsTableModel = new DefaultTableModel(new Object[]{"ID", "Nome", "Descrição", "Preço Fixo", "Itens (IDs)"}, 0) {
             @Override
@@ -81,13 +79,11 @@ public class PromocaoFrame extends JPanel {
 
         add(tabbedPane, BorderLayout.CENTER);
 
-        // Configuração inicial de botões de edição/exclusão
         btnEditarPromocao.setEnabled(false);
         btnExcluirPromocao.setEnabled(false);
         btnEditarKit.setEnabled(false);
         btnExcluirKit.setEnabled(false);
 
-        // Adicionar Listeners de Seleção de Tabela
         promocoesTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 boolean hasSelection = promocoesTable.getSelectedRow() != -1;
@@ -135,7 +131,6 @@ public class PromocaoFrame extends JPanel {
         promocoesTableModel.setRowCount(0);
     }
 
-    // --- Métodos de acesso para Kits Promocionais (mantidos) ---
     public DefaultTableModel getKitsTableModel() {
         return kitsTableModel;
     }

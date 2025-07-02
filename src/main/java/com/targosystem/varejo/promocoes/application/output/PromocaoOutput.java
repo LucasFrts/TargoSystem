@@ -4,8 +4,8 @@ import com.targosystem.varejo.promocoes.domain.model.Promocao;
 import com.targosystem.varejo.promocoes.domain.model.TipoDesconto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List; // Importar List
-import java.util.Collections; // Para Collections.unmodifiableList
+import java.util.List;
+import java.util.Collections;
 
 public record PromocaoOutput(
         String id,

@@ -10,11 +10,12 @@ import com.targosystem.varejo.seguranca.domain.repository.UsuarioRepository;
 import com.targosystem.varejo.seguranca.domain.service.PasswordEncryptor;
 import com.targosystem.varejo.shared.domain.DomainException;
 import com.targosystem.varejo.shared.infra.EventPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CriarUsuarioUseCase {
 
@@ -76,7 +77,7 @@ public class CriarUsuarioUseCase {
         }
         papeisDoUsuario.forEach(novoUsuario::adicionarPapel);
 
-        Usuario usuarioSalvo = usuarioRepository.save(novoUsuario); // Continua chamando o save do repo
+        Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
         logger.info("User {} (ID: {}) created successfully.", usuarioSalvo.getUsername(), usuarioSalvo.getId().getValue());
 
         eventPublisher.publish(new UsuarioCriadoEvent(usuarioSalvo.getId().getValue(), usuarioSalvo.getUsername(), usuarioSalvo.getNomeCompleto()));

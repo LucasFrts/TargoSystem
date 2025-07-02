@@ -11,8 +11,8 @@ import com.targosystem.varejo.seguranca.application.usecases.CriarUsuarioUseCase
 import com.targosystem.varejo.seguranca.application.usecases.LoginUsuarioUseCase;
 import com.targosystem.varejo.seguranca.domain.repository.PapelRepository;
 import com.targosystem.varejo.shared.domain.DomainException;
-import jakarta.persistence.EntityManager; // NOVO: Importar EntityManager
-import jakarta.persistence.EntityTransaction; // NOVO: Importar EntityTransaction
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public class SegurancaService {
     private final ObterUsuarioPorIdQuery obterUsuarioPorIdQuery;
     private final ListarUsuariosQuery listarUsuariosQuery;
     private final PapelRepository papelRepository;
-    private final EntityManager entityManager; // NOVO: Campo para EntityManager
+    private final EntityManager entityManager;
 
     public SegurancaService(CriarUsuarioUseCase criarUsuarioUseCase,
                             AtualizarUsuarioUseCase atualizarUsuarioUseCase,
@@ -49,10 +49,10 @@ public class SegurancaService {
     }
 
     public UsuarioOutput criarUsuario(CriarUsuarioInput input) throws DomainException {
-        EntityTransaction transaction = entityManager.getTransaction(); // Gerencia a transação aqui
+        EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            UsuarioOutput output = criarUsuarioUseCase.execute(input); // Chama o Use Case
+            UsuarioOutput output = criarUsuarioUseCase.execute(input);
             transaction.commit();
             return output;
         } catch (DomainException e) {
@@ -65,7 +65,7 @@ public class SegurancaService {
                 transaction.rollback();
             }
             logger.error("Erro inesperado ao criar usuário no service: {}", e.getMessage(), e);
-            throw new RuntimeException("Falha ao criar usuário: " + e.getMessage(), e); // Lança RuntimeException
+            throw new RuntimeException("Falha ao criar usuário: " + e.getMessage(), e);
         }
     }
 
@@ -75,7 +75,6 @@ public class SegurancaService {
     }
 
     public UsuarioOutput loginUsuario(LoginInput input) throws DomainException {
-        // Transaction esta aqui, mas o ideal é mover todas para englobar nos useCase
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();

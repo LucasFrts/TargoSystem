@@ -7,7 +7,6 @@ import com.targosystem.varejo.shared.domain.DomainException;
 import java.util.Objects;
 import java.util.Optional;
 
-// Serviço de domínio para gerenciar a classificação de produtos em categorias
 public class ClassificadorProduto {
 
     private final CategoriaRepository categoriaRepository;
@@ -30,15 +29,14 @@ public class ClassificadorProduto {
         Optional<Categoria> categoriaExistente = categoriaRepository.findByNome(nomeCategoria);
 
         if (categoriaExistente.isPresent()) {
-            return categoriaExistente.get(); // Retorna a categoria existente (já gerenciada pelo EM se foi buscada na transação atual)
+            return categoriaExistente.get();
         } else {
-            // Se a categoria não existe, cria uma nova
+
             Categoria novaCategoria = new Categoria(
                     nomeCategoria,
                     descricaoCategoria // Pode ser null ou vazio se não fornecido
             );
-            // Salva a nova categoria. O CategoriaDao.save() agora usa merge e garante
-            // que a instância retornada é a gerenciada.
+
             return categoriaRepository.save(novaCategoria);
         }
     }
@@ -52,13 +50,5 @@ public class ClassificadorProduto {
     public void reclassificarProduto(Produto produto, Categoria novaCategoria) {
         Objects.requireNonNull(produto, "Product cannot be null");
         Objects.requireNonNull(novaCategoria, "New category cannot be null");
-        // A lógica de setar a categoria no produto já está em Produto.java
-        // Aqui, o serviço de domínio garante que a Categoria é válida e existe ou foi criada
-        // Antes de ser associada ao produto.
-        // Se a Categoria for uma entidade separada com ciclo de vida próprio,
-        // o CategoriaRepository seria usado para buscar/salvar aqui.
-        // Como Categoria é VO aqui, a associação é direta no Produto.
-        // produto.setCategoria(novaCategoria); // Não é um setter público em Produto
-        // O UseCase chamaria o método de atualização do produto.
     }
 }

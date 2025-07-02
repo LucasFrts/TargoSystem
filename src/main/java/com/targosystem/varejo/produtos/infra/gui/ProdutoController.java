@@ -18,34 +18,26 @@ import java.util.stream.Collectors;
 public class ProdutoController {
 
     private final ProdutoService produtoService;
-    private final ProdutoPanel produtoPanel; // A View real do Swing
+    private final ProdutoPanel produtoPanel;
 
     public ProdutoController(ProdutoService produtoService, ProdutoPanel produtoPanel) {
         this.produtoService = Objects.requireNonNull(produtoService, "ProdutoService cannot be null");
         this.produtoPanel = Objects.requireNonNull(produtoPanel, "ProdutoPanel cannot be null");
 
-        // Associa as ações da UI aos métodos do controller
         produtoPanel.setCadastrarButtonAction(e -> cadastrarProduto());
         produtoPanel.setAtualizarButtonAction(e -> atualizarProduto());
         produtoPanel.setListarButtonAction(e -> listarProdutos());
-        // ... outras ações
 
-        // *** Novo: Popula o ComboBox de categorias ao iniciar o controller ***
         popularCategoriasComboBox();
-        // Também liste os produtos ao iniciar a tela
         listarProdutos();
     }
 
-    // *** Novo método para popular o JComboBox de categorias ***
     private void popularCategoriasComboBox() {
         try {
-            // Chama o ProdutoService para obter a lista de CategoriaOutput
             List<CategoriaOutput> categoriasOutput = produtoService.listarTodasCategorias();
-            // Mapeia para uma lista de Strings (nomes das categorias)
             List<String> nomesDasCategorias = categoriasOutput.stream()
                     .map(CategoriaOutput::nome)
                     .collect(Collectors.toList());
-            // Passa a lista de Strings para o ProdutoPanel
             produtoPanel.setCategorias(nomesDasCategorias);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(produtoPanel,
@@ -60,7 +52,7 @@ public class ProdutoController {
             String nome = produtoPanel.getProdutoNome();
             String descricao = produtoPanel.getProdutoDescricao();
             String codigoBarras = produtoPanel.getProdutoCodigoBarras();
-            String nomeCategoria = produtoPanel.getProdutoCategoria(); // Obtém a categoria do ComboBox
+            String nomeCategoria = produtoPanel.getProdutoCategoria();
             String marca = produtoPanel.getProdutoMarca();
             BigDecimal precoValue = BigDecimal.valueOf(produtoPanel.getProdutoPrecoAsDouble());
 
@@ -71,8 +63,8 @@ public class ProdutoController {
             ProdutoOutput produtoOutput = produtoService.cadastrarProduto(input);
             JOptionPane.showMessageDialog(produtoPanel, "Produto cadastrado com sucesso: " + produtoOutput.nome(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             produtoPanel.limparCampos();
-            listarProdutos(); // Atualiza a lista após o cadastro
-            popularCategoriasComboBox(); // Recarrega categorias, caso uma nova tenha sido digitada e salva
+            listarProdutos();
+            popularCategoriasComboBox();
         } catch (DomainException e) {
             JOptionPane.showMessageDialog(produtoPanel, "Erro de negócio: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException e) {
@@ -85,8 +77,7 @@ public class ProdutoController {
 
     private void atualizarProduto() {
         try {
-            // Obter dados da UI, incluindo o ID do produto selecionado
-            String id = produtoPanel.getProdutoId(); // Assumindo que o ID é visível ou selecionável na UI
+            String id = produtoPanel.getProdutoId();
             if (id == null || id.isBlank()) {
                 JOptionPane.showMessageDialog(produtoPanel, "Selecione um produto para atualizar.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -95,20 +86,20 @@ public class ProdutoController {
             String nome = produtoPanel.getProdutoNome();
             String descricao = produtoPanel.getProdutoDescricao();
             String codigoBarras = produtoPanel.getProdutoCodigoBarras();
-            String nomeCategoria = produtoPanel.getProdutoCategoria(); // Obtém a categoria do ComboBox
+            String nomeCategoria = produtoPanel.getProdutoCategoria();
             String marca = produtoPanel.getProdutoMarca();
             BigDecimal precoValue = new BigDecimal(produtoPanel.getProdutoPreco());
 
             AtualizarProdutoInput input = new AtualizarProdutoInput(
-                    ProdutoId.from(id), // Converter String para ProdutoId
+                    ProdutoId.from(id),
                     nome, descricao, codigoBarras, nomeCategoria, null, marca, Price.of(precoValue)
             );
 
             ProdutoOutput produtoOutput = produtoService.atualizarProduto(input);
             JOptionPane.showMessageDialog(produtoPanel, "Produto atualizado com sucesso: " + produtoOutput.nome(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             produtoPanel.limparCampos();
-            listarProdutos(); // Atualiza a lista
-            popularCategoriasComboBox(); // Recarrega categorias, caso uma nova tenha sido digitada e salva
+            listarProdutos();
+            popularCategoriasComboBox();
         } catch (DomainException e) {
             JOptionPane.showMessageDialog(produtoPanel, "Erro de negócio: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException e) {
@@ -137,7 +128,7 @@ public class ProdutoController {
                     produto.nome(),
                     produto.descricao(),
                     produto.codigoBarras(),
-                    produto.categoriaNome(), // Este valor irá para o JComboBox da categoria
+                    produto.categoriaNome(),
                     produto.marca(),
                     produto.precoSugerido().toString()
             );

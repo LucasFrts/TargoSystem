@@ -4,8 +4,8 @@ import java.util.List;
 
 public record CriarUsuarioInput(
         String username,
-        String password, // Senha em texto plano, será hashed no Use Case
+        String password,
         String nomeCompleto,
         String email,
-        List<String> papeisNomes // Nomes dos papéis a serem associados
+        List<String> papeisNomes
 ) {}

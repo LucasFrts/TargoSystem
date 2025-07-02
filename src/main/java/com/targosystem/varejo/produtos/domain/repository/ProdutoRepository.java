@@ -10,7 +10,7 @@ public interface ProdutoRepository {
     Produto save(Produto produto);
     Optional<Produto> findById(ProdutoId id);
     List<Produto> findAll();
-    Optional<Produto> findByCodigoBarras(String codigoBarras); // Novo método
-    boolean existsByCodigoBarras(String codigoBarras); // Novo método
-    void delete(ProdutoId id); // Adicionado para demonstração no DAO
+    Optional<Produto> findByCodigoBarras(String codigoBarras);
+    boolean existsByCodigoBarras(String codigoBarras);
+    void delete(ProdutoId id);
 }

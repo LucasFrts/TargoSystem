@@ -13,20 +13,18 @@ public class Categoria implements AggregateRoot {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
 
-    // Construtor para nova criação
     public Categoria(String nome, String descricao) {
-        this.id = CategoriaId.generate(); // Gerar um novo ID ao criar
+        this.id = CategoriaId.generate();
         setNome(nome);
         setDescricao(descricao);
         this.dataCriacao = LocalDateTime.now();
         this.dataAtualizacao = LocalDateTime.now();
     }
 
-    // Construtor para reconstrução da persistência (todos os campos, incluindo CategoriaId)
     public Categoria(CategoriaId id, String nome, String descricao, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
         this.id = Objects.requireNonNull(id, "ID da categoria não pode ser nulo.");
-        setNome(nome); // Usar setter para validação
-        setDescricao(descricao); // Usar setter para validação
+        setNome(nome);
+        setDescricao(descricao);
         this.dataCriacao = Objects.requireNonNull(dataCriacao, "Data de criação da categoria não pode ser nula.");
         this.dataAtualizacao = Objects.requireNonNull(dataAtualizacao, "Data de atualização da categoria não pode ser nula.");
     }
@@ -52,7 +50,6 @@ public class Categoria implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
-    // Métodos de domínio adicionais para Categoria (ex: atualizarDescricao)
     public void atualizarDescricao(String novaDescricao) {
         setDescricao(novaDescricao);
     }

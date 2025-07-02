@@ -1,7 +1,7 @@
 package com.targosystem.varejo.vendas.infra.persistence.entity;
 
 import com.targosystem.varejo.produtos.domain.model.ProdutoId;
-import com.targosystem.varejo.vendas.domain.model.ItemVenda; // Keep your domain import
+import com.targosystem.varejo.vendas.domain.model.ItemVenda;
 
 import com.targosystem.varejo.vendas.domain.model.ItemVendaId;
 import jakarta.persistence.*;

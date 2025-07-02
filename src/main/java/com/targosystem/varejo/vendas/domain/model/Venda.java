@@ -1,10 +1,8 @@
-// src/main/java/com/targosystem/varejo/vendas/domain/model/Venda.java
 package com.targosystem.varejo.vendas.domain.model;
 
 import com.targosystem.varejo.shared.domain.AggregateRoot;
 import com.targosystem.varejo.shared.domain.DomainException;
-import com.targosystem.varejo.clientes.domain.model.Cliente; // Importe o Cliente do Bounded Context de Clientes
-import com.targosystem.varejo.clientes.domain.model.ClienteId; // Importe o ClienteId
+import com.targosystem.varejo.clientes.domain.model.Cliente;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +22,6 @@ public class Venda implements AggregateRoot {
     private LocalDateTime dataVenda;
     private LocalDateTime dataAtualizacao;
 
-    // Construtor para nova criação de venda
     public Venda(Cliente cliente, List<ItemVenda> itens, BigDecimal valorDesconto) {
         this.id = VendaId.generate();
         setCliente(cliente);

@@ -1,12 +1,12 @@
 package com.targosystem.varejo.promocoes.infra.persistence.entity;
 
+import com.targosystem.varejo.promocoes.domain.model.ItemKit;
 import com.targosystem.varejo.promocoes.domain.model.KitPromocional;
-import com.targosystem.varejo.promocoes.domain.model.ItemKit; // Certifique-se que ItemKit está correto
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -31,19 +31,16 @@ public class KitPromocionalJpaEntity {
             @AttributeOverride(name = "produtoId", column = @Column(name = "produto_id", nullable = false)),
             @AttributeOverride(name = "quantidade", column = @Column(name = "quantidade", nullable = false))
     })
-    private List<ItemKitJpaEmbeddable> itens; // Usaremos uma classe "Embeddable" para ItemKit
+    private List<ItemKitJpaEmbeddable> itens;
 
-    // NOVOS CAMPOS PARA DATAS
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
 
     @Column(name = "data_atualizacao", nullable = false)
     private LocalDateTime dataAtualizacao;
 
-    // Construtor padrão JPA
     protected KitPromocionalJpaEntity() {}
 
-    // Construtor completo ajustado para incluir as datas
     public KitPromocionalJpaEntity(String id, String nome, String descricao, BigDecimal precoFixoKit,
                                    List<ItemKitJpaEmbeddable> itens,
                                    LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
@@ -56,7 +53,6 @@ public class KitPromocionalJpaEntity {
         this.dataAtualizacao = dataAtualizacao;
     }
 
-    // Método fromDomain ajustado para usar as datas do objeto de domínio
     public static KitPromocionalJpaEntity fromDomain(KitPromocional kit) {
         List<ItemKitJpaEmbeddable> jpaItens = kit.getItens().stream()
                 .map(ItemKitJpaEmbeddable::fromDomain)
@@ -72,7 +68,6 @@ public class KitPromocionalJpaEntity {
         );
     }
 
-    // Método toDomain ajustado para chamar o construtor completo de KitPromocional
     public KitPromocional toDomain() {
         List<ItemKit> domainItens = this.itens.stream()
                 .map(ItemKitJpaEmbeddable::toDomain)

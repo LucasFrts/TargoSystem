@@ -1,4 +1,3 @@
-// src/main/java/com/targosystem/varejo/shared/infra/SimpleEventPublisher.java
 package com.targosystem.varejo.shared.infra;
 
 import com.targosystem.varejo.shared.domain.DomainEvent;
@@ -27,8 +26,6 @@ public class SimpleEventPublisher implements EventPublisher {
         Objects.requireNonNull(event, "Event cannot be null");
         logger.info("Publishing event: {}", event.getClass().getSimpleName());
 
-        // Obtém a lista de listeners para o tipo de evento específico.
-        // O cast é seguro porque a chave do mapa é Class<? extends DomainEvent>.
         List<Consumer<DomainEvent>> eventListeners = listeners.get(event.getClass());
 
         if (eventListeners != null) {
@@ -50,13 +47,8 @@ public class SimpleEventPublisher implements EventPublisher {
         Objects.requireNonNull(eventType, "Event type cannot be null");
         Objects.requireNonNull(listener, "Listener cannot be null");
 
-        // Get or create the list of consumers for this event type.
         List<Consumer<DomainEvent>> eventConsumers = listeners.computeIfAbsent(eventType, k -> new ArrayList<>());
 
-        // This is the critical line. We perform an explicit unchecked cast.
-        // This tells the compiler that we are confident this Consumer<? super T>
-        // is compatible with Consumer<DomainEvent> for the purpose of adding it
-        // to our list.
         @SuppressWarnings("unchecked") // Suppress the warning because we know it's safe
         Consumer<DomainEvent> castedListener = (Consumer<DomainEvent>) listener;
         eventConsumers.add(castedListener);

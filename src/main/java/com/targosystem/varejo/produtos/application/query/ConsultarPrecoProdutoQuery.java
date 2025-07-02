@@ -1,13 +1,13 @@
 package com.targosystem.varejo.produtos.application.query;
 
 import com.targosystem.varejo.produtos.application.output.PrecoProdutoOutput;
-import com.targosystem.varejo.produtos.domain.model.ProdutoId; // Assumindo que você tem um ProdutoId no domínio do Produto
-import com.targosystem.varejo.produtos.domain.repository.ProdutoRepository; // Repositório de Produto
-import com.targosystem.varejo.shared.domain.DomainException; // Usando a DomainException compartilhada
-
-import java.util.Objects;
+import com.targosystem.varejo.produtos.domain.model.ProdutoId;
+import com.targosystem.varejo.produtos.domain.repository.ProdutoRepository;
+import com.targosystem.varejo.shared.domain.DomainException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Query para consultar o preço de venda de um produto no Bounded Context de Produto.

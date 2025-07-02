@@ -2,8 +2,8 @@ package com.targosystem.varejo.seguranca.infra.gui;
 
 import com.targosystem.varejo.seguranca.application.SegurancaService;
 import com.targosystem.varejo.seguranca.application.input.CriarUsuarioInput;
-import com.targosystem.varejo.seguranca.application.output.PapelOutput; // Precisamos disso para listar os papéis
-import com.targosystem.varejo.seguranca.application.output.UsuarioOutput; // Para o retorno do serviço
+import com.targosystem.varejo.seguranca.application.output.PapelOutput;
+import com.targosystem.varejo.seguranca.application.output.UsuarioOutput;
 import com.targosystem.varejo.shared.domain.DomainException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

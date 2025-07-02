@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*; // Importa java.awt.Frame
+import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,13 +38,11 @@ public class PromocaoController {
         this.promocaoFrame.getBtnEditarPromocao().addActionListener(e -> editarPromocaoSelecionada());
         this.promocaoFrame.getBtnExcluirPromocao().addActionListener(e -> excluirPromocaoSelecionada());
 
-        // Listeners para Kits Promocionais
         this.promocaoFrame.getBtnListarKits().addActionListener(e -> listarTodosKits());
         this.promocaoFrame.getBtnNovoKit().addActionListener(e -> criarNovoKitPromocional());
         this.promocaoFrame.getBtnEditarKit().addActionListener(e -> editarKitPromocionalSelecionado());
         this.promocaoFrame.getBtnExcluirKit().addActionListener(e -> excluirKitPromocionalSelecionado());
 
-        // Configuração inicial de botões (habilitar/desabilitar)
         this.promocaoFrame.getPromocoesTable().getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 boolean hasSelection = promocaoFrame.getPromocoesTable().getSelectedRow() != -1;
@@ -68,7 +66,6 @@ public class PromocaoController {
         listarTodosKits();
     }
 
-    // --- Métodos para Promoções ---
     public void listarPromocoesAtivas() {
         logger.info("Listando promoções ativas...");
         promocaoFrame.clearPromocoesTable();
@@ -100,11 +97,10 @@ public class PromocaoController {
     private void criarNovaPromocao() {
         logger.info("Abrindo diálogo para criar nova promoção...");
         try {
-            // Obter a lista de todos os produtos disponíveis antes de abrir o diálogo
             List<ProdutoOutput> todosProdutosDisponiveis = produtoService.listarTodosProdutos();
 
             Frame ownerFrame = SwingUtilities.getWindowAncestor(promocaoFrame) instanceof JFrame ? (JFrame) SwingUtilities.getWindowAncestor(promocaoFrame) : null;
-            // Passar a lista de produtos para o construtor
+
             PromocaoDialog dialog = new PromocaoDialog(ownerFrame, todosProdutosDisponiveis);
             dialog.setVisible(true);
 
@@ -131,11 +127,11 @@ public class PromocaoController {
 
             try {
                 PromocaoOutput promocaoExistente = promocaoService.obterPromocaoPorId(promocaoId);
-                // Obter a lista de todos os produtos disponíveis antes de abrir o diálogo
+
                 List<ProdutoOutput> todosProdutosDisponiveis = produtoService.listarTodosProdutos();
 
                 Frame ownerFrame = SwingUtilities.getWindowAncestor(promocaoFrame) instanceof JFrame ? (JFrame) SwingUtilities.getWindowAncestor(promocaoFrame) : null;
-                // Passar a promoção existente E a lista de produtos para o construtor
+
                 PromocaoDialog dialog = new PromocaoDialog(ownerFrame, promocaoExistente, todosProdutosDisponiveis);
                 dialog.setVisible(true);
 
@@ -169,9 +165,6 @@ public class PromocaoController {
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    // CUIDADO: Você não tem um método delete no PromocaoService ainda.
-                    // public void excluirPromocao(String id) { promocaoRepository.delete(id); }
-                    // E um Use Case se necessário.
                     promocaoService.excluirPromocao(promocaoId); // Você precisará implementar isso
                     JOptionPane.showMessageDialog(promocaoFrame, "Promoção excluida com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                     listarPromocoesAtivas();
@@ -188,20 +181,15 @@ public class PromocaoController {
         }
     }
 
-    // --- Métodos para Kits Promocionais ---
     public void listarTodosKits() {
         logger.info("Listando todos os kits promocionais...");
         promocaoFrame.clearKitsTable();
 
         try {
-            // Este método devera chamar um usecase/query que constroi o KitPromocionalOutput
-            // já com o nome do produto. O PromocaoService precisará de um método assim.
             List<KitPromocionalOutput> kits = promocaoService.listarTodosKitsComDetalhesProduto(); // NOVO: Assumindo este método
             DefaultTableModel model = promocaoFrame.getKitsTableModel();
             for (KitPromocionalOutput kit : kits) {
-                // Converta a lista de itens para uma string legível para a tabela
                 String itensString = kit.itens().stream()
-                        // CORREÇÃO: Usando item.nomeProduto() que foi adicionado ao ItemKitOutput
                         .map(item -> item.nomeProduto() + " (x" + item.quantidade() + ")")
                         .collect(Collectors.joining(", "));
                 model.addRow(new Object[]{
@@ -252,19 +240,14 @@ public class PromocaoController {
             logger.info("Abrindo diálogo para editar kit promocional ID: {}", kitId);
 
             try {
-                // Ao obter o KitPromocionalOutput para edição, ele também precisará vir com os nomes dos produtos
-                KitPromocionalOutput kitExistente = promocaoService.obterKitPromocionalPorIdComDetalhesProduto(kitId); // NOVO: Assumindo este método
+                KitPromocionalOutput kitExistente = promocaoService.obterKitPromocionalPorIdComDetalhesProduto(kitId);
                 List<ProdutoOutput> todosProdutos = produtoService.listarTodosProdutos();
                 Frame ownerFrame = SwingUtilities.getWindowAncestor(promocaoFrame) instanceof JFrame ? (JFrame) SwingUtilities.getWindowAncestor(promocaoFrame) : null;
                 KitPromocionalDialog dialog = new KitPromocionalDialog(ownerFrame, kitExistente, todosProdutos);
                 dialog.setVisible(true);
 
                 if (dialog.isSaved()) {
-                    // Você precisará de um input e use case para atualizar kits.
-                    // AtualizarKitPromocionalInput input = dialog.getAtualizarKitPromocionalInput(); // O dialog precisaria fornecer isso
-                    // promocaoService.atualizarKitPromocional(input); // Você precisará implementar isso
                     JOptionPane.showMessageDialog(promocaoFrame, "Funcionalidade de edição de Kit em desenvolvimento.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    // listarTodosKits();
                 }
             } catch (DomainException e) {
                 logger.error("Erro de domínio ao editar kit: {}", e.getMessage());
@@ -290,10 +273,7 @@ public class PromocaoController {
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    // Você precisará de um Use Case e método no PromocaoService para excluir kits.
-                    // promocaoService.excluirKitPromocional(kitId); // Você precisará implementar isso
                     JOptionPane.showMessageDialog(promocaoFrame, "Funcionalidade de exclusão de Kit em desenvolvimento.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    // listarTodosKits();
                 } catch (DomainException e) {
                     logger.error("Erro de domínio ao excluir kit: {}", e.getMessage());
                     JOptionPane.showMessageDialog(promocaoFrame, "Erro de domínio: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
