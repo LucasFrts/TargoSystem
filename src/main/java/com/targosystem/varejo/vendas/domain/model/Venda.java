@@ -22,6 +22,7 @@ public class Venda implements AggregateRoot {
     private LocalDateTime dataVenda;
     private LocalDateTime dataAtualizacao;
 
+    // Construtor principal para nova venda
     public Venda(Cliente cliente, List<ItemVenda> itens, BigDecimal valorDesconto) {
         this.id = VendaId.generate();
         setCliente(cliente);
@@ -38,6 +39,7 @@ public class Venda implements AggregateRoot {
         }
     }
 
+    // Construtor para venda reconstruída (ex: banco)
     public Venda(VendaId id, Cliente cliente, List<ItemVenda> itens,
                  BigDecimal valorTotal, BigDecimal valorDesconto, BigDecimal valorFinal,
                  String status, LocalDateTime dataVenda, LocalDateTime dataAtualizacao) {
@@ -64,7 +66,7 @@ public class Venda implements AggregateRoot {
     public LocalDateTime getDataVenda() { return dataVenda; }
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
 
-    // Setters com validação (se aplicável, para comportamentos de domínio)
+    // Setters privados com validação
     private void setCliente(Cliente cliente) {
         Objects.requireNonNull(cliente, "O cliente da venda não pode ser nulo.");
         this.cliente = cliente;
@@ -80,12 +82,13 @@ public class Venda implements AggregateRoot {
         calcularTotais();
     }
 
+    // Aplica um desconto na venda (validação de regras de negócio)
     public void aplicarDesconto(BigDecimal novoValorDesconto) {
         Objects.requireNonNull(novoValorDesconto, "O valor do desconto não pode ser nulo.");
         if (novoValorDesconto.compareTo(BigDecimal.ZERO) < 0) {
             throw new DomainException("Valor de desconto não pode ser negativo.");
         }
-        if (!"CRIADA".equals(this.status)) { // Example business rule: Only apply discount to a 'CRIADA' sale
+        if (!"CRIADA".equals(this.status)) {
             throw new DomainException("Não é possível aplicar desconto em venda com status: " + this.status);
         }
 
@@ -94,7 +97,7 @@ public class Venda implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
-    
+    // Adiciona um item à venda e recalcula totais
     public void addItem(ItemVenda item) {
         Objects.requireNonNull(item, "Item de venda não pode ser nulo.");
         this.itens.add(item);
@@ -102,6 +105,7 @@ public class Venda implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
+    // Remove item da venda e recalcula totais
     public void removeItem(ItemVenda item) {
         if (this.itens.remove(item)) {
             calcularTotais();
@@ -111,6 +115,7 @@ public class Venda implements AggregateRoot {
         }
     }
 
+    // Conclui a venda (status e data)
     public void concluirVenda() {
         if (!"CRIADA".equals(this.status)) {
             throw new DomainException("A venda só pode ser concluída se estiver no status CRIADA.");
@@ -119,6 +124,7 @@ public class Venda implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
+    // Cancela a venda, salvo se já concluída
     public void cancelarVenda() {
         if ("CONCLUIDA".equals(this.status)) {
             throw new DomainException("Venda concluída não pode ser cancelada.");
@@ -127,11 +133,19 @@ public class Venda implements AggregateRoot {
         this.dataAtualizacao = LocalDateTime.now();
     }
 
+    // Método que calcula valores totais da venda
     private void calcularTotais() {
         BigDecimal subtotal = itens.stream()
                 .map(ItemVenda::getPrecoTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         this.valorTotal = subtotal;
+
+        // Evitar null no valorDesconto
+        if (this.valorDesconto == null) {
+            this.valorDesconto = BigDecimal.ZERO;
+        }
+
         this.valorFinal = subtotal.subtract(this.valorDesconto);
 
         if (this.valorFinal.compareTo(BigDecimal.ZERO) < 0) {
@@ -139,10 +153,12 @@ public class Venda implements AggregateRoot {
         }
     }
 
+    // equals e hashCode para identidade
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Venda venda = (Venda) o;
         return Objects.equals(id, venda.id);
     }
