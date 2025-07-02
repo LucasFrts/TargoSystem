@@ -2,34 +2,30 @@ package com.targosystem.varejo.seguranca.infra.gui;
 
 import com.targosystem.varejo.clientes.application.ClienteService;
 import com.targosystem.varejo.clientes.infra.gui.ClienteController;
-import com.targosystem.varejo.clientes.infra.gui.ClienteFrame; // Deve ser ClientePanel ou similar
+import com.targosystem.varejo.clientes.infra.gui.ClienteFrame;
 import com.targosystem.varejo.estoque.application.EstoqueService;
 import com.targosystem.varejo.estoque.infra.gui.EstoqueController;
-import com.targosystem.varejo.estoque.infra.gui.EstoqueFrame; // Deve ser EstoquePanel ou similar
+import com.targosystem.varejo.estoque.infra.gui.EstoqueFrame;
 import com.targosystem.varejo.fornecedores.application.FornecedorService;
 import com.targosystem.varejo.fornecedores.infra.gui.FornecedorController;
-import com.targosystem.varejo.fornecedores.infra.gui.FornecedorFrame; // Deve ser FornecedorPanel ou similar
+import com.targosystem.varejo.fornecedores.infra.gui.FornecedorFrame;
 import com.targosystem.varejo.produtos.application.ProdutoService;
 import com.targosystem.varejo.produtos.infra.gui.ProdutoController;
 import com.targosystem.varejo.produtos.infra.gui.ProdutoPanel;
 import com.targosystem.varejo.promocoes.application.PromocaoService;
 import com.targosystem.varejo.promocoes.infra.gui.PromocaoController;
-import com.targosystem.varejo.promocoes.infra.gui.PromocaoFrame; // Deve ser PromocaoPanel ou similar
+import com.targosystem.varejo.promocoes.infra.gui.PromocaoFrame;
 import com.targosystem.varejo.seguranca.application.SegurancaService;
 import com.targosystem.varejo.seguranca.application.output.UsuarioOutput;
 import com.targosystem.varejo.vendas.application.VendaService;
 import com.targosystem.varejo.vendas.infra.gui.VendaController;
-import com.targosystem.varejo.vendas.infra.gui.VendaFrame; // Deve ser VendaPanel ou similar
+import com.targosystem.varejo.vendas.infra.gui.VendaFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
-
-// NOVO IMPORT para UsuarioFrame
-import com.targosystem.varejo.seguranca.infra.gui.UsuarioController; // Adicionado
-import com.targosystem.varejo.seguranca.infra.gui.UsuarioFrame; // Adicionado, assuming this is a JPanel
 
 public class MainApplicationFrame extends JFrame {
 
@@ -46,33 +42,31 @@ public class MainApplicationFrame extends JFrame {
     private JPanel cardsPanel;
     private CardLayout cardLayout;
 
-    // Referências para os painéis e controllers
-    // CORRIGIDO: O nome da variável sugere que é um Frame, mas deve ser um JPanel
-    private LoginFrame loginFrame; // <- Esta classe LoginFrame deve estender JPanel
+    private LoginFrame loginFrame;
     private SecurityController securityController;
 
-    private DashboardFrame dashboardPanel; // <- Esta classe DashboardFrame deve estender JPanel
+    private DashboardFrame dashboardPanel;
 
     private ProdutoPanel produtoPanel;
     private ProdutoController produtoController;
 
-    private PromocaoFrame promocaoFrame; // <- Esta classe PromocaoFrame deve estender JPanel
+    private PromocaoFrame promocaoFrame;
     private PromocaoController promocaoController;
 
-    private EstoqueFrame estoqueFrame; // <- Esta classe EstoqueFrame deve estender JPanel
+    private EstoqueFrame estoqueFrame;
     private EstoqueController estoqueController;
 
-    private ClienteFrame clienteFrame; // <- Esta classe ClienteFrame deve estender JPanel
+    private ClienteFrame clienteFrame;
     private ClienteController clienteController;
 
-    private FornecedorFrame fornecedorFrame; // <- Esta classe FornecedorFrame deve estender JPanel
+    private FornecedorFrame fornecedorFrame;
     private FornecedorController fornecedorController;
 
-    private VendaFrame vendaFrame; // <- Esta classe VendaFrame deve estender JPanel
+    private VendaFrame vendaFrame;
     private VendaController vendaController;
 
     // NOVO: Para usuários
-    private UsuarioFrame usuarioFrame; // <- Esta classe UsuarioFrame deve estender JPanel
+    private UsuarioFrame usuarioFrame;
     private UsuarioController usuarioController;
 
     private JMenuBar menuBar;
@@ -103,57 +97,50 @@ public class MainApplicationFrame extends JFrame {
         cardsPanel = new JPanel(cardLayout);
         add(cardsPanel, BorderLayout.CENTER);
 
-        // 1. Painel de Login
-        // Certifique-se que LoginFrame estenda JPanel
+
         loginFrame = new LoginFrame();
         securityController = new SecurityController(segurancaService, loginFrame, this);
         cardsPanel.add(loginFrame, "Login");
 
-        // 2. Painel de Dashboard / Boas-Vindas
-        // Certifique-se que DashboardFrame estenda JPanel
+
         dashboardPanel = new DashboardFrame();
         cardsPanel.add(dashboardPanel, "Dashboard");
 
-        // Outros painéis
-        // ProdutoPanel já deve estender JPanel
+
         produtoPanel = new ProdutoPanel();
         produtoController = new ProdutoController(produtoService, produtoPanel);
         cardsPanel.add(produtoPanel, "Produtos");
 
-        // Certifique-se que PromocaoFrame estenda JPanel
+
         promocaoFrame = new PromocaoFrame();
         promocaoController = new PromocaoController(promocaoService,produtoService, promocaoFrame);
         cardsPanel.add(promocaoFrame, "Promocoes");
 
-        // Certifique-se que EstoqueFrame estenda JPanel
+
         estoqueFrame = new EstoqueFrame();
         estoqueController = new EstoqueController(estoqueService, estoqueFrame, produtoService);
         cardsPanel.add(estoqueFrame, "Estoque");
 
-        // Certifique-se que ClienteFrame estenda JPanel
+
         clienteFrame = new ClienteFrame();
         clienteController = new ClienteController(clienteService, clienteFrame);
         cardsPanel.add(clienteFrame, "Clientes");
 
-        // Certifique-se que FornecedorFrame estenda JPanel
+
         fornecedorFrame = new FornecedorFrame();
         fornecedorController = new FornecedorController(fornecedorService, fornecedorFrame);
         cardsPanel.add(fornecedorFrame, "Fornecedores");
 
-        // Certifique-se que VendaFrame estenda JPanel
+
         vendaFrame = new VendaFrame();
         vendaController = new VendaController(vendaService, vendaFrame);
         cardsPanel.add(vendaFrame, "Vendas");
 
-        // NOVO: Painel de Usuários
-        // Certifique-se que UsuarioFrame estenda JPanel
         usuarioFrame = new UsuarioFrame(java.util.Collections.emptyList());
         usuarioController = new UsuarioController(segurancaService, usuarioFrame);
-        cardsPanel.add(usuarioFrame, "Usuarios"); // Nome da carta para o CardLayout
+        cardsPanel.add(usuarioFrame, "Usuarios");
 
         setupMenuBar();
-        // Não definir o menu bar aqui, apenas depois do login bem-sucedido
-        // setJMenuBar(null); // Essa linha pode ser removida ou mantida para garantir que não haja menu antes do login
 
         showPanel("Login");
     }
@@ -176,9 +163,9 @@ public class MainApplicationFrame extends JFrame {
             fornecedorController.listarTodosFornecedores();
         } else if ("Vendas".equals(panelName) && vendaController != null) {
             vendaController.listarTodasVendas();
-        } else if ("Usuarios".equals(panelName) && usuarioController != null) { // NOVO: Para usuários
-            usuarioController.carregarPapeisDisponiveis(); // Carrega os papéis ao exibir o painel
-            usuarioFrame.clearFields(); // Limpa campos ao exibir
+        } else if ("Usuarios".equals(panelName) && usuarioController != null) {
+            usuarioController.carregarPapeisDisponiveis();
+            usuarioFrame.clearFields();
         }
     }
 
@@ -190,8 +177,8 @@ public class MainApplicationFrame extends JFrame {
         logoutItem.addActionListener(e -> {
             logger.info("User requested logout. Performing logout actions.");
             this.loggedInUser = null;
-            setJMenuBar(null); // Remove o menu bar
-            showPanel("Login"); // Volta para a tela de login
+            setJMenuBar(null);
+            showPanel("Login");
             JOptionPane.showMessageDialog(this, "Você foi desconectado.", "Logout", JOptionPane.INFORMATION_MESSAGE);
             setTitle("Targo System - Sistema de Varejo");
         });
@@ -257,8 +244,8 @@ public class MainApplicationFrame extends JFrame {
         this.loggedInUser = loggedInUser;
         logger.info("Login successful for user: {}. Displaying dashboard and menu.", loggedInUser.username());
 
-        setJMenuBar(menuBar); // Define o menu bar APÓS o login bem-sucedido
-        showPanel("Dashboard"); // Vai para o Dashboard após o login
+        setJMenuBar(menuBar);
+        showPanel("Dashboard");
 
         setTitle("Targo System - Logado como: " + loggedInUser.nomeCompleto());
     }

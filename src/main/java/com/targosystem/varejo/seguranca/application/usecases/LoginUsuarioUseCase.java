@@ -5,10 +5,11 @@ import com.targosystem.varejo.seguranca.application.output.UsuarioOutput;
 import com.targosystem.varejo.seguranca.domain.model.Usuario;
 import com.targosystem.varejo.seguranca.domain.service.AutenticadorUsuario;
 import com.targosystem.varejo.shared.domain.DomainException;
-import com.targosystem.varejo.shared.infra.EventPublisher; // Para eventos de domínio como LoginSucessoEvent
-import java.util.Objects;
+import com.targosystem.varejo.shared.infra.EventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class LoginUsuarioUseCase {
 
@@ -32,15 +33,10 @@ public class LoginUsuarioUseCase {
             Usuario usuarioAutenticado = autenticadorUsuario.autenticar(input.username(), input.password());
             logger.info("User {} logged in successfully.", usuarioAutenticado.getUsername());
 
-            // Opcional: Publicar evento de domínio (ex: LoginSucessoEvent)
-            // eventPublisher.publish(new LoginSucessoEvent(usuarioAutenticado.getId(), usuarioAutenticado.getUsername()));
-
             return UsuarioOutput.from(usuarioAutenticado);
         } catch (DomainException e) {
             logger.warn("Login failed for username {}: {}", input.username(), e.getMessage());
-            // Opcional: Publicar evento de domínio (ex: LoginFalhaEvent)
-            // eventPublisher.publish(new LoginFalhaEvent(input.username(), e.getMessage()));
-            throw e; // Relançar exceção para a camada de apresentação
+            throw e;
         }
     }
 }

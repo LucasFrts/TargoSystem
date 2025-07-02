@@ -21,7 +21,6 @@ public class Papel {
         this.id = null;
     }
 
-    // Métodos de comportamento (se houver regras de negócio específicas para Papel)
     public void atualizar(String novoNome, String novaDescricao) {
         setNome(novoNome);
         setDescricao(novaDescricao);
@@ -40,7 +39,6 @@ public class Papel {
         return descricao;
     }
 
-    // Setters com validações
     private void setNome(String nome) {
         Objects.requireNonNull(nome, "Role name cannot be null");
         if (nome.isBlank()) {

@@ -32,20 +32,17 @@ public class AtualizarProdutoUseCase {
         Produto produtoExistente = produtoRepository.findById(input.id())
                 .orElseThrow(() -> new DomainException("Product with ID " + input.id().getValue() + " not found."));
 
-        // Verificar unicidade do código de barras se ele foi alterado e já existe em outro produto
         if (!produtoExistente.getCodigoBarras().equals(input.codigoBarras())) {
             if (produtoRepository.existsByCodigoBarras(input.codigoBarras())) {
                 throw new DomainException("Another product with barcode " + input.codigoBarras() + " already exists.");
             }
         }
 
-        // Obter ou criar categoria
         Categoria categoria = classificadorProduto.obterOuCriarCategoria(input.nomeCategoria(), input.descricaoCategoria());
         if (categoria.getId() == null) {
             categoria = categoriaRepository.save(categoria);
         }
 
-        // Atualizar informações do produto (comportamento de domínio)
         produtoExistente.atualizarInformacoes(
                 input.nome(),
                 input.descricao(),
@@ -55,7 +52,6 @@ public class AtualizarProdutoUseCase {
                 input.precoSugerido().getValue()
         );
 
-        // Persistir as mudanças
         Produto produtoAtualizado = produtoRepository.save(produtoExistente);
 
         return ProdutoOutput.from(produtoAtualizado);

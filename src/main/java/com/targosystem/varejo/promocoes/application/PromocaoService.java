@@ -30,12 +30,11 @@ public class PromocaoService {
     private final ObterPromocaoPorIdQuery obterPromocaoPorIdQuery;
     private final ListarPromocoesAtivasQuery listarPromocoesAtivasQuery;
     private final CriarKitPromocionalUseCase criarKitPromocionalUseCase;
-    private final ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery; // Query simples (sem detalhes do produto)
-    private final ListarTodosKitsQuery listarTodosKitsQuery; // Query simples (sem detalhes do produto)
+    private final ObterKitPromocionalPorIdQuery obterKitPromocionalPorIdQuery;
+    private final ListarTodosKitsQuery listarTodosKitsQuery;
     private final ExcluirPromocaoUseCase excluirPromocaoUseCase;
     private final ExcluirKitPromocionalUseCase excluirKitPromocionalUseCase;
 
-    // Campos para as queries com detalhes de produto
     private final ListarTodosKitsComDetalhesProdutoQuery listarTodosKitsComDetalhesProdutoQuery;
     private final ObterKitPromocionalPorIdComDetalhesProdutoQuery obterKitPromocionalPorIdComDetalhesProdutoQuery;
 
@@ -50,7 +49,6 @@ public class PromocaoService {
             ListarTodosKitsQuery listarTodosKitsQuery,
             ExcluirPromocaoUseCase excluirPromocaoUseCase,
             ExcluirKitPromocionalUseCase excluirKitPromocionalUseCase,
-            // Adicionar as novas queries ao construtor
             ListarTodosKitsComDetalhesProdutoQuery listarTodosKitsComDetalhesProdutoQuery,
             ObterKitPromocionalPorIdComDetalhesProdutoQuery obterKitPromocionalPorIdComDetalhesProdutoQuery
     ) {
@@ -64,7 +62,6 @@ public class PromocaoService {
         this.excluirPromocaoUseCase = Objects.requireNonNull(excluirPromocaoUseCase, "ExcluirPromocaoUseCase cannot be null");
         this.excluirKitPromocionalUseCase = Objects.requireNonNull(excluirKitPromocionalUseCase, "ExcluirKitPromocionalUseCase cannot be null");
 
-        // Inicializar as novas queries
         this.listarTodosKitsComDetalhesProdutoQuery = Objects.requireNonNull(listarTodosKitsComDetalhesProdutoQuery, "ListarTodosKitsComDetalhesProdutoQuery cannot be null");
         this.obterKitPromocionalPorIdComDetalhesProdutoQuery = Objects.requireNonNull(obterKitPromocionalPorIdComDetalhesProdutoQuery, "ObterKitPromocionalPorIdComDetalhesProdutoQuery cannot be null");
     }

@@ -4,13 +4,12 @@ import com.targosystem.varejo.promocoes.domain.model.ItemKit;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
-@Embeddable // <--- Indica que esta classe pode ser incorporada em outras entidades JPA
+@Embeddable
 public class ItemKitJpaEmbeddable {
 
-    private String produtoId; // Mapeado como coluna na tabela pai (kit_itens)
+    private String produtoId;
     private int quantidade;
 
-    // Construtor padrão JPA
     protected ItemKitJpaEmbeddable() {}
 
     public ItemKitJpaEmbeddable(String produtoId, int quantidade) {
@@ -26,7 +25,6 @@ public class ItemKitJpaEmbeddable {
         return new ItemKit(this.produtoId, this.quantidade);
     }
 
-    // Getters e Setters para JPA
     public String getProdutoId() { return produtoId; }
     public void setProdutoId(String produtoId) { this.produtoId = produtoId; }
     public int getQuantidade() { return quantidade; }

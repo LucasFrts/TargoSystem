@@ -2,12 +2,13 @@ package com.targosystem.varejo.promocoes.application.query;
 
 import com.targosystem.varejo.promocoes.application.output.PromocaoOutput;
 import com.targosystem.varejo.promocoes.domain.repository.PromocaoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ListarPromocoesAtivasQuery {
 
@@ -23,7 +24,6 @@ public class ListarPromocoesAtivasQuery {
         LocalDateTime now = LocalDateTime.now();
         logger.debug("Executing ListarPromocoesAtivasQuery to fetch active promotions as of: {}", now);
         try {
-            // Busca promoções ativas no momento atual
             return promocaoRepository.findActivePromotions(now).stream()
                     .map(PromocaoOutput::from) // Assumindo que PromocaoOutput tem um método from(Promocao)
                     .collect(Collectors.toList());

@@ -3,19 +3,16 @@ package com.targosystem.varejo.promocoes.application.usecases;
 import com.targosystem.varejo.promocoes.application.input.AtualizarPromocaoInput;
 import com.targosystem.varejo.promocoes.application.output.PromocaoOutput;
 import com.targosystem.varejo.promocoes.domain.model.Promocao;
-import com.targosystem.varejo.promocoes.domain.model.TipoDesconto;
 import com.targosystem.varejo.promocoes.domain.repository.PromocaoRepository;
 import com.targosystem.varejo.shared.domain.DomainException;
 import com.targosystem.varejo.shared.infra.EventPublisher;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.util.Objects;
 
 public class AtualizarPromocaoUseCase {
 

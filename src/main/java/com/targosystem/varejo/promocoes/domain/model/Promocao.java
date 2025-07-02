@@ -1,9 +1,8 @@
-// src/main/java/com/targosystem/varejo/promocoes/domain/model/Promocao.java
 package com.targosystem.varejo.promocoes.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections; // Importar para Collections.unmodifiableList
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -17,12 +16,11 @@ public class Promocao {
     private BigDecimal valorDesconto;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
-    private List<String> produtoIds; // NOVO: Lista de IDs de produtos
+    private List<String> produtoIds;
     private boolean ativa;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
 
-    // Construtor principal para criar novas promoções no domínio
     public Promocao(String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto, LocalDateTime dataInicio, LocalDateTime dataFim, List<String> produtoIds) {
         this.id = UUID.randomUUID().toString();
         this.nome = Objects.requireNonNull(nome, "Nome da promoção não pode ser nulo.");
@@ -38,10 +36,9 @@ public class Promocao {
         validarValorDesconto();
     }
 
-    // Construtor usado pelo repositório (infraestrutura) ao carregar do banco
     public Promocao(String id, String nome, TipoDesconto tipoDesconto, BigDecimal valorDesconto,
                     LocalDateTime dataInicio, LocalDateTime dataFim, boolean ativa,
-                    List<String> produtoIds, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) { // MUDADO: kitPromocionalId para List<String> produtoIds
+                    List<String> produtoIds, LocalDateTime dataCriacao, LocalDateTime dataAtualizacao) {
         this.id = Objects.requireNonNull(id, "ID da promoção não pode ser nulo.");
         this.nome = Objects.requireNonNull(nome, "Nome da promoção não pode ser nulo.");
         this.tipoDesconto = Objects.requireNonNull(tipoDesconto, "Tipo de desconto não pode ser nulo.");
@@ -56,7 +53,6 @@ public class Promocao {
         validarValorDesconto();
     }
 
-    // Métodos de negócio
     public void ativar() {
         if (!this.ativa) {
             this.ativa = true;
@@ -75,7 +71,7 @@ public class Promocao {
         return this.ativa && !momento.isBefore(this.dataInicio) && !momento.isAfter(this.dataFim);
     }
 
-    // Validações
+
     private void validarDatas() {
         if (dataInicio.isAfter(dataFim)) {
             throw new IllegalArgumentException("Data de início não pode ser posterior à data de fim.");
@@ -86,7 +82,6 @@ public class Promocao {
         if (valorDesconto.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Valor de desconto não pode ser negativo.");
         }
-        // Ajuste: A validação para PERCENTUAL deve permitir 1.0 (100%)
         if (tipoDesconto == TipoDesconto.PERCENTUAL && (valorDesconto.compareTo(BigDecimal.ZERO) < 0 || valorDesconto.compareTo(BigDecimal.ONE) > 0)) {
             throw new IllegalArgumentException("Valor percentual de desconto deve ser entre 0 e 1.");
         }
@@ -100,7 +95,7 @@ public class Promocao {
     public LocalDateTime getDataInicio() { return dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public boolean isAtiva() { return ativa; }
-    public List<String> getProdutoIds() { return Collections.unmodifiableList(produtoIds); } // Retorna uma lista imutável
+    public List<String> getProdutoIds() { return Collections.unmodifiableList(produtoIds); }
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
 

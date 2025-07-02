@@ -2,14 +2,15 @@ package com.targosystem.varejo.promocoes.application.usecases;
 
 import com.targosystem.varejo.promocoes.application.input.CriarKitPromocionalInput;
 import com.targosystem.varejo.promocoes.application.output.KitPromocionalOutput;
-import com.targosystem.varejo.promocoes.domain.model.KitPromocional;
 import com.targosystem.varejo.promocoes.domain.model.ItemKit;
+import com.targosystem.varejo.promocoes.domain.model.KitPromocional;
 import com.targosystem.varejo.promocoes.domain.repository.KitPromocionalRepository;
 import com.targosystem.varejo.shared.domain.DomainException;
 import com.targosystem.varejo.shared.infra.EventPublisher;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,8 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CriarKitPromocionalUseCase {
 
@@ -27,13 +26,11 @@ public class CriarKitPromocionalUseCase {
     private final KitPromocionalRepository kitPromocionalRepository;
     private final EventPublisher eventPublisher;
     private final EntityManager entityManager;
-    // Removido: private final ProdutoService produtoService;
 
     public CriarKitPromocionalUseCase(KitPromocionalRepository kitPromocionalRepository, EventPublisher eventPublisher, EntityManager entityManager) {
         this.kitPromocionalRepository = Objects.requireNonNull(kitPromocionalRepository, "KitPromocionalRepository cannot be null");
         this.eventPublisher = Objects.requireNonNull(eventPublisher, "EventPublisher cannot be null");
         this.entityManager = Objects.requireNonNull(entityManager, "EntityManager cannot be null");
-        // Removido: this.produtoService = Objects.requireNonNull(produtoService, "ProdutoService cannot be null");
     }
 
     public KitPromocionalOutput execute(CriarKitPromocionalInput input) {
@@ -59,20 +56,18 @@ public class CriarKitPromocionalUseCase {
                 throw new DomainException("Um kit promocional deve conter pelo menos um item.");
             }
 
-            // Mapear ItemKitInput para ItemKit de domínio
             List<ItemKit> itensDominio = input.itens().stream()
                     .map(itemInput -> new ItemKit(itemInput.produtoId(), itemInput.quantidade()))
                     .collect(Collectors.toList());
 
-            // Usando o construtor do domínio que aceita todos os campos para reconstruir
             KitPromocional novoKit = new KitPromocional(
-                    UUID.randomUUID().toString(), // Gerar ID único para o novo kit
+                    UUID.randomUUID().toString(),
                     input.nome(),
                     input.descricao(),
                     input.precoFixoKit(),
                     itensDominio,
-                    LocalDateTime.now(), // Data de criação
-                    LocalDateTime.now()  // Data de atualização
+                    LocalDateTime.now(),
+                    LocalDateTime.now()
             );
 
             KitPromocional kitSalvo = kitPromocionalRepository.save(novoKit);
@@ -82,7 +77,6 @@ public class CriarKitPromocionalUseCase {
                 transaction.commit();
             }
 
-            // Agora chamamos o 'from' que NAO precisa do ProdutoService
             return KitPromocionalOutput.from(kitSalvo);
         } catch (DomainException e) {
             if (transaction != null && transaction.isActive() && newTransaction) {

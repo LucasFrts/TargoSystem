@@ -13,9 +13,7 @@ import com.targosystem.varejo.shared.infra.EventPublisher;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 public class CadastrarProdutoUseCase {
 
@@ -35,11 +33,11 @@ public class CadastrarProdutoUseCase {
 
     public ProdutoOutput execute(CadastrarProdutoInput input) {
         EntityTransaction transaction = entityManager.getTransaction();
-        boolean newTransaction = false; // Flag para saber se esta Use Case iniciou a transação
+        boolean newTransaction = false;
 
         try {
             if (!transaction.isActive()) {
-                transaction.begin(); // Inicia a transação se não houver uma ativa
+                transaction.begin();
                 newTransaction = true;
             }
 
@@ -48,7 +46,6 @@ public class CadastrarProdutoUseCase {
             Objects.requireNonNull(input.precoSugerido(), "Suggested price cannot be null");
             Objects.requireNonNull(input.nomeCategoria(), "Category name cannot be null");
 
-            // 2. Verificar regras de negócio de unicidade (RF01 - Código de Barras Único)
             if (produtoRepository.existsByCodigoBarras(input.codigoBarras())) {
                 throw new DomainException("Product with barcode " + input.codigoBarras() + " already exists.");
             }
@@ -60,34 +57,29 @@ public class CadastrarProdutoUseCase {
                     input.descricao(),
                     input.precoSugerido().getValue(),
                     input.codigoBarras(),
-                    categoria, // **Esta é a instância de Categoria que deve ser gerenciada pelo EM**
+                    categoria,
                     input.marca()
             );
 
-            // 5. Persistir o produto.
-            // Assumimos que produtoRepository.save() vai lidar corretamente com a entidade
-            // Produto e sua associação com Categoria (já gerenciada).
             Produto produtoSalvo = produtoRepository.save(novoProduto);
 
             if (newTransaction) {
-                transaction.commit(); // Confirma a transação se foi iniciada por este Use Case
+                transaction.commit();
             }
 
-            // 6. Publicar evento de domínio
             eventPublisher.publish(new ProdutoCadastradoEvent(produtoSalvo.getId().getValue(), produtoSalvo.getNome()));
 
-            // 7. Retornar DTO de saída
             return ProdutoOutput.from(produtoSalvo);
         } catch (DomainException e) {
-            if (transaction != null && transaction.isActive() && newTransaction) { // Só faz rollback se esta transação foi iniciada aqui
+            if (transaction != null && transaction.isActive() && newTransaction) {
                 transaction.rollback();
             }
             throw e;
         } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive() && newTransaction) { // Só faz rollback se esta transação foi iniciada aqui
+            if (transaction != null && transaction.isActive() && newTransaction) {
                 transaction.rollback();
             }
-            e.printStackTrace(); // Para depuração
+            e.printStackTrace();
             throw new DomainException("Erro ao cadastrar produto: " + e.getMessage(), e);
         }
     }

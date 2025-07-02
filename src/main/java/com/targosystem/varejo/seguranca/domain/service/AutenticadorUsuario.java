@@ -40,8 +40,8 @@ public class AutenticadorUsuario {
             throw new DomainException("Invalid credentials.");
         }
 
-        usuario.registrarUltimoLogin(); // Comportamento de domínio: registrar login
-        usuarioRepository.save(usuario); // Persistir a atualização do último login
+        usuario.registrarUltimoLogin();
+        usuarioRepository.save(usuario);
 
         return usuario;
     }

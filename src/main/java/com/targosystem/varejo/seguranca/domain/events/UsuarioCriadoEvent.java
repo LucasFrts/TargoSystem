@@ -12,7 +12,7 @@ public class UsuarioCriadoEvent implements DomainEvent {
     private final String usuarioId;
     private final String username;
     private final String nomeCompleto;
-    private final LocalDateTime ocorreuEm; // Corrigido para 'ocorreuEm' se sua interface usa isso
+    private final LocalDateTime ocorreuEm;
 
     public UsuarioCriadoEvent(String usuarioId, String username, String nomeCompleto) {
         this.usuarioId = Objects.requireNonNull(usuarioId, "User ID cannot be null");

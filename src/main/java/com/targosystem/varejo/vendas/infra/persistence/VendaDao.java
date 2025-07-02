@@ -5,10 +5,8 @@ import com.targosystem.varejo.vendas.domain.model.Venda;
 import com.targosystem.varejo.vendas.domain.model.VendaId;
 import com.targosystem.varejo.vendas.domain.repository.VendaRepository;
 import com.targosystem.varejo.vendas.infra.persistence.entity.VendaJpaEntity;
-import com.targosystem.varejo.clientes.domain.model.ClienteId; // Importe ClienteId
-import com.targosystem.varejo.clientes.infra.persistence.ClienteDao; // Importe ClienteDao
-import com.targosystem.varejo.clientes.infra.persistence.entity.ClienteJpaEntity; // Importe ClienteJpaEntity
-import com.targosystem.varejo.shared.domain.DomainException; // Para lançar exceções se cliente não for encontrado
+import com.targosystem.varejo.clientes.infra.persistence.entity.ClienteJpaEntity;
+import com.targosystem.varejo.shared.domain.DomainException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;

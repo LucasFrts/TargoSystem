@@ -5,10 +5,10 @@ import com.targosystem.varejo.produtos.domain.model.CategoriaId;
 import com.targosystem.varejo.produtos.domain.repository.CategoriaRepository;
 import com.targosystem.varejo.produtos.infra.persistence.entity.CategoriaJpaEntity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction; // Keep if you decide to manage transactions here for delete
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,7 +66,7 @@ public class CategoriaDao implements CategoriaRepository {
         EntityTransaction transaction = null;
         try {
             transaction = entityManager.getTransaction();
-            if (!transaction.isActive()) { // Só começa se não houver uma transação ativa
+            if (!transaction.isActive()) {
                 transaction.begin();
             }
 
@@ -75,7 +75,7 @@ public class CategoriaDao implements CategoriaRepository {
                 entityManager.remove(entity);
             }
 
-            if (transaction.isActive() && !transaction.getRollbackOnly()) { // Apenas commit se a transação foi iniciada aqui e não foi marcada para rollback
+            if (transaction.isActive() && !transaction.getRollbackOnly()) {
                 transaction.commit();
             }
         } catch (RuntimeException e) {

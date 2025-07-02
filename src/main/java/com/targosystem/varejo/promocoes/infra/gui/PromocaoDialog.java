@@ -1,11 +1,10 @@
-// src/main/java/com/targosystem/varejo/promocoes/infra/gui/PromocaoDialog.java
 package com.targosystem.varejo.promocoes.infra.gui;
 
 import com.targosystem.varejo.promocoes.application.input.CriarPromocaoInput;
 import com.targosystem.varejo.promocoes.application.input.AtualizarPromocaoInput;
 import com.targosystem.varejo.promocoes.application.output.PromocaoOutput;
-import com.targosystem.varejo.promocoes.domain.model.TipoDesconto; // Assumindo que você tem este enum
-import com.targosystem.varejo.produtos.application.output.ProdutoOutput; // Importar ProdutoOutput
+import com.targosystem.varejo.promocoes.domain.model.TipoDesconto;
+import com.targosystem.varejo.produtos.application.output.ProdutoOutput;
 
 import javax.swing.*;
 import javax.swing.text.DateFormatter;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-// import java.util.stream.IntStream; // Não é necessário com a Opção 1
 
 public class PromocaoDialog extends JDialog {
 
@@ -36,7 +34,6 @@ public class PromocaoDialog extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
 
-    // NOVOS COMPONENTES PARA SELEÇÃO DE PRODUTOS
     private JList<ProdutoOutput> produtosDisponiveisList;
     private DefaultListModel<ProdutoOutput> produtosDisponiveisModel;
     private JList<ProdutoOutput> produtosSelecionadosList;
@@ -50,15 +47,13 @@ public class PromocaoDialog extends JDialog {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-    // Construtor para criar nova promoção - agora recebe lista de produtos disponíveis
     public PromocaoDialog(Frame owner, List<ProdutoOutput> todosProdutosDisponiveis) {
         super(owner, "Nova Promoção", true);
         setupUI(owner, todosProdutosDisponiveis);
-        idField.setText("<Gerado Automaticamente>"); // Indica que o ID será gerado
-        ativaCheckBox.setSelected(true); // Nova promoção ativa por padrão
+        idField.setText("<Gerado Automaticamente>");
+        ativaCheckBox.setSelected(true);
     }
 
-    // Construtor para editar promoção - agora recebe lista de produtos disponíveis E a promoção a ser editada
     public PromocaoDialog(Frame owner, PromocaoOutput promocao, List<ProdutoOutput> todosProdutosDisponiveis) {
         super(owner, "Editar Promoção", true);
         this.originalPromocaoId = promocao.id();
@@ -72,26 +67,22 @@ public class PromocaoDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Painel para os campos básicos da promoção
         JPanel basicInfoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints basicGbc = new GridBagConstraints();
         basicGbc.insets = new Insets(5, 5, 5, 5);
         basicGbc.anchor = GridBagConstraints.WEST;
 
-        // ID
         basicGbc.gridx = 0; basicGbc.gridy = 0; basicInfoPanel.add(new JLabel("ID:"), basicGbc);
         basicGbc.gridx = 1; basicGbc.fill = GridBagConstraints.HORIZONTAL; basicGbc.weightx = 1.0;
         idField = new JTextField(20);
         idField.setEditable(false);
         basicInfoPanel.add(idField, basicGbc);
 
-        // Nome
         basicGbc.gridx = 0; basicGbc.gridy = 1; basicInfoPanel.add(new JLabel("Nome:"), basicGbc);
         basicGbc.gridx = 1;
         nomeField = new JTextField(20);
         basicInfoPanel.add(nomeField, basicGbc);
 
-        // Tipo de Desconto
         basicGbc.gridx = 0; basicGbc.gridy = 2; basicInfoPanel.add(new JLabel("Tipo Desconto:"), basicGbc);
         basicGbc.gridx = 1;
         tipoDescontoComboBox = new JComboBox<>(new String[]{
@@ -100,13 +91,11 @@ public class PromocaoDialog extends JDialog {
         });
         basicInfoPanel.add(tipoDescontoComboBox, basicGbc);
 
-        // Valor de Desconto
         basicGbc.gridx = 0; basicGbc.gridy = 3; basicInfoPanel.add(new JLabel("Valor/Percentual:"), basicGbc);
         basicGbc.gridx = 1;
         valorDescontoField = new JTextField(10);
         basicInfoPanel.add(valorDescontoField, basicGbc);
 
-        // Data Início
         basicGbc.gridx = 0; basicGbc.gridy = 4; basicInfoPanel.add(new JLabel("Data Início (dd/MM/yyyy HH:mm):"), basicGbc);
         basicGbc.gridx = 1;
         dataInicioField = new JFormattedTextField(new DateFormatter(SIMPLE_DATE_FORMAT));
@@ -114,7 +103,6 @@ public class PromocaoDialog extends JDialog {
         dataInicioField.setValue(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
         basicInfoPanel.add(dataInicioField, basicGbc);
 
-        // Data Fim
         basicGbc.gridx = 0; basicGbc.gridy = 5; basicInfoPanel.add(new JLabel("Data Fim (dd/MM/yyyy HH:mm):"), basicGbc);
         basicGbc.gridx = 1;
         dataFimField = new JFormattedTextField(new DateFormatter(SIMPLE_DATE_FORMAT));
@@ -122,32 +110,25 @@ public class PromocaoDialog extends JDialog {
         dataFimField.setValue(Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant()));
         basicInfoPanel.add(dataFimField, basicGbc);
 
-        // Ativa
         basicGbc.gridx = 0; basicGbc.gridy = 6;
         ativaCheckBox = new JCheckBox("Ativa");
         basicGbc.gridwidth = 2; basicGbc.anchor = GridBagConstraints.CENTER;
         basicInfoPanel.add(ativaCheckBox, basicGbc);
 
-        // Adiciona o painel de informações básicas ao diálogo
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weightx = 0.5; gbc.weighty = 1.0;
         add(basicInfoPanel, gbc);
 
-
-        // --- Painel de Seleção de Produtos (mesma lógica do PromocaoFrame, mas aqui no diálogo) ---
         JPanel produtosSelectionPanel = new JPanel(new GridBagLayout());
         GridBagConstraints prodSelGbc = new GridBagConstraints();
         prodSelGbc.insets = new Insets(5, 5, 5, 5);
         prodSelGbc.fill = GridBagConstraints.BOTH;
 
-        // Label para Produtos Disponíveis
         prodSelGbc.gridx = 0; prodSelGbc.gridy = 0; prodSelGbc.weightx = 0.5;
         produtosSelectionPanel.add(new JLabel("Produtos Disponíveis:"), prodSelGbc);
 
-        // Label para Produtos Selecionados
         prodSelGbc.gridx = 2; prodSelGbc.gridy = 0; prodSelGbc.weightx = 0.5;
         produtosSelectionPanel.add(new JLabel("Produtos na Promoção:"), prodSelGbc);
 
-        // Lista de Produtos Disponíveis
         prodSelGbc.gridx = 0; prodSelGbc.gridy = 1; prodSelGbc.weighty = 1.0;
         produtosDisponiveisModel = new DefaultListModel<>();
         produtosDisponiveisList = new JList<>(produtosDisponiveisModel);
@@ -165,7 +146,6 @@ public class PromocaoDialog extends JDialog {
         produtosDisponiveisList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         produtosSelectionPanel.add(new JScrollPane(produtosDisponiveisList), prodSelGbc);
 
-        // Painel de Botões de Transferência ( > e < )
         prodSelGbc.gridx = 1; prodSelGbc.gridy = 1; prodSelGbc.weightx = 0; prodSelGbc.fill = GridBagConstraints.NONE;
         JPanel transferButtonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints transferGbc = new GridBagConstraints();
@@ -178,11 +158,10 @@ public class PromocaoDialog extends JDialog {
         transferButtonPanel.add(removeProdutoButton, transferGbc);
         produtosSelectionPanel.add(transferButtonPanel, prodSelGbc);
 
-        // Lista de Produtos Selecionados para a Promoção
         prodSelGbc.gridx = 2; prodSelGbc.gridy = 1; prodSelGbc.weighty = 1.0; prodSelGbc.fill = GridBagConstraints.BOTH;
         produtosSelecionadosModel = new DefaultListModel<>();
         produtosSelecionadosList = new JList<>(produtosSelecionadosModel);
-        // Renderer para exibir ProdutoOutput de forma amigável
+
         produtosSelecionadosList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -196,11 +175,9 @@ public class PromocaoDialog extends JDialog {
         produtosSelecionadosList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         produtosSelectionPanel.add(new JScrollPane(produtosSelecionadosList), prodSelGbc);
 
-        // Adiciona o painel de seleção de produtos ao diálogo
         gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weightx = 0.5; gbc.weighty = 1.0;
         add(produtosSelectionPanel, gbc);
 
-        // Botões Salvar/Cancelar (agora no final de tudo)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         saveButton = new JButton("Salvar");
         cancelButton = new JButton("Cancelar");
@@ -211,11 +188,8 @@ public class PromocaoDialog extends JDialog {
         gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.EAST;
         add(buttonPanel, gbc);
 
-        // Preenche a lista de produtos disponíveis
         setProdutosDisponiveis(todosProdutosDisponiveis);
 
-
-        // Listeners
         saveButton.addActionListener(e -> onSave());
         cancelButton.addActionListener(e -> onCancel());
         addProdutoButton.addActionListener(e -> addSelectedProducts());
@@ -239,8 +213,7 @@ public class PromocaoDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "Erro ao carregar datas: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
 
-        // NOVO: Carregar produtos selecionados da promoção
-        // CORREÇÃO: Converter DefaultListModel para List antes de usar stream()
+
         List<ProdutoOutput> produtosDisponiveisListTemp = new ArrayList<>();
         for (int i = 0; i < produtosDisponiveisModel.size(); i++) {
             produtosDisponiveisListTemp.add(produtosDisponiveisModel.getElementAt(i));
@@ -250,10 +223,6 @@ public class PromocaoDialog extends JDialog {
                 .filter(p -> promocao.produtoIds().contains(p.id()))
                 .collect(Collectors.toList());
         setSelectedProdutos(produtosNaPromocao);
-        // Opcional: Remover os produtos selecionados da lista de disponíveis
-        // Mas para edição, é mais fácil mantê-los em ambas as listas se a interface é de arrastar/soltar
-        // Ou, se a interface permite, remover da lista de disponíveis o que já está selecionado para evitar confusão.
-        // Por simplicidade, vamos manter ambos visíveis aqui, mas você pode ajustar a lógica se preferir.
     }
 
     private void onSave() {
@@ -262,7 +231,6 @@ public class PromocaoDialog extends JDialog {
             return;
         }
         try {
-            // Usa replace para garantir que vírgulas sejam tratadas como pontos para BigDecimal
             new BigDecimal(valorDescontoField.getText().replace(",", "."));
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Valor/Percentual de desconto inválido. Use um número válido.", "Erro de Validação", JOptionPane.WARNING_MESSAGE);
@@ -307,7 +275,6 @@ public class PromocaoDialog extends JDialog {
         return saved;
     }
 
-    // --- Métodos para manipulação das listas de produtos no diálogo ---
     public void setProdutosDisponiveis(List<ProdutoOutput> produtos) {
         produtosDisponiveisModel.clear();
         for (ProdutoOutput p : produtos) {
@@ -360,7 +327,7 @@ public class PromocaoDialog extends JDialog {
 
         LocalDateTime dataInicio = ((Date) dataInicioField.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime dataFim = ((Date) dataFimField.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        List<String> produtoIds = getSelectedProdutoIds(); // Pega os IDs dos produtos selecionados
+        List<String> produtoIds = getSelectedProdutoIds();
 
         return new CriarPromocaoInput(nome, tipoDesconto, valorDesconto, dataInicio, dataFim, produtoIds);
     }
@@ -374,7 +341,7 @@ public class PromocaoDialog extends JDialog {
 
         LocalDateTime dataInicio = ((Date) dataInicioField.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime dataFim = ((Date) dataFimField.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        List<String> produtoIds = getSelectedProdutoIds(); // Pega os IDs dos produtos selecionados
+        List<String> produtoIds = getSelectedProdutoIds();
 
         return new AtualizarPromocaoInput(
                 originalPromocaoId,
@@ -384,7 +351,7 @@ public class PromocaoDialog extends JDialog {
                 Optional.ofNullable(dataInicio),
                 Optional.ofNullable(dataFim),
                 Optional.of(ativaCheckBox.isSelected()),
-                Optional.of(produtoIds) // Passa a lista de IDs de produtos no Optional
+                Optional.of(produtoIds)
         );
     }
 }

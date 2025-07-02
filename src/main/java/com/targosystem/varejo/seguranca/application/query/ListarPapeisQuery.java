@@ -2,7 +2,6 @@ package com.targosystem.varejo.seguranca.application.query;
 
 import com.targosystem.varejo.seguranca.application.output.PapelOutput;
 import com.targosystem.varejo.seguranca.domain.repository.PapelRepository;
-import com.targosystem.varejo.seguranca.domain.repository.UsuarioRepository;
 
 import java.util.List;
 import java.util.Objects;

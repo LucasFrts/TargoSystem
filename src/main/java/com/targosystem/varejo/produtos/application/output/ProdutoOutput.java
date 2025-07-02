@@ -1,6 +1,6 @@
 package com.targosystem.varejo.produtos.application.output;
 
-import com.targosystem.varejo.produtos.domain.model.Produto; // Ensure Produto is imported
+import com.targosystem.varejo.produtos.domain.model.Produto;
 import java.time.LocalDateTime;
 
 public record ProdutoOutput(
@@ -10,12 +10,12 @@ public record ProdutoOutput(
         String codigoBarras,
         String categoriaNome,
         String marca,
-        String precoSugerido, // String for UI formatting
+        String precoSugerido,
         boolean ativo,
         LocalDateTime dataCadastro,
         LocalDateTime ultimaAtualizacao
 ) {
-    public static ProdutoOutput from(Produto produto) { // Use the fully qualified class name or import properly
+    public static ProdutoOutput from(Produto produto) {
         return new ProdutoOutput(
                 produto.getId().value(),
                 produto.getNome(),

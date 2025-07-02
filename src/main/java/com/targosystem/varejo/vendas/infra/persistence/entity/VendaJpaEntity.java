@@ -2,8 +2,7 @@ package com.targosystem.varejo.vendas.infra.persistence.entity;
 
 import com.targosystem.varejo.vendas.domain.model.Venda;
 import com.targosystem.varejo.vendas.domain.model.VendaId;
-import com.targosystem.varejo.clientes.infra.persistence.entity.ClienteJpaEntity; // Importe ClienteJpaEntity
-import com.targosystem.varejo.clientes.domain.model.Cliente; // Importe Cliente do domínio
+import com.targosystem.varejo.clientes.infra.persistence.entity.ClienteJpaEntity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -75,7 +74,7 @@ public class VendaJpaEntity {
 
         venda.getItens().forEach(itemDomain -> {
             ItemVendaJpaEntity itemJpa = ItemVendaJpaEntity.fromDomain(itemDomain, vendaJpa);
-            vendaJpa.addIten(itemJpa); // Adiciona e seta a referência venda
+            vendaJpa.addIten(itemJpa);
         });
 
         return vendaJpa;
@@ -118,7 +117,6 @@ public class VendaJpaEntity {
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) { this.dataAtualizacao = dataAtualizacao; }
 
-    // Helper methods to manage bi-directional relationship (important for OneToMany/ManyToOne)
     public void addIten(ItemVendaJpaEntity item) {
         if (item == null) {
             return;
@@ -127,7 +125,7 @@ public class VendaJpaEntity {
             itens = new ArrayList<>();
         }
         itens.add(item);
-        item.setVenda(this); // Set the parent VendaJpaEntity on the child item
+        item.setVenda(this);
     }
 
     public void removeIten(ItemVendaJpaEntity item) {
@@ -135,6 +133,6 @@ public class VendaJpaEntity {
             return;
         }
         itens.remove(item);
-        item.setVenda(null); // Clear the parent VendaJpaEntity on the child item
+        item.setVenda(null);
     }
 }

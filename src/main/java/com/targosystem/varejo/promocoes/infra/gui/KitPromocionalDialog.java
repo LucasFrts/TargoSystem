@@ -11,8 +11,6 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class KitPromocionalDialog extends JDialog {
 
@@ -90,7 +88,6 @@ public class KitPromocionalDialog extends JDialog {
             produtosDisponiveisModel.addElement(p);
         }
         produtosDisponiveisList = new JList<>(produtosDisponiveisModel);
-        // Exemplo de como renderizar ProdutoOutput na JList (se ProdutoOutput não tiver toString adequado)
         produtosDisponiveisList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -107,7 +104,6 @@ public class KitPromocionalDialog extends JDialog {
         gbc.gridx = 2;
         produtosSelecionadosModel = new DefaultListModel<>();
         produtosSelecionadosList = new JList<>(produtosSelecionadosModel);
-        // Exemplo de como renderizar ProdutoOutput na JList (se ProdutoOutput não tiver toString adequado)
         produtosSelecionadosList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -157,7 +153,6 @@ public class KitPromocionalDialog extends JDialog {
     private void addSelectedProducts() {
         List<ProdutoOutput> selected = produtosDisponiveisList.getSelectedValuesList();
         for (ProdutoOutput p : selected) {
-            // Verifica se o produto já está na lista para evitar duplicatas visuais (compara por ID)
             boolean found = false;
             for(int i = 0; i < produtosSelecionadosModel.size(); i++) {
                 if(produtosSelecionadosModel.getElementAt(i).id().equals(p.id())) {
@@ -184,12 +179,8 @@ public class KitPromocionalDialog extends JDialog {
         descricaoArea.setText(kit.descricao());
         precoFixoKitField.setText(kit.precoFixoKit().toPlainString());
 
-        // Carrega produtos do kit existente para a lista de selecionados
         produtosSelecionadosModel.clear();
         for (KitItemOutput item : kit.itens()) {
-            // Reconstroi um ProdutoOutput a partir do ItemKitOutput para exibir na lista.
-            // Para isso, assumimos que ProdutoOutput tem um construtor que aceita ID, nome, etc.
-            // O ProdutoOutput retornado aqui terá o nome que veio do KitPromocionalOutput já enriquecido.
             produtosSelecionadosModel.addElement(
                     new ProdutoOutput(item.produtoId(), item.nomeProduto(), null, null, null, null, null, false, null, null)
             );
@@ -229,9 +220,7 @@ public class KitPromocionalDialog extends JDialog {
         List<KitItemInput> itens = new ArrayList<>();
         for (int i = 0; i < produtosSelecionadosModel.size(); i++) {
             ProdutoOutput p = produtosSelecionadosModel.getElementAt(i);
-            // IMPORTANTE: Aqui você pode adicionar um diálogo para perguntar a quantidade,
-            // ou assumir 1 como padrão se não for implementada a seleção de quantidade por item.
-            itens.add(new KitItemInput(p.id(), 1)); // Assumindo quantidade 1 para cada item no kit
+            itens.add(new KitItemInput(p.id(), 1));
         }
 
         return new CriarKitPromocionalInput(
@@ -241,8 +230,4 @@ public class KitPromocionalDialog extends JDialog {
                 itens
         );
     }
-
-    // Para Atualizar Kit Promocional, você precisaria de um input similar
-    // AtualizarKitPromocionalInput e um método getAtualizarKitPromocionalInput()
-    // Mas para o escopo inicial, vamos focar na criação.
 }

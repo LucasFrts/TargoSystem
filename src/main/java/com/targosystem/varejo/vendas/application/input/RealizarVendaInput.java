@@ -5,7 +5,7 @@ import java.util.List;
 import com.targosystem.varejo.produtos.domain.model.ProdutoId; // Certifique-se de que ProdutoId é usado no input
 
 public record RealizarVendaInput(
-        String idCliente, // Apenas o ID do cliente
+        String idCliente,
         List<ItemVendaInput> itens,
         BigDecimal valorDesconto
 ) {

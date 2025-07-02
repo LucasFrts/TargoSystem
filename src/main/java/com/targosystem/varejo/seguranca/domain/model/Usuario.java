@@ -10,13 +10,13 @@ import java.util.Set;
 public class Usuario {
     private final UsuarioId id;
     private String username;
-    private String passwordHash; // O hash da senha, não a senha em texto plano
+    private String passwordHash;
     private String nomeCompleto;
     private String email;
     private boolean ativo;
     private final LocalDateTime dataCadastro;
     private LocalDateTime ultimoLogin;
-    private Set<Papel> papeis; // Set de papéis do usuário
+    private Set<Papel> papeis;
 
     public Usuario(String username, String passwordHash, String nomeCompleto, String email) {
         this.id = UsuarioId.generate();

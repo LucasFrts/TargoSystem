@@ -41,8 +41,6 @@ public class AplicarDescontoVendaUseCase {
         Venda vendaSalva = vendaRepository.save(venda);
         logger.info("Desconto aplicado com sucesso à venda ID: {}. Novo valor final: {}", vendaSalva.getId().value(), vendaSalva.getValorFinal());
 
-        // eventPublisher.publish(new DescontoAplicadoVendaEvent(vendaSalva.getId().value(), input.valorDesconto()));
-
         return VendaOutput.from(vendaSalva);
     }
 }

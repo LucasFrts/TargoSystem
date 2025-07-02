@@ -20,7 +20,7 @@ public class ProdutoPanel extends JPanel {
     private JTextField nomeField;
     private JTextArea descricaoArea;
     private JTextField codigoBarrasField;
-    private JComboBox<String> categoriaComboBox; // Alterado de JTextField para JComboBox
+    private JComboBox<String> categoriaComboBox;
     private JTextField marcaField; // Voltando para JTextField
     private JFormattedTextField precoField;
     private JButton cadastrarButton;
@@ -29,12 +29,11 @@ public class ProdutoPanel extends JPanel {
     private JTable produtosTable;
     private JScrollPane tableScrollPane;
 
-    // Constantes para limites de caracteres (ajuste conforme seu modelo de dados/DB)
-    private static final int MAX_ID_LENGTH = 36; // UUID padrão
+    private static final int MAX_ID_LENGTH = 36;
     private static final int MAX_NOME_LENGTH = 100;
     private static final int MAX_DESCRICAO_LENGTH = 500;
     private static final int MAX_CODIGO_BARRAS_LENGTH = 50;
-    private static final int MAX_CATEGORIA_LENGTH = 50; // Ainda útil para o DocumentFilter do editor do JComboBox
+    private static final int MAX_CATEGORIA_LENGTH = 50;
     private static final int MAX_MARCA_LENGTH = 50;
 
     public ProdutoPanel() {
@@ -59,20 +58,15 @@ public class ProdutoPanel extends JPanel {
         codigoBarrasField = new JTextField(25);
         ((AbstractDocument) codigoBarrasField.getDocument()).setDocumentFilter(new LengthDocumentFilter(MAX_CODIGO_BARRAS_LENGTH));
 
-        // INÍCIO DA ALTERAÇÃO PARA JComboBox DA CATEGORIA
         categoriaComboBox = new JComboBox<>();
-        categoriaComboBox.setEditable(true); // Permite digitar um novo valor
+        categoriaComboBox.setEditable(true);
 
-        // Adiciona um DocumentFilter ao editor do JComboBox para limitar o tamanho da string digitada
         JTextField categoriaEditor = (JTextField) categoriaComboBox.getEditor().getEditorComponent();
         ((AbstractDocument) categoriaEditor.getDocument()).setDocumentFilter(new LengthDocumentFilter(MAX_CATEGORIA_LENGTH));
-        // FIM DA ALTERAÇÃO PARA JComboBox DA CATEGORIA
 
-        // Marca volta a ser um JTextField
         marcaField = new JTextField(20);
         ((AbstractDocument) marcaField.getDocument()).setDocumentFilter(new LengthDocumentFilter(MAX_MARCA_LENGTH));
 
-        // Configuração para preço
         NumberFormat priceFormat = NumberFormat.getNumberInstance(new Locale("pt", "BR"));
         priceFormat.setMinimumFractionDigits(2);
         priceFormat.setMaximumFractionDigits(2);
@@ -94,9 +88,6 @@ public class ProdutoPanel extends JPanel {
         tableScrollPane = new JScrollPane(produtosTable);
         tableScrollPane.setPreferredSize(new Dimension(800, 300));
 
-        // --- Adicionar componentes ao GridBagLayout ---
-
-        // Linha 0: ID
         gbc.gridx = 0; gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -122,7 +113,6 @@ public class ProdutoPanel extends JPanel {
         gbc.weightx = 0.1;
         add(nomeField, gbc);
 
-        // Linha 2: Descrição
         gbc.gridx = 0; gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.NORTHEAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -136,7 +126,6 @@ public class ProdutoPanel extends JPanel {
         gbc.weighty = 0.1;
         add(descricaoScrollPane, gbc);
 
-        // Linha 3: Código de Barras
         gbc.gridx = 0; gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -150,7 +139,6 @@ public class ProdutoPanel extends JPanel {
         gbc.weightx = 0.1;
         add(codigoBarrasField, gbc);
 
-        // Linha 4: Categoria (agora JComboBox)
         gbc.gridx = 0; gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -161,9 +149,8 @@ public class ProdutoPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 0.1;
-        add(categoriaComboBox, gbc); // Adiciona o JComboBox de Categoria
+        add(categoriaComboBox, gbc);
 
-        // Linha 5: Marca (voltando para JTextField)
         gbc.gridx = 0; gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -174,9 +161,8 @@ public class ProdutoPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 0.1;
-        add(marcaField, gbc); // Adiciona o JTextField de Marca
+        add(marcaField, gbc);
 
-        // Linha 6: Preço Sugerido
         gbc.gridx = 0; gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
@@ -189,7 +175,6 @@ public class ProdutoPanel extends JPanel {
         gbc.weightx = 0.1;
         add(precoField, gbc);
 
-        // Painel para os botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         buttonPanel.add(cadastrarButton);
         buttonPanel.add(atualizarButton);
@@ -202,7 +187,6 @@ public class ProdutoPanel extends JPanel {
         gbc.weightx = 0;
         add(buttonPanel, gbc);
 
-        // Tabela de produtos
         gbc.gridx = 0; gbc.gridy = 8;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
@@ -210,7 +194,6 @@ public class ProdutoPanel extends JPanel {
         gbc.weighty = 1.0;
         add(tableScrollPane, gbc);
 
-        // Adicionar um listener para seleção de linha na tabela (para edição)
         produtosTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && produtosTable.getSelectedRow() != -1) {
                 int selectedRow = produtosTable.getSelectedRow();
@@ -256,13 +239,11 @@ public class ProdutoPanel extends JPanel {
         return codigoBarrasField.getText();
     }
 
-    // MÉTODO getProdutoCategoria() - AGORA DO JComboBox
     public String getProdutoCategoria() {
         Object selected = categoriaComboBox.getSelectedItem();
         return (selected != null) ? selected.toString() : "";
     }
 
-    // MÉTODO getProdutoMarca() - VOLTOU A SER DO JTextField
     public String getProdutoMarca() {
         return marcaField.getText();
     }
@@ -312,17 +293,15 @@ public class ProdutoPanel extends JPanel {
         }
     }
 
-    // NOVO MÉTODO: Para o Controller popular o JComboBox de categorias
     public void setCategorias(List<String> categorias) {
         categoriaComboBox.removeAllItems();
         for (String categoria : categorias) {
             categoriaComboBox.addItem(categoria);
         }
-        // Opcional: Selecionar o primeiro item ou deixar vazio
         if (!categorias.isEmpty()) {
             categoriaComboBox.setSelectedIndex(0);
         } else {
-            categoriaComboBox.setSelectedItem(""); // Garante que o campo esteja vazio se não houver categorias
+            categoriaComboBox.setSelectedItem("");
         }
     }
 
@@ -348,27 +327,18 @@ public class ProdutoPanel extends JPanel {
             }
         });
 
-        // Esconder colunas
         if (produtosTable.getColumnModel().getColumnCount() > 0) { // ID
             produtosTable.getColumnModel().getColumn(0).setMinWidth(0);
             produtosTable.getColumnModel().getColumn(0).setMaxWidth(0);
             produtosTable.getColumnModel().getColumn(0).setWidth(0);
         }
-        // Colunas de Marca e Descrição ainda podem ser escondidas se desejar, mas
-        // para demonstração, deixarei visíveis no exemplo, como estavam antes da última alteração.
-        // Se desejar escondê-las novamente, descomente as linhas abaixo.
-        // if (produtosTable.getColumnModel().getColumnCount() > 6) { // Marca
-        //     produtosTable.getColumnModel().getColumn(6).setMinWidth(0);
-        //     produtosTable.getColumnModel().getColumn(6).setMaxWidth(0);
-        //     produtosTable.getColumnModel().getColumn(6).setWidth(0);
-        // }
+
         if (produtosTable.getColumnModel().getColumnCount() > 7) { // Descrição
             produtosTable.getColumnModel().getColumn(7).setMinWidth(0);
             produtosTable.getColumnModel().getColumn(7).setMaxWidth(0);
             produtosTable.getColumnModel().getColumn(7).setWidth(0);
         }
 
-        // Ajustar largura preferencial das colunas visíveis
         produtosTable.getColumnModel().getColumn(1).setPreferredWidth(150); // Nome
         produtosTable.getColumnModel().getColumn(2).setPreferredWidth(120); // Código de Barras
         produtosTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Categoria (agora visível)

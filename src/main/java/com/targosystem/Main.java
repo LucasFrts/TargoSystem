@@ -336,7 +336,6 @@ public class Main {
             }
         });
 
-        // Shutdown Hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutting down application resources...");
             if (entityManager.isOpen()) {

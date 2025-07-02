@@ -3,7 +3,6 @@ package com.targosystem.varejo.produtos.domain.model;
 import com.targosystem.varejo.shared.domain.DomainException;
 import com.targosystem.varejo.shared.domain.ValueObject;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public record ProdutoId(String value) implements ValueObject {

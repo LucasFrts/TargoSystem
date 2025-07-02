@@ -47,11 +47,8 @@ public class CategoriaJpaEntity {
      * @return A CategoriaJpaEntity correspondente.
      */
     public static CategoriaJpaEntity fromDomain(Categoria categoria) {
-        // Assume que categoria.getId() nunca é nulo, pois Categoria.java já gera o UUID.
-        // Se categoria.getId() pudesse ser nulo para uma nova categoria, JPA faria a geração.
-        // Mas como estamos gerando no domínio, o ID já virá preenchido.
         return new CategoriaJpaEntity(
-                categoria.getId().value(), // Pega o valor String do CategoriaId
+                categoria.getId().value(),
                 categoria.getNome(),
                 categoria.getDescricao(),
                 categoria.getDataCriacao(),
@@ -61,7 +58,7 @@ public class CategoriaJpaEntity {
 
     public Categoria toDomain() {
         return new Categoria(
-                new CategoriaId(this.id), // Constrói CategoriaId a partir da String
+                new CategoriaId(this.id),
                 this.nome,
                 this.descricao,
                 this.dataCriacao,

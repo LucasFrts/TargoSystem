@@ -1,6 +1,5 @@
 package com.targosystem.varejo.vendas.infra.integration;
 
-import com.targosystem.varejo.produtos.domain.model.ProdutoId; // Import ProdutoId from the Products BC
 import com.targosystem.varejo.shared.infra.EventPublisher;
 import com.targosystem.varejo.shared.infra.SolicitacaoBaixaEstoqueEvent;
 import com.targosystem.varejo.shared.infra.SolicitacaoReposicaoEstoqueEvent;

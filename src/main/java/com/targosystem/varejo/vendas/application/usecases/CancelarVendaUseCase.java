@@ -8,13 +8,12 @@ import com.targosystem.varejo.vendas.domain.repository.VendaRepository;
 import com.targosystem.varejo.shared.domain.DomainException;
 import com.targosystem.varejo.shared.infra.EventPublisher;
 
-// Import the specific DTO type from EstoqueEventProducer
 import com.targosystem.varejo.vendas.infra.integration.EstoqueEventProducer;
-import com.targosystem.varejo.vendas.infra.integration.ProdutoParaEstoqueInfo; // Import the nested record
+import com.targosystem.varejo.vendas.infra.integration.ProdutoParaEstoqueInfo;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors; // Import Collectors for stream operations
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class CancelarVendaUseCase {
     private static final Logger logger = LoggerFactory.getLogger(CancelarVendaUseCase.class);
 
     private final VendaRepository vendaRepository;
-    private final EstoqueEventProducer estoqueEventProducer; // Para notificar o BC de Estoque (repor itens)
+    private final EstoqueEventProducer estoqueEventProducer;
     private final EventPublisher eventPublisher;
 
     public CancelarVendaUseCase(VendaRepository vendaRepository, EstoqueEventProducer estoqueEventProducer, EventPublisher eventPublisher) {

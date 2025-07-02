@@ -2,7 +2,7 @@ package com.targosystem.varejo.vendas.application;
 
 import com.targosystem.varejo.vendas.application.input.RealizarVendaInput;
 import com.targosystem.varejo.vendas.application.input.CancelarVendaInput;
-import com.targosystem.varejo.vendas.application.input.AplicarDescontoVendaInput; // NOVO
+import com.targosystem.varejo.vendas.application.input.AplicarDescontoVendaInput;
 
 import com.targosystem.varejo.vendas.application.output.VendaOutput;
 
@@ -11,7 +11,7 @@ import com.targosystem.varejo.vendas.application.query.ListarTodasVendasQuery;
 
 import com.targosystem.varejo.vendas.application.usecases.RealizarVendaUseCase;
 import com.targosystem.varejo.vendas.application.usecases.CancelarVendaUseCase;
-import com.targosystem.varejo.vendas.application.usecases.AplicarDescontoVendaUseCase; // NOVO
+import com.targosystem.varejo.vendas.application.usecases.AplicarDescontoVendaUseCase;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +20,7 @@ public class VendaService {
 
     private final RealizarVendaUseCase realizarVendaUseCase;
     private final CancelarVendaUseCase cancelarVendaUseCase;
-    private final AplicarDescontoVendaUseCase aplicarDescontoVendaUseCase; // NOVO
+    private final AplicarDescontoVendaUseCase aplicarDescontoVendaUseCase;
 
     private final ConsultarVendaPorIdQuery consultarVendaPorIdQuery;
     private final ListarTodasVendasQuery listarTodasVendasQuery;
